@@ -1,0 +1,1 @@
+g++ -o /home/alif/_tools/_developed/verilog-10.0/lib/ivl/conquest.tgt -fpic -shared concolic.cpp event.cpp expr.cpp misc.cpp numbers.cpp scope.cpp stmt.cpp globals.cpp logic_lpm.cpp smt_lib.cpp simulation.cpp -I/home/alif/_tools/_developed/verilog-10.0/include/iverilog -I. -I/home/alif/_tools/_developed/verilog-10.0 -lyices -g -std=c++11 -Wall -Og -Wno-unused-result

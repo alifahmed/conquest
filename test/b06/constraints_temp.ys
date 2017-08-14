@@ -1,0 +1,94 @@
+(include "defines.ys")
+(assert (= state_1   0b000)) ;2 NB
+(assert (= cc_mux_1   0b00)) ;3 NB
+(assert (= enable_count_1   0b0)) ;4 NB
+(assert (= ackout_1   0b0)) ;5 NB
+(assert (= uscite_1   0b00)) ;6 NB
+
+;------------------------------------------------CLK 1-----------------------------------------------
+(assert (= (bv-comp cont_eql_1 0b1)   0b0)) ;8 BR
+(assert (= ackout_2   0b1)) ;11 NB
+(assert (= enable_count_2   0b1)) ;12 NB
+(assert (= state_1   0b000)) ;13 CS
+(assert (= cc_mux_2   0b01)) ;14 NB
+(assert (= uscite_2   0b01)) ;15 NB
+(assert (= state_2   0b001)) ;16 NB
+
+;------------------------------------------------CLK 2-----------------------------------------------
+(assert (= (bv-comp cont_eql_2 0b1)   0b1)) ;7 BR
+(assert (= ackout_3   0b0)) ;9 NB
+(assert (= enable_count_3   0b0)) ;10 NB
+(assert (= state_2   0b001)) ;17 CS
+(assert (= (bv-comp eql_2 0b1)   0b0)) ;19 BR
+(assert (= uscite_3   0b01)) ;23 NB
+(assert (= cc_mux_3   0b10)) ;24 NB
+(assert (= state_3   0b101)) ;25 NB
+
+;------------------------------------------------CLK 3-----------------------------------------------
+(assert (= (bv-comp cont_eql_3 0b1)   0b1)) ;7 BR
+(assert (= ackout_4   0b0)) ;9 NB
+(assert (= enable_count_4   0b0)) ;10 NB
+(assert (= state_3   0b101)) ;26 CS
+(assert (= (bv-comp eql_3 0b1)   0b1)) ;27 BR
+(assert (= uscite_4   0b00)) ;29 NB
+(assert (= cc_mux_4   0b11)) ;30 NB
+(assert (= state_4   0b100)) ;31 NB
+
+;------------------------------------------------CLK 4-----------------------------------------------
+(assert (= (bv-comp cont_eql_4 0b1)   0b1)) ;7 BR
+(assert (= ackout_5   0b0)) ;9 NB
+(assert (= enable_count_5   0b0)) ;10 NB
+(assert (= state_4   0b100)) ;55 CS
+(assert (= (bv-comp eql_4 0b1)   0b0)) ;57 BR
+(assert (= uscite_5   0b11)) ;61 NB
+(assert (= cc_mux_5   0b10)) ;62 NB
+(assert (= state_5   0b110)) ;63 NB
+
+;------------------------------------------------CLK 5-----------------------------------------------
+(assert (= (bv-comp cont_eql_5 0b1)   0b1)) ;7 BR
+(assert (= ackout_6   0b0)) ;9 NB
+(assert (= enable_count_6   0b0)) ;10 NB
+(assert (= state_5   0b110)) ;64 CS
+(assert (= (bv-comp eql_5 0b1)   0b1)) ;65 BR
+(assert (= uscite_6   0b11)) ;67 NB
+(assert (= cc_mux_6   0b10)) ;68 NB
+(assert (= state_6   0b110)) ;69 NB
+
+;------------------------------------------------CLK 6-----------------------------------------------
+(assert (= (bv-comp cont_eql_6 0b1)   0b0)) ;8 BR
+(assert (= ackout_7   0b1)) ;11 NB
+(assert (= enable_count_7   0b1)) ;12 NB
+(assert (= state_6   0b110)) ;64 CS
+(assert (= (bv-comp eql_6 0b1)   0b0)) ;66 BR
+(assert (= uscite_7   0b01)) ;70 NB
+(assert (= cc_mux_7   0b01)) ;71 NB
+(assert (= state_7   0b001)) ;72 NB
+
+;------------------------------------------------CLK 7-----------------------------------------------
+(assert (= (bv-comp cont_eql_7 0b1)   0b1)) ;7 BR
+(assert (= ackout_8   0b0)) ;9 NB
+(assert (= enable_count_8   0b0)) ;10 NB
+(assert (= state_7   0b001)) ;17 CS
+(assert (= (bv-comp eql_7 0b1)   0b0)) ;19 BR
+(assert (= uscite_8   0b01)) ;23 NB
+(assert (= cc_mux_8   0b10)) ;24 NB
+(assert (= state_8   0b101)) ;25 NB
+
+;------------------------------------------------CLK 8-----------------------------------------------
+(assert (= (bv-comp cont_eql_8 0b1)   0b0)) ;8 BR
+(assert (= ackout_9   0b1)) ;11 NB
+(assert (= enable_count_9   0b1)) ;12 NB
+(assert (= state_8   0b101)) ;26 CS
+(assert (= (bv-comp eql_8 0b1)   0b1)) ;27 BR
+(assert (= uscite_9   0b00)) ;29 NB
+(assert (= cc_mux_9   0b11)) ;30 NB
+(assert (= state_9   0b100)) ;31 NB
+
+;------------------------------------------------CLK 9-----------------------------------------------
+(assert (= (bv-comp cont_eql_9 0b1)   0b1)) ;7 BR
+(assert (= ackout_10   0b0)) ;9 NB
+(assert (= enable_count_10   0b0)) ;10 NB
+(assert (= state_9   0b100)) ;55 CS
+(assert (= (bv-comp eql_9 0b1)   0b1)) ;56 BR
+(check)
+(show-model)

@@ -1,0 +1,48 @@
+IVERILOG_DIR = /home/alif/_tools/_developed/verilog-10.0
+IVERILOG_BIN = $(IVERILOG_DIR)/bin
+IVERILOG_LIB = $(IVERILOG_DIR)/lib/ivl
+IVERILOG_INC = $(IVERILOG_DIR)/include/iverilog
+CONC_TEST_DIR = tests
+
+OBJ_FLAT = flattened.v
+OBJ_INST = instrumented.v
+
+FLATTEN_ROOT = /home/alif/_tools/DesignPlayer/08JAN2017
+
+
+.PHONY: all clean
+
+ifeq ($(IS_FLATTENED),true)
+all:
+	@rm -rf $(CONC_TEST_DIR)
+	@mkdir -p $(CONC_TEST_DIR)
+	@$(IVERILOG_BIN)/iverilog -f files.f -o $(OBJ_INST) -t concolic \
+		-ptb=tb_concolic.v -pclk=$(CLK_NAME) -preset=$(RESET_NAME) -preset_edge=$(RESET_EDGE) \
+		-punroll=$(UNROLL_CYC)
+	@rm -rf tmp_alif_concolic_debug.txt
+	
+else
+all: $(OBJ_FLAT)
+	@rm -rf $(CONC_TEST_DIR)
+	@mkdir -p $(CONC_TEST_DIR)
+	@$(IVERILOG_BIN)/iverilog $(OBJ_FLAT) -o $(OBJ_INST) -t concolic \
+		-ptb=tb_concolic.v -pclk=$(CLK_NAME) -preset=$(RESET_NAME) -preset_edge=$(RESET_EDGE) \
+		-punroll=$(UNROLL_CYC)
+	@rm -rf tmp_alif_concolic_debug.txt
+
+$(OBJ_FLAT): $(OBJ_SRC)
+	@flattenverilog -f files.f -top $(TOP_MODULE) -quiet -nobanner -out $(OBJ_FLAT) -remove_unused_nets
+	@rm -rf flattenverilog.log
+endif
+
+
+clean:
+	@rm -rf $(CONC_TEST_DIR)
+	@rm -rf *.ys
+	@rm -rf *.v
+	@rm -rf *.out
+	@rm -rf data.mem
+	@rm -rf *.txt
+	@rm -rf *.vvp
+	@rm -rf *.log
+	@echo "--------------CLEANED---------------"

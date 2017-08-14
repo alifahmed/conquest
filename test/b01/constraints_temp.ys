@@ -1,0 +1,45 @@
+(include "defines.ys")
+(assert (= stato_1   0b000)) ;2 NB
+(assert (= outp_1   0b0)) ;3 NB
+(assert (= overflw_1   0b0)) ;4 NB
+
+;------------------------------------------------CLK 1-----------------------------------------------
+(assert (= stato_1   0b000)) ;5 CS
+(assert (= (bv-and (bv-comp line1_1 0b1) (bv-comp line2_1 0b1))   0b0)) ;7 BR
+(assert (= stato_2   0b001)) ;9 NB
+(assert (= outp_2   (bv-or line1_1 line2_1))) ;10 NB
+(assert (= overflw_2   0b0)) ;11 NB
+
+;------------------------------------------------CLK 2-----------------------------------------------
+(assert (= stato_2   0b001)) ;19 CS
+(assert (= (bv-and (bv-comp line1_2 0b1) (bv-comp line2_2 0b1))   0b0)) ;21 BR
+(assert (= stato_3   0b010)) ;23 NB
+(assert (= outp_3   (bv-or line1_2 line2_2))) ;24 NB
+(assert (= overflw_3   0b0)) ;25 NB
+
+;------------------------------------------------CLK 3-----------------------------------------------
+(assert (= stato_3   0b010)) ;33 CS
+(assert (= (bv-and (bv-comp line1_3 0b1) (bv-comp line2_3 0b1))   0b1)) ;34 BR
+(assert (= stato_4   0b111)) ;36 NB
+(assert (= outp_4   (bv-or line1_3 line2_3))) ;38 NB
+(assert (= overflw_4   0b0)) ;39 NB
+
+;------------------------------------------------CLK 4-----------------------------------------------
+(assert (= stato_4   0b111)) ;54 CS
+(assert (= (bv-or (bv-comp line1_4 0b1) (bv-comp line2_4 0b1))   0b1)) ;55 BR
+(assert (= stato_5   0b011)) ;57 NB
+(assert (= outp_5   (bv-not (bv-or line1_4 line2_4)))) ;59 NB
+(assert (= overflw_5   0b0)) ;60 NB
+
+;------------------------------------------------CLK 5-----------------------------------------------
+(assert (= stato_5   0b011)) ;12 CS
+(assert (= (bv-and (bv-comp line1_5 0b1) (bv-comp line2_5 0b1))   0b0)) ;14 BR
+(assert (= stato_6   0b001)) ;16 NB
+(assert (= outp_6   (bv-or line1_5 line2_5))) ;17 NB
+(assert (= overflw_6   0b1)) ;18 NB
+
+;------------------------------------------------CLK 6-----------------------------------------------
+(assert (= stato_6   0b001)) ;19 CS
+(assert (= (bv-and (bv-comp line1_6 0b1) (bv-comp line2_6 0b1))   0b1)) ;20 BR
+(check)
+(show-model)

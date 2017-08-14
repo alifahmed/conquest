@@ -1,0 +1,322 @@
+(include "defines.ys")
+(assert (= stato_1   0b0000)) ;2 NB
+(assert (= r_in_1   0b000000)) ;3 NB
+(assert (= cont_1   0b000000)) ;4 NB
+(assert (= cont1_1   0b000000000)) ;5 NB
+(assert (= x_out_1   0b000000)) ;6 NB
+(assert (= zeros_1   0b000000000)) ;7 NB
+
+;------------------------------------------------CLK 1-----------------------------------------------
+(assert (= stato_1   0b0000)) ;8 CS
+(assert (= cont_2   0b000000)) ;9 NB
+(assert (= r_in_2   x_in_1)) ;10 NB
+(assert (= x_out_2   0b000000)) ;11 NB
+(assert (= stato_2   0b0001)) ;12 NB
+
+;------------------------------------------------CLK 2-----------------------------------------------
+(assert (= stato_2   0b0001)) ;13 CS
+(assert (= r_in_3   x_in_2)) ;14 NB
+(assert (= (bv-comp stbi_2 0b1)   0b0)) ;16 BR
+(assert (= stato_3   0b0010)) ;18 NB
+
+;------------------------------------------------CLK 3-----------------------------------------------
+(assert (= stato_3   0b0010)) ;19 CS
+(assert (= (bv-or (bv-comp r_in_3 0b000000) (bv-comp r_in_3 0b111111))   0b1)) ;20 BR
+(assert (= (bool-to-bv (bv-lt cont_2 0b011001))   0b1)) ;22 BR
+(assert (= cont_3   (bv-add cont_2 0b000001))) ;24 NB
+(assert (= cont1_2   (bv-concat 0b000 r_in_3))) ;26 NB
+(assert (= stato_4   0b1000)) ;27 NB
+
+;------------------------------------------------CLK 4-----------------------------------------------
+(assert (= stato_4   0b1000)) ;69 CS
+(assert (= (bool-to-bv (bv-lt cont1_2 zeros_1))   0b0)) ;71 BR
+(assert (= x_out_3   (bv-extract 5 0 cont1_2))) ;73 NB
+(assert (= stato_5   0b0001)) ;74 NB
+
+;------------------------------------------------CLK 5-----------------------------------------------
+(assert (= stato_5   0b0001)) ;13 CS
+(assert (= r_in_4   x_in_5)) ;14 NB
+(assert (= (bv-comp stbi_5 0b1)   0b0)) ;16 BR
+(assert (= stato_6   0b0010)) ;18 NB
+
+;------------------------------------------------CLK 6-----------------------------------------------
+(assert (= stato_6   0b0010)) ;19 CS
+(assert (= (bv-or (bv-comp r_in_4 0b000000) (bv-comp r_in_4 0b111111))   0b1)) ;20 BR
+(assert (= (bool-to-bv (bv-lt cont_3 0b011001))   0b1)) ;22 BR
+(assert (= cont_4   (bv-add cont_3 0b000001))) ;24 NB
+(assert (= cont1_3   (bv-concat 0b000 r_in_4))) ;26 NB
+(assert (= stato_7   0b1000)) ;27 NB
+
+;------------------------------------------------CLK 7-----------------------------------------------
+(assert (= stato_7   0b1000)) ;69 CS
+(assert (= (bool-to-bv (bv-lt cont1_3 zeros_1))   0b0)) ;71 BR
+(assert (= x_out_4   (bv-extract 5 0 cont1_3))) ;73 NB
+(assert (= stato_8   0b0001)) ;74 NB
+
+;------------------------------------------------CLK 8-----------------------------------------------
+(assert (= stato_8   0b0001)) ;13 CS
+(assert (= r_in_5   x_in_8)) ;14 NB
+(assert (= (bv-comp stbi_8 0b1)   0b0)) ;16 BR
+(assert (= stato_9   0b0010)) ;18 NB
+
+;------------------------------------------------CLK 9-----------------------------------------------
+(assert (= stato_9   0b0010)) ;19 CS
+(assert (= (bv-or (bv-comp r_in_5 0b000000) (bv-comp r_in_5 0b111111))   0b1)) ;20 BR
+(assert (= (bool-to-bv (bv-lt cont_4 0b011001))   0b1)) ;22 BR
+(assert (= cont_5   (bv-add cont_4 0b000001))) ;24 NB
+(assert (= cont1_4   (bv-concat 0b000 r_in_5))) ;26 NB
+(assert (= stato_10   0b1000)) ;27 NB
+
+;------------------------------------------------CLK 10-----------------------------------------------
+(assert (= stato_10   0b1000)) ;69 CS
+(assert (= (bool-to-bv (bv-lt cont1_4 zeros_1))   0b0)) ;71 BR
+(assert (= x_out_5   (bv-extract 5 0 cont1_4))) ;73 NB
+(assert (= stato_11   0b0001)) ;74 NB
+
+;------------------------------------------------CLK 11-----------------------------------------------
+(assert (= stato_11   0b0001)) ;13 CS
+(assert (= r_in_6   x_in_11)) ;14 NB
+(assert (= (bv-comp stbi_11 0b1)   0b1)) ;15 BR
+(assert (= stato_12   0b0001)) ;17 NB
+
+;------------------------------------------------CLK 12-----------------------------------------------
+(assert (= stato_12   0b0001)) ;13 CS
+(assert (= r_in_7   x_in_12)) ;14 NB
+(assert (= (bv-comp stbi_12 0b1)   0b1)) ;15 BR
+(assert (= stato_13   0b0001)) ;17 NB
+
+;------------------------------------------------CLK 13-----------------------------------------------
+(assert (= stato_13   0b0001)) ;13 CS
+(assert (= r_in_8   x_in_13)) ;14 NB
+(assert (= (bv-comp stbi_13 0b1)   0b1)) ;15 BR
+(assert (= stato_14   0b0001)) ;17 NB
+
+;------------------------------------------------CLK 14-----------------------------------------------
+(assert (= stato_14   0b0001)) ;13 CS
+(assert (= r_in_9   x_in_14)) ;14 NB
+(assert (= (bv-comp stbi_14 0b1)   0b0)) ;16 BR
+(assert (= stato_15   0b0010)) ;18 NB
+
+;------------------------------------------------CLK 15-----------------------------------------------
+(assert (= stato_15   0b0010)) ;19 CS
+(assert (= (bv-or (bv-comp r_in_9 0b000000) (bv-comp r_in_9 0b111111))   0b1)) ;20 BR
+(assert (= (bool-to-bv (bv-lt cont_5 0b011001))   0b1)) ;22 BR
+(assert (= cont_6   (bv-add cont_5 0b000001))) ;24 NB
+(assert (= cont1_5   (bv-concat 0b000 r_in_9))) ;26 NB
+(assert (= stato_16   0b1000)) ;27 NB
+
+;------------------------------------------------CLK 16-----------------------------------------------
+(assert (= stato_16   0b1000)) ;69 CS
+(assert (= (bool-to-bv (bv-lt cont1_5 zeros_1))   0b0)) ;71 BR
+(assert (= x_out_6   (bv-extract 5 0 cont1_5))) ;73 NB
+(assert (= stato_17   0b0001)) ;74 NB
+
+;------------------------------------------------CLK 17-----------------------------------------------
+(assert (= stato_17   0b0001)) ;13 CS
+(assert (= r_in_10   x_in_17)) ;14 NB
+(assert (= (bv-comp stbi_17 0b1)   0b1)) ;15 BR
+(assert (= stato_18   0b0001)) ;17 NB
+
+;------------------------------------------------CLK 18-----------------------------------------------
+(assert (= stato_18   0b0001)) ;13 CS
+(assert (= r_in_11   x_in_18)) ;14 NB
+(assert (= (bv-comp stbi_18 0b1)   0b0)) ;16 BR
+(assert (= stato_19   0b0010)) ;18 NB
+
+;------------------------------------------------CLK 19-----------------------------------------------
+(assert (= stato_19   0b0010)) ;19 CS
+(assert (= (bv-or (bv-comp r_in_11 0b000000) (bv-comp r_in_11 0b111111))   0b1)) ;20 BR
+(assert (= (bool-to-bv (bv-lt cont_6 0b011001))   0b1)) ;22 BR
+(assert (= cont_7   (bv-add cont_6 0b000001))) ;24 NB
+(assert (= cont1_6   (bv-concat 0b000 r_in_11))) ;26 NB
+(assert (= stato_20   0b1000)) ;27 NB
+
+;------------------------------------------------CLK 20-----------------------------------------------
+(assert (= stato_20   0b1000)) ;69 CS
+(assert (= (bool-to-bv (bv-lt cont1_6 zeros_1))   0b0)) ;71 BR
+(assert (= x_out_7   (bv-extract 5 0 cont1_6))) ;73 NB
+(assert (= stato_21   0b0001)) ;74 NB
+
+;------------------------------------------------CLK 21-----------------------------------------------
+(assert (= stato_21   0b0001)) ;13 CS
+(assert (= r_in_12   x_in_21)) ;14 NB
+(assert (= (bv-comp stbi_21 0b1)   0b0)) ;16 BR
+(assert (= stato_22   0b0010)) ;18 NB
+
+;------------------------------------------------CLK 22-----------------------------------------------
+(assert (= stato_22   0b0010)) ;19 CS
+(assert (= (bv-or (bv-comp r_in_12 0b000000) (bv-comp r_in_12 0b111111))   0b1)) ;20 BR
+(assert (= (bool-to-bv (bv-lt cont_7 0b011001))   0b1)) ;22 BR
+(assert (= cont_8   (bv-add cont_7 0b000001))) ;24 NB
+(assert (= cont1_7   (bv-concat 0b000 r_in_12))) ;26 NB
+(assert (= stato_23   0b1000)) ;27 NB
+
+;------------------------------------------------CLK 23-----------------------------------------------
+(assert (= stato_23   0b1000)) ;69 CS
+(assert (= (bool-to-bv (bv-lt cont1_7 zeros_1))   0b0)) ;71 BR
+(assert (= x_out_8   (bv-extract 5 0 cont1_7))) ;73 NB
+(assert (= stato_24   0b0001)) ;74 NB
+
+;------------------------------------------------CLK 24-----------------------------------------------
+(assert (= stato_24   0b0001)) ;13 CS
+(assert (= r_in_13   x_in_24)) ;14 NB
+(assert (= (bv-comp stbi_24 0b1)   0b0)) ;16 BR
+(assert (= stato_25   0b0010)) ;18 NB
+
+;------------------------------------------------CLK 25-----------------------------------------------
+(assert (= stato_25   0b0010)) ;19 CS
+(assert (= (bv-or (bv-comp r_in_13 0b000000) (bv-comp r_in_13 0b111111))   0b1)) ;20 BR
+(assert (= (bool-to-bv (bv-lt cont_8 0b011001))   0b1)) ;22 BR
+(assert (= cont_9   (bv-add cont_8 0b000001))) ;24 NB
+(assert (= cont1_8   (bv-concat 0b000 r_in_13))) ;26 NB
+(assert (= stato_26   0b1000)) ;27 NB
+
+;------------------------------------------------CLK 26-----------------------------------------------
+(assert (= stato_26   0b1000)) ;69 CS
+(assert (= (bool-to-bv (bv-lt cont1_8 zeros_1))   0b0)) ;71 BR
+(assert (= x_out_9   (bv-extract 5 0 cont1_8))) ;73 NB
+(assert (= stato_27   0b0001)) ;74 NB
+
+;------------------------------------------------CLK 27-----------------------------------------------
+(assert (= stato_27   0b0001)) ;13 CS
+(assert (= r_in_14   x_in_27)) ;14 NB
+(assert (= (bv-comp stbi_27 0b1)   0b1)) ;15 BR
+(assert (= stato_28   0b0001)) ;17 NB
+
+;------------------------------------------------CLK 28-----------------------------------------------
+(assert (= stato_28   0b0001)) ;13 CS
+(assert (= r_in_15   x_in_28)) ;14 NB
+(assert (= (bv-comp stbi_28 0b1)   0b0)) ;16 BR
+(assert (= stato_29   0b0010)) ;18 NB
+
+;------------------------------------------------CLK 29-----------------------------------------------
+(assert (= stato_29   0b0010)) ;19 CS
+(assert (= (bv-or (bv-comp r_in_15 0b000000) (bv-comp r_in_15 0b111111))   0b1)) ;20 BR
+(assert (= (bool-to-bv (bv-lt cont_9 0b011001))   0b1)) ;22 BR
+(assert (= cont_10   (bv-add cont_9 0b000001))) ;24 NB
+(assert (= cont1_9   (bv-concat 0b000 r_in_15))) ;26 NB
+(assert (= stato_30   0b1000)) ;27 NB
+
+;------------------------------------------------CLK 30-----------------------------------------------
+(assert (= stato_30   0b1000)) ;69 CS
+(assert (= (bool-to-bv (bv-lt cont1_9 zeros_1))   0b0)) ;71 BR
+(assert (= x_out_10   (bv-extract 5 0 cont1_9))) ;73 NB
+(assert (= stato_31   0b0001)) ;74 NB
+
+;------------------------------------------------CLK 31-----------------------------------------------
+(assert (= stato_31   0b0001)) ;13 CS
+(assert (= r_in_16   x_in_31)) ;14 NB
+(assert (= (bv-comp stbi_31 0b1)   0b0)) ;16 BR
+(assert (= stato_32   0b0010)) ;18 NB
+
+;------------------------------------------------CLK 32-----------------------------------------------
+(assert (= stato_32   0b0010)) ;19 CS
+(assert (= (bv-or (bv-comp r_in_16 0b000000) (bv-comp r_in_16 0b111111))   0b1)) ;20 BR
+(assert (= (bool-to-bv (bv-lt cont_10 0b011001))   0b1)) ;22 BR
+(assert (= cont_11   (bv-add cont_10 0b000001))) ;24 NB
+(assert (= cont1_10   (bv-concat 0b000 r_in_16))) ;26 NB
+(assert (= stato_33   0b1000)) ;27 NB
+
+;------------------------------------------------CLK 33-----------------------------------------------
+(assert (= stato_33   0b1000)) ;69 CS
+(assert (= (bool-to-bv (bv-lt cont1_10 zeros_1))   0b0)) ;71 BR
+(assert (= x_out_11   (bv-extract 5 0 cont1_10))) ;73 NB
+(assert (= stato_34   0b0001)) ;74 NB
+
+;------------------------------------------------CLK 34-----------------------------------------------
+(assert (= stato_34   0b0001)) ;13 CS
+(assert (= r_in_17   x_in_34)) ;14 NB
+(assert (= (bv-comp stbi_34 0b1)   0b1)) ;15 BR
+(assert (= stato_35   0b0001)) ;17 NB
+
+;------------------------------------------------CLK 35-----------------------------------------------
+(assert (= stato_35   0b0001)) ;13 CS
+(assert (= r_in_18   x_in_35)) ;14 NB
+(assert (= (bv-comp stbi_35 0b1)   0b0)) ;16 BR
+(assert (= stato_36   0b0010)) ;18 NB
+
+;------------------------------------------------CLK 36-----------------------------------------------
+(assert (= stato_36   0b0010)) ;19 CS
+(assert (= (bv-or (bv-comp r_in_18 0b000000) (bv-comp r_in_18 0b111111))   0b1)) ;20 BR
+(assert (= (bool-to-bv (bv-lt cont_11 0b011001))   0b1)) ;22 BR
+(assert (= cont_12   (bv-add cont_11 0b000001))) ;24 NB
+(assert (= cont1_11   (bv-concat 0b000 r_in_18))) ;26 NB
+(assert (= stato_37   0b1000)) ;27 NB
+
+;------------------------------------------------CLK 37-----------------------------------------------
+(assert (= stato_37   0b1000)) ;69 CS
+(assert (= (bool-to-bv (bv-lt cont1_11 zeros_1))   0b0)) ;71 BR
+(assert (= x_out_12   (bv-extract 5 0 cont1_11))) ;73 NB
+(assert (= stato_38   0b0001)) ;74 NB
+
+;------------------------------------------------CLK 38-----------------------------------------------
+(assert (= stato_38   0b0001)) ;13 CS
+(assert (= r_in_19   x_in_38)) ;14 NB
+(assert (= (bv-comp stbi_38 0b1)   0b1)) ;15 BR
+(assert (= stato_39   0b0001)) ;17 NB
+
+;------------------------------------------------CLK 39-----------------------------------------------
+(assert (= stato_39   0b0001)) ;13 CS
+(assert (= r_in_20   x_in_39)) ;14 NB
+(assert (= (bv-comp stbi_39 0b1)   0b1)) ;15 BR
+(assert (= stato_40   0b0001)) ;17 NB
+
+;------------------------------------------------CLK 40-----------------------------------------------
+(assert (= stato_40   0b0001)) ;13 CS
+(assert (= r_in_21   x_in_40)) ;14 NB
+(assert (= (bv-comp stbi_40 0b1)   0b0)) ;16 BR
+(assert (= stato_41   0b0010)) ;18 NB
+
+;------------------------------------------------CLK 41-----------------------------------------------
+(assert (= stato_41   0b0010)) ;19 CS
+(assert (= (bv-or (bv-comp r_in_21 0b000000) (bv-comp r_in_21 0b111111))   0b0)) ;21 BR
+(assert (= (bool-to-bv (bv-le r_in_21 0b011010))   0b1)) ;28 BR
+(assert (= stato_42   0b0011)) ;30 NB
+
+;------------------------------------------------CLK 42-----------------------------------------------
+(assert (= stato_42   0b0011)) ;32 CS
+(assert (= (bv-comp (bv-extract 0 0 r_in_21) 0b1)   0b1)) ;33 BR
+(assert (= cont1_12   (bv-add (bv-concat 0b000 cont_12) (bv-concat 0b000 cont_12)))) ;35 NB
+(assert (= stato_43   0b0100)) ;37 NB
+
+;------------------------------------------------CLK 43-----------------------------------------------
+(assert (= stato_43   0b0100)) ;38 CS
+(assert (= (bv-comp (bv-extract 1 1 r_in_21) 0b1)   0b0)) ;40 BR
+(assert (= cont1_13   (bv-sub (bv-concat 0b000 r_in_21) cont1_12))) ;43 NB
+(assert (= stato_44   0b0110)) ;44 NB
+
+;------------------------------------------------CLK 44-----------------------------------------------
+(assert (= stato_44   0b0110)) ;51 CS
+(assert (= (bool-to-bv (bv-gt cont1_13 0b000111111))   0b1)) ;52 BR
+(assert (= cont1_14   (bv-add cont1_13 0b000011010))) ;54 NB
+(assert (= stato_45   0b0110)) ;55 NB
+
+;------------------------------------------------CLK 45-----------------------------------------------
+(assert (= stato_45   0b0110)) ;51 CS
+(assert (= (bool-to-bv (bv-gt cont1_14 0b000111111))   0b0)) ;53 BR
+(assert (= stato_46   0b0111)) ;56 NB
+
+;------------------------------------------------CLK 46-----------------------------------------------
+(assert (= stato_46   0b0111)) ;57 CS
+(assert (= (bv-comp (bv-extract 3 2 r_in_21) 0b00)   0b1)) ;58 BR
+(assert (= cont1_15   (bv-sub cont1_14 0b000010101))) ;60 NB
+(assert (= stato_47   0b1000)) ;68 NB
+
+;------------------------------------------------CLK 47-----------------------------------------------
+(assert (= stato_47   0b1000)) ;69 CS
+(assert (= (bool-to-bv (bv-lt cont1_15 zeros_1))   0b0)) ;71 BR
+(assert (= x_out_13   (bv-extract 5 0 cont1_15))) ;73 NB
+(assert (= stato_48   0b0001)) ;74 NB
+
+;------------------------------------------------CLK 48-----------------------------------------------
+(assert (= stato_48   0b0001)) ;13 CS
+(assert (= r_in_22   x_in_48)) ;14 NB
+(assert (= (bv-comp stbi_48 0b1)   0b1)) ;15 BR
+(assert (= stato_49   0b0001)) ;17 NB
+
+;------------------------------------------------CLK 49-----------------------------------------------
+(assert (= stato_49   0b0001)) ;13 CS
+(assert (= r_in_23   x_in_49)) ;14 NB
+(assert (= (bv-comp stbi_49 0b1)   0b1)) ;15 BR
+(assert (= stato_50   0b0001)) ;17 NB
+(check)

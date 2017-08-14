@@ -1,0 +1,673 @@
+(include "defines.ys")
+(assert (= mf_1   (bv-extract 28 27 IR_0))) ;0 BL
+(assert (= df_1   (bv-extract 26 24 IR_0))) ;1 BL
+(assert (= ff_1   (bv-extract 22 19 IR_0))) ;2 BL
+(assert (= cf_1   (bv-extract 23 23 IR_0))) ;3 BL
+(assert (= tail_1   (bv-extract 19 0 IR_0))) ;4 BL
+(assert (= s_1   (bv-extract 30 29 IR_0))) ;5 BL
+(assert (= IR_1   0b0000000000000000000000000000000)) ;8 NB
+(assert (= d_1   0b00)) ;9 NB
+(assert (= rx_1   0b0000000000000000000000000000000)) ;10 NB
+(assert (= m_1   0b0000000000000000000000000000000)) ;11 NB
+(assert (= B_1   0b0)) ;12 NB
+(assert (= reg0_1   0b0000000000000000000000000000000)) ;13 NB
+(assert (= reg1_1   0b0000000000000000000000000000000)) ;14 NB
+(assert (= reg2_1   0b0000000000000000000000000000000)) ;15 NB
+(assert (= reg3_1   0b0000000000000000000000000000000)) ;16 NB
+(assert (= addr_1   0b00000000000000000000)) ;17 NB
+(assert (= rd_1   0b0)) ;18 NB
+(assert (= wr_1   0b0)) ;19 NB
+(assert (= datao_1   0b0000000000000000000000000000000)) ;20 NB
+(assert (= state_1   0b0)) ;21 NB
+
+;------------------------------------------------CLK 1-----------------------------------------------
+(assert (= state_1   0b0)) ;22 CS
+(assert (= addr_2   (bv-extract 19 0 reg3_1))) ;23 NB
+(assert (= rd_2   0b1)) ;24 NB
+(assert (= IR_2   datai_1)) ;25 NB
+(assert (= state_2   0b1)) ;26 NB
+(assert (= (bv-extract 30 29 datai_1)   0b00)) ;27 CS
+(assert (= rx_2   reg0_1)) ;28 NB
+
+;------------------------------------------------CLK 2-----------------------------------------------
+(assert (= state_2   0b1)) ;35 CS
+(assert (= cf_1   0b0)) ;143 CS
+(assert (= (bv-not (bv-comp df_1 0b111))   0b1)) ;144 BR
+(assert (= (bv-or (bv-and (bv-comp df_1 0b101) (bv-comp B_1 0b0)) (bv-and (bv-comp df_1 0b100) (bv-comp B_1 0b1)))   0b0)) ;147 BR
+(assert (= d_2   (bv-extract 1 0 df_1))) ;149 BL
+(assert (= ff_1   0b0000)) ;150 CS
+(assert (= mf_1   0b00)) ;151 CS
+(assert (= m_2   (bv-concat 0b00000000000 tail_1))) ;152 BL
+(assert (= t_1   0b0000000000000000000000000000000)) ;165 BL
+(assert (= d_2   0b00)) ;166 CS
+(assert (= reg0_2   (bv-sub t_1 m_2))) ;167 BL
+(assert (= state_3   0b0)) ;455 NB
+
+;------------------------------------------------CLK 3-----------------------------------------------
+(assert (= state_3   0b0)) ;22 CS
+(assert (= addr_3   (bv-extract 19 0 reg3_1))) ;23 NB
+(assert (= rd_3   0b1)) ;24 NB
+(assert (= IR_3   datai_3)) ;25 NB
+(assert (= state_4   0b1)) ;26 NB
+(assert (= (bv-extract 30 29 datai_3)   0b00)) ;27 CS
+(assert (= rx_3   reg0_2)) ;28 NB
+
+;------------------------------------------------CLK 4-----------------------------------------------
+(assert (= state_4   0b1)) ;35 CS
+(assert (= cf_1   0b0)) ;143 CS
+(assert (= (bv-not (bv-comp df_1 0b111))   0b1)) ;144 BR
+(assert (= (bv-or (bv-and (bv-comp df_1 0b101) (bv-comp B_1 0b0)) (bv-and (bv-comp df_1 0b100) (bv-comp B_1 0b1)))   0b0)) ;147 BR
+(assert (= d_3   (bv-extract 1 0 df_1))) ;149 BL
+(assert (= ff_1   0b0000)) ;150 CS
+(assert (= mf_1   0b00)) ;151 CS
+(assert (= m_3   (bv-concat 0b00000000000 tail_1))) ;152 BL
+(assert (= t_2   0b0000000000000000000000000000000)) ;165 BL
+(assert (= d_3   0b00)) ;166 CS
+(assert (= reg0_3   (bv-sub t_2 m_3))) ;167 BL
+(assert (= state_5   0b0)) ;455 NB
+
+;------------------------------------------------CLK 5-----------------------------------------------
+(assert (= state_5   0b0)) ;22 CS
+(assert (= addr_4   (bv-extract 19 0 reg3_1))) ;23 NB
+(assert (= rd_4   0b1)) ;24 NB
+(assert (= IR_4   datai_5)) ;25 NB
+(assert (= state_6   0b1)) ;26 NB
+(assert (= (bv-extract 30 29 datai_5)   0b00)) ;27 CS
+(assert (= rx_4   reg0_3)) ;28 NB
+
+;------------------------------------------------CLK 6-----------------------------------------------
+(assert (= state_6   0b1)) ;35 CS
+(assert (= cf_1   0b0)) ;143 CS
+(assert (= (bv-not (bv-comp df_1 0b111))   0b1)) ;144 BR
+(assert (= (bv-or (bv-and (bv-comp df_1 0b101) (bv-comp B_1 0b0)) (bv-and (bv-comp df_1 0b100) (bv-comp B_1 0b1)))   0b0)) ;147 BR
+(assert (= d_4   (bv-extract 1 0 df_1))) ;149 BL
+(assert (= ff_1   0b0000)) ;150 CS
+(assert (= mf_1   0b00)) ;151 CS
+(assert (= m_4   (bv-concat 0b00000000000 tail_1))) ;152 BL
+(assert (= t_3   0b0000000000000000000000000000000)) ;165 BL
+(assert (= d_4   0b00)) ;166 CS
+(assert (= reg0_4   (bv-sub t_3 m_4))) ;167 BL
+(assert (= state_7   0b0)) ;455 NB
+
+;------------------------------------------------CLK 7-----------------------------------------------
+(assert (= state_7   0b0)) ;22 CS
+(assert (= addr_5   (bv-extract 19 0 reg3_1))) ;23 NB
+(assert (= rd_5   0b1)) ;24 NB
+(assert (= IR_5   datai_7)) ;25 NB
+(assert (= state_8   0b1)) ;26 NB
+(assert (= (bv-extract 30 29 datai_7)   0b01)) ;29 CS
+(assert (= rx_5   reg1_1)) ;30 NB
+
+;------------------------------------------------CLK 8-----------------------------------------------
+(assert (= s_2   (bv-extract 30 29 IR_5))) ;5 BL
+(assert (= tail_2   (bv-extract 19 0 IR_5))) ;4 BL
+(assert (= cf_2   (bv-extract 23 23 IR_5))) ;3 BL
+(assert (= ff_2   (bv-extract 22 19 IR_5))) ;2 BL
+(assert (= df_2   (bv-extract 26 24 IR_5))) ;1 BL
+(assert (= mf_2   (bv-extract 28 27 IR_5))) ;0 BL
+(assert (= state_8   0b1)) ;35 CS
+(assert (= cf_2   0b0)) ;143 CS
+(assert (= (bv-not (bv-comp df_2 0b111))   0b1)) ;144 BR
+(assert (= (bv-or (bv-and (bv-comp df_2 0b101) (bv-comp B_1 0b0)) (bv-and (bv-comp df_2 0b100) (bv-comp B_1 0b1)))   0b0)) ;147 BR
+(assert (= d_5   (bv-extract 1 0 df_2))) ;149 BL
+(assert (= ff_2   0b0000)) ;150 CS
+(assert (= mf_2   0b00)) ;151 CS
+(assert (= m_5   (bv-concat 0b00000000000 tail_2))) ;152 BL
+(assert (= t_4   0b0000000000000000000000000000000)) ;165 BL
+(assert (= d_5   0b00)) ;166 CS
+(assert (= reg0_5   (bv-sub t_4 m_5))) ;167 BL
+(assert (= state_9   0b0)) ;455 NB
+
+;------------------------------------------------CLK 9-----------------------------------------------
+(assert (= state_9   0b0)) ;22 CS
+(assert (= addr_6   (bv-extract 19 0 reg3_1))) ;23 NB
+(assert (= rd_6   0b1)) ;24 NB
+(assert (= IR_6   datai_9)) ;25 NB
+(assert (= state_10   0b1)) ;26 NB
+(assert (= (bv-extract 30 29 datai_9)   0b00)) ;27 CS
+(assert (= rx_6   reg0_5)) ;28 NB
+
+;------------------------------------------------CLK 10-----------------------------------------------
+(assert (= mf_3   (bv-extract 28 27 IR_6))) ;0 BL
+(assert (= df_3   (bv-extract 26 24 IR_6))) ;1 BL
+(assert (= ff_3   (bv-extract 22 19 IR_6))) ;2 BL
+(assert (= cf_3   (bv-extract 23 23 IR_6))) ;3 BL
+(assert (= tail_3   (bv-extract 19 0 IR_6))) ;4 BL
+(assert (= s_3   (bv-extract 30 29 IR_6))) ;5 BL
+(assert (= state_10   0b1)) ;35 CS
+(assert (= cf_3   0b0)) ;143 CS
+(assert (= (bv-not (bv-comp df_3 0b111))   0b1)) ;144 BR
+(assert (= (bv-or (bv-and (bv-comp df_3 0b101) (bv-comp B_1 0b0)) (bv-and (bv-comp df_3 0b100) (bv-comp B_1 0b1)))   0b0)) ;147 BR
+(assert (= d_6   (bv-extract 1 0 df_3))) ;149 BL
+(assert (= ff_3   0b0000)) ;150 CS
+(assert (= mf_3   0b00)) ;151 CS
+(assert (= m_6   (bv-concat 0b00000000000 tail_3))) ;152 BL
+(assert (= t_5   0b0000000000000000000000000000000)) ;165 BL
+(assert (= d_6   0b00)) ;166 CS
+(assert (= reg0_6   (bv-sub t_5 m_6))) ;167 BL
+(assert (= state_11   0b0)) ;455 NB
+
+;------------------------------------------------CLK 11-----------------------------------------------
+(assert (= state_11   0b0)) ;22 CS
+(assert (= addr_7   (bv-extract 19 0 reg3_1))) ;23 NB
+(assert (= rd_7   0b1)) ;24 NB
+(assert (= IR_7   datai_11)) ;25 NB
+(assert (= state_12   0b1)) ;26 NB
+(assert (= (bv-extract 30 29 datai_11)   0b00)) ;27 CS
+(assert (= rx_7   reg0_6)) ;28 NB
+
+;------------------------------------------------CLK 12-----------------------------------------------
+(assert (= state_12   0b1)) ;35 CS
+(assert (= cf_3   0b0)) ;143 CS
+(assert (= (bv-not (bv-comp df_3 0b111))   0b1)) ;144 BR
+(assert (= (bv-or (bv-and (bv-comp df_3 0b101) (bv-comp B_1 0b0)) (bv-and (bv-comp df_3 0b100) (bv-comp B_1 0b1)))   0b0)) ;147 BR
+(assert (= d_7   (bv-extract 1 0 df_3))) ;149 BL
+(assert (= ff_3   0b0000)) ;150 CS
+(assert (= mf_3   0b00)) ;151 CS
+(assert (= m_7   (bv-concat 0b00000000000 tail_3))) ;152 BL
+(assert (= t_6   0b0000000000000000000000000000000)) ;165 BL
+(assert (= d_7   0b00)) ;166 CS
+(assert (= reg0_7   (bv-sub t_6 m_7))) ;167 BL
+(assert (= state_13   0b0)) ;455 NB
+
+;------------------------------------------------CLK 13-----------------------------------------------
+(assert (= state_13   0b0)) ;22 CS
+(assert (= addr_8   (bv-extract 19 0 reg3_1))) ;23 NB
+(assert (= rd_8   0b1)) ;24 NB
+(assert (= IR_8   datai_13)) ;25 NB
+(assert (= state_14   0b1)) ;26 NB
+(assert (= (bv-extract 30 29 datai_13)   0b00)) ;27 CS
+(assert (= rx_8   reg0_7)) ;28 NB
+
+;------------------------------------------------CLK 14-----------------------------------------------
+(assert (= state_14   0b1)) ;35 CS
+(assert (= cf_3   0b0)) ;143 CS
+(assert (= (bv-not (bv-comp df_3 0b111))   0b1)) ;144 BR
+(assert (= (bv-or (bv-and (bv-comp df_3 0b101) (bv-comp B_1 0b0)) (bv-and (bv-comp df_3 0b100) (bv-comp B_1 0b1)))   0b0)) ;147 BR
+(assert (= d_8   (bv-extract 1 0 df_3))) ;149 BL
+(assert (= ff_3   0b0000)) ;150 CS
+(assert (= mf_3   0b00)) ;151 CS
+(assert (= m_8   (bv-concat 0b00000000000 tail_3))) ;152 BL
+(assert (= t_7   0b0000000000000000000000000000000)) ;165 BL
+(assert (= d_8   0b00)) ;166 CS
+(assert (= reg0_8   (bv-sub t_7 m_8))) ;167 BL
+(assert (= state_15   0b0)) ;455 NB
+
+;------------------------------------------------CLK 15-----------------------------------------------
+(assert (= state_15   0b0)) ;22 CS
+(assert (= addr_9   (bv-extract 19 0 reg3_1))) ;23 NB
+(assert (= rd_9   0b1)) ;24 NB
+(assert (= IR_9   datai_15)) ;25 NB
+(assert (= state_16   0b1)) ;26 NB
+(assert (= (bv-extract 30 29 datai_15)   0b00)) ;27 CS
+(assert (= rx_9   reg0_8)) ;28 NB
+
+;------------------------------------------------CLK 16-----------------------------------------------
+(assert (= state_16   0b1)) ;35 CS
+(assert (= cf_3   0b0)) ;143 CS
+(assert (= (bv-not (bv-comp df_3 0b111))   0b1)) ;144 BR
+(assert (= (bv-or (bv-and (bv-comp df_3 0b101) (bv-comp B_1 0b0)) (bv-and (bv-comp df_3 0b100) (bv-comp B_1 0b1)))   0b0)) ;147 BR
+(assert (= d_9   (bv-extract 1 0 df_3))) ;149 BL
+(assert (= ff_3   0b0000)) ;150 CS
+(assert (= mf_3   0b00)) ;151 CS
+(assert (= m_9   (bv-concat 0b00000000000 tail_3))) ;152 BL
+(assert (= t_8   0b0000000000000000000000000000000)) ;165 BL
+(assert (= d_9   0b00)) ;166 CS
+(assert (= reg0_9   (bv-sub t_8 m_9))) ;167 BL
+(assert (= state_17   0b0)) ;455 NB
+
+;------------------------------------------------CLK 17-----------------------------------------------
+(assert (= state_17   0b0)) ;22 CS
+(assert (= addr_10   (bv-extract 19 0 reg3_1))) ;23 NB
+(assert (= rd_10   0b1)) ;24 NB
+(assert (= IR_10   datai_17)) ;25 NB
+(assert (= state_18   0b1)) ;26 NB
+(assert (= (bv-extract 30 29 datai_17)   0b00)) ;27 CS
+(assert (= rx_10   reg0_9)) ;28 NB
+
+;------------------------------------------------CLK 18-----------------------------------------------
+(assert (= state_18   0b1)) ;35 CS
+(assert (= cf_3   0b0)) ;143 CS
+(assert (= (bv-not (bv-comp df_3 0b111))   0b1)) ;144 BR
+(assert (= (bv-or (bv-and (bv-comp df_3 0b101) (bv-comp B_1 0b0)) (bv-and (bv-comp df_3 0b100) (bv-comp B_1 0b1)))   0b0)) ;147 BR
+(assert (= d_10   (bv-extract 1 0 df_3))) ;149 BL
+(assert (= ff_3   0b0000)) ;150 CS
+(assert (= mf_3   0b00)) ;151 CS
+(assert (= m_10   (bv-concat 0b00000000000 tail_3))) ;152 BL
+(assert (= t_9   0b0000000000000000000000000000000)) ;165 BL
+(assert (= d_10   0b00)) ;166 CS
+(assert (= reg0_10   (bv-sub t_9 m_10))) ;167 BL
+(assert (= state_19   0b0)) ;455 NB
+
+;------------------------------------------------CLK 19-----------------------------------------------
+(assert (= state_19   0b0)) ;22 CS
+(assert (= addr_11   (bv-extract 19 0 reg3_1))) ;23 NB
+(assert (= rd_11   0b1)) ;24 NB
+(assert (= IR_11   datai_19)) ;25 NB
+(assert (= state_20   0b1)) ;26 NB
+(assert (= (bv-extract 30 29 datai_19)   0b01)) ;29 CS
+(assert (= rx_11   reg1_1)) ;30 NB
+
+;------------------------------------------------CLK 20-----------------------------------------------
+(assert (= s_4   (bv-extract 30 29 IR_11))) ;5 BL
+(assert (= tail_4   (bv-extract 19 0 IR_11))) ;4 BL
+(assert (= cf_4   (bv-extract 23 23 IR_11))) ;3 BL
+(assert (= ff_4   (bv-extract 22 19 IR_11))) ;2 BL
+(assert (= df_4   (bv-extract 26 24 IR_11))) ;1 BL
+(assert (= mf_4   (bv-extract 28 27 IR_11))) ;0 BL
+(assert (= state_20   0b1)) ;35 CS
+(assert (= cf_4   0b0)) ;143 CS
+(assert (= (bv-not (bv-comp df_4 0b111))   0b1)) ;144 BR
+(assert (= (bv-or (bv-and (bv-comp df_4 0b101) (bv-comp B_1 0b0)) (bv-and (bv-comp df_4 0b100) (bv-comp B_1 0b1)))   0b0)) ;147 BR
+(assert (= d_11   (bv-extract 1 0 df_4))) ;149 BL
+(assert (= ff_4   0b0000)) ;150 CS
+(assert (= mf_4   0b00)) ;151 CS
+(assert (= m_11   (bv-concat 0b00000000000 tail_4))) ;152 BL
+(assert (= t_10   0b0000000000000000000000000000000)) ;165 BL
+(assert (= d_11   0b00)) ;166 CS
+(assert (= reg0_11   (bv-sub t_10 m_11))) ;167 BL
+(assert (= state_21   0b0)) ;455 NB
+
+;------------------------------------------------CLK 21-----------------------------------------------
+(assert (= state_21   0b0)) ;22 CS
+(assert (= addr_12   (bv-extract 19 0 reg3_1))) ;23 NB
+(assert (= rd_12   0b1)) ;24 NB
+(assert (= IR_12   datai_21)) ;25 NB
+(assert (= state_22   0b1)) ;26 NB
+(assert (= (bv-extract 30 29 datai_21)   0b01)) ;29 CS
+(assert (= rx_12   reg1_1)) ;30 NB
+
+;------------------------------------------------CLK 22-----------------------------------------------
+(assert (= state_22   0b1)) ;35 CS
+(assert (= cf_4   0b0)) ;143 CS
+(assert (= (bv-not (bv-comp df_4 0b111))   0b1)) ;144 BR
+(assert (= (bv-or (bv-and (bv-comp df_4 0b101) (bv-comp B_1 0b0)) (bv-and (bv-comp df_4 0b100) (bv-comp B_1 0b1)))   0b0)) ;147 BR
+(assert (= d_12   (bv-extract 1 0 df_4))) ;149 BL
+(assert (= ff_4   0b0000)) ;150 CS
+(assert (= mf_4   0b00)) ;151 CS
+(assert (= m_12   (bv-concat 0b00000000000 tail_4))) ;152 BL
+(assert (= t_11   0b0000000000000000000000000000000)) ;165 BL
+(assert (= d_12   0b00)) ;166 CS
+(assert (= reg0_12   (bv-sub t_11 m_12))) ;167 BL
+(assert (= state_23   0b0)) ;455 NB
+
+;------------------------------------------------CLK 23-----------------------------------------------
+(assert (= state_23   0b0)) ;22 CS
+(assert (= addr_13   (bv-extract 19 0 reg3_1))) ;23 NB
+(assert (= rd_13   0b1)) ;24 NB
+(assert (= IR_13   datai_23)) ;25 NB
+(assert (= state_24   0b1)) ;26 NB
+(assert (= (bv-extract 30 29 datai_23)   0b00)) ;27 CS
+(assert (= rx_13   reg0_12)) ;28 NB
+
+;------------------------------------------------CLK 24-----------------------------------------------
+(assert (= mf_5   (bv-extract 28 27 IR_13))) ;0 BL
+(assert (= df_5   (bv-extract 26 24 IR_13))) ;1 BL
+(assert (= ff_5   (bv-extract 22 19 IR_13))) ;2 BL
+(assert (= cf_5   (bv-extract 23 23 IR_13))) ;3 BL
+(assert (= tail_5   (bv-extract 19 0 IR_13))) ;4 BL
+(assert (= s_5   (bv-extract 30 29 IR_13))) ;5 BL
+(assert (= state_24   0b1)) ;35 CS
+(assert (= cf_5   0b0)) ;143 CS
+(assert (= (bv-not (bv-comp df_5 0b111))   0b1)) ;144 BR
+(assert (= (bv-or (bv-and (bv-comp df_5 0b101) (bv-comp B_1 0b0)) (bv-and (bv-comp df_5 0b100) (bv-comp B_1 0b1)))   0b0)) ;147 BR
+(assert (= d_13   (bv-extract 1 0 df_5))) ;149 BL
+(assert (= ff_5   0b0000)) ;150 CS
+(assert (= mf_5   0b00)) ;151 CS
+(assert (= m_13   (bv-concat 0b00000000000 tail_5))) ;152 BL
+(assert (= t_12   0b0000000000000000000000000000000)) ;165 BL
+(assert (= d_13   0b00)) ;166 CS
+(assert (= reg0_13   (bv-sub t_12 m_13))) ;167 BL
+(assert (= state_25   0b0)) ;455 NB
+
+;------------------------------------------------CLK 25-----------------------------------------------
+(assert (= state_25   0b0)) ;22 CS
+(assert (= addr_14   (bv-extract 19 0 reg3_1))) ;23 NB
+(assert (= rd_14   0b1)) ;24 NB
+(assert (= IR_14   datai_25)) ;25 NB
+(assert (= state_26   0b1)) ;26 NB
+(assert (= (bv-extract 30 29 datai_25)   0b00)) ;27 CS
+(assert (= rx_14   reg0_13)) ;28 NB
+
+;------------------------------------------------CLK 26-----------------------------------------------
+(assert (= s_6   (bv-extract 30 29 IR_14))) ;5 BL
+(assert (= tail_6   (bv-extract 19 0 IR_14))) ;4 BL
+(assert (= cf_6   (bv-extract 23 23 IR_14))) ;3 BL
+(assert (= ff_6   (bv-extract 22 19 IR_14))) ;2 BL
+(assert (= df_6   (bv-extract 26 24 IR_14))) ;1 BL
+(assert (= mf_6   (bv-extract 28 27 IR_14))) ;0 BL
+(assert (= state_26   0b1)) ;35 CS
+(assert (= cf_6   0b0)) ;143 CS
+(assert (= (bv-not (bv-comp df_6 0b111))   0b1)) ;144 BR
+(assert (= (bv-or (bv-and (bv-comp df_6 0b101) (bv-comp B_1 0b0)) (bv-and (bv-comp df_6 0b100) (bv-comp B_1 0b1)))   0b0)) ;147 BR
+(assert (= d_14   (bv-extract 1 0 df_6))) ;149 BL
+(assert (= ff_6   0b0000)) ;150 CS
+(assert (= mf_6   0b00)) ;151 CS
+(assert (= m_14   (bv-concat 0b00000000000 tail_6))) ;152 BL
+(assert (= t_13   0b0000000000000000000000000000000)) ;165 BL
+(assert (= d_14   0b01)) ;168 CS
+(assert (= reg1_2   (bv-sub t_13 m_14))) ;169 BL
+(assert (= state_27   0b0)) ;455 NB
+
+;------------------------------------------------CLK 27-----------------------------------------------
+(assert (= state_27   0b0)) ;22 CS
+(assert (= addr_15   (bv-extract 19 0 reg3_1))) ;23 NB
+(assert (= rd_15   0b1)) ;24 NB
+(assert (= IR_15   datai_27)) ;25 NB
+(assert (= state_28   0b1)) ;26 NB
+(assert (= (bv-extract 30 29 datai_27)   0b00)) ;27 CS
+(assert (= rx_15   reg0_13)) ;28 NB
+
+;------------------------------------------------CLK 28-----------------------------------------------
+(assert (= mf_7   (bv-extract 28 27 IR_15))) ;0 BL
+(assert (= df_7   (bv-extract 26 24 IR_15))) ;1 BL
+(assert (= ff_7   (bv-extract 22 19 IR_15))) ;2 BL
+(assert (= cf_7   (bv-extract 23 23 IR_15))) ;3 BL
+(assert (= tail_7   (bv-extract 19 0 IR_15))) ;4 BL
+(assert (= s_7   (bv-extract 30 29 IR_15))) ;5 BL
+(assert (= state_28   0b1)) ;35 CS
+(assert (= cf_7   0b0)) ;143 CS
+(assert (= (bv-not (bv-comp df_7 0b111))   0b1)) ;144 BR
+(assert (= (bv-or (bv-and (bv-comp df_7 0b101) (bv-comp B_1 0b0)) (bv-and (bv-comp df_7 0b100) (bv-comp B_1 0b1)))   0b0)) ;147 BR
+(assert (= d_15   (bv-extract 1 0 df_7))) ;149 BL
+(assert (= ff_7   0b0000)) ;150 CS
+(assert (= mf_7   0b00)) ;151 CS
+(assert (= m_15   (bv-concat 0b00000000000 tail_7))) ;152 BL
+(assert (= t_14   0b0000000000000000000000000000000)) ;165 BL
+(assert (= d_15   0b10)) ;170 CS
+(assert (= reg2_2   (bv-sub t_14 m_15))) ;171 BL
+(assert (= state_29   0b0)) ;455 NB
+
+;------------------------------------------------CLK 29-----------------------------------------------
+(assert (= state_29   0b0)) ;22 CS
+(assert (= addr_16   (bv-extract 19 0 reg3_1))) ;23 NB
+(assert (= rd_16   0b1)) ;24 NB
+(assert (= IR_16   datai_29)) ;25 NB
+(assert (= state_30   0b1)) ;26 NB
+(assert (= (bv-extract 30 29 datai_29)   0b00)) ;27 CS
+(assert (= rx_16   reg0_13)) ;28 NB
+
+;------------------------------------------------CLK 30-----------------------------------------------
+(assert (= s_8   (bv-extract 30 29 IR_16))) ;5 BL
+(assert (= tail_8   (bv-extract 19 0 IR_16))) ;4 BL
+(assert (= cf_8   (bv-extract 23 23 IR_16))) ;3 BL
+(assert (= ff_8   (bv-extract 22 19 IR_16))) ;2 BL
+(assert (= df_8   (bv-extract 26 24 IR_16))) ;1 BL
+(assert (= mf_8   (bv-extract 28 27 IR_16))) ;0 BL
+(assert (= state_30   0b1)) ;35 CS
+(assert (= cf_8   0b0)) ;143 CS
+(assert (= (bv-not (bv-comp df_8 0b111))   0b1)) ;144 BR
+(assert (= (bv-or (bv-and (bv-comp df_8 0b101) (bv-comp B_1 0b0)) (bv-and (bv-comp df_8 0b100) (bv-comp B_1 0b1)))   0b0)) ;147 BR
+(assert (= d_16   (bv-extract 1 0 df_8))) ;149 BL
+(assert (= ff_8   0b0000)) ;150 CS
+(assert (= mf_8   0b00)) ;151 CS
+(assert (= m_16   (bv-concat 0b00000000000 tail_8))) ;152 BL
+(assert (= t_15   0b0000000000000000000000000000000)) ;165 BL
+(assert (= d_16   0b00)) ;166 CS
+(assert (= reg0_14   (bv-sub t_15 m_16))) ;167 BL
+(assert (= state_31   0b0)) ;455 NB
+
+;------------------------------------------------CLK 31-----------------------------------------------
+(assert (= state_31   0b0)) ;22 CS
+(assert (= addr_17   (bv-extract 19 0 reg3_1))) ;23 NB
+(assert (= rd_17   0b1)) ;24 NB
+(assert (= IR_17   datai_31)) ;25 NB
+(assert (= state_32   0b1)) ;26 NB
+(assert (= (bv-extract 30 29 datai_31)   0b00)) ;27 CS
+(assert (= rx_17   reg0_14)) ;28 NB
+
+;------------------------------------------------CLK 32-----------------------------------------------
+(assert (= state_32   0b1)) ;35 CS
+(assert (= cf_8   0b0)) ;143 CS
+(assert (= (bv-not (bv-comp df_8 0b111))   0b1)) ;144 BR
+(assert (= (bv-or (bv-and (bv-comp df_8 0b101) (bv-comp B_1 0b0)) (bv-and (bv-comp df_8 0b100) (bv-comp B_1 0b1)))   0b0)) ;147 BR
+(assert (= d_17   (bv-extract 1 0 df_8))) ;149 BL
+(assert (= ff_8   0b0000)) ;150 CS
+(assert (= mf_8   0b00)) ;151 CS
+(assert (= m_17   (bv-concat 0b00000000000 tail_8))) ;152 BL
+(assert (= t_16   0b0000000000000000000000000000000)) ;165 BL
+(assert (= d_17   0b00)) ;166 CS
+(assert (= reg0_15   (bv-sub t_16 m_17))) ;167 BL
+(assert (= state_33   0b0)) ;455 NB
+
+;------------------------------------------------CLK 33-----------------------------------------------
+(assert (= state_33   0b0)) ;22 CS
+(assert (= addr_18   (bv-extract 19 0 reg3_1))) ;23 NB
+(assert (= rd_18   0b1)) ;24 NB
+(assert (= IR_18   datai_33)) ;25 NB
+(assert (= state_34   0b1)) ;26 NB
+(assert (= (bv-extract 30 29 datai_33)   0b11)) ;33 CS
+(assert (= rx_18   reg3_1)) ;34 NB
+
+;------------------------------------------------CLK 34-----------------------------------------------
+(assert (= mf_9   (bv-extract 28 27 IR_18))) ;0 BL
+(assert (= df_9   (bv-extract 26 24 IR_18))) ;1 BL
+(assert (= ff_9   (bv-extract 22 19 IR_18))) ;2 BL
+(assert (= cf_9   (bv-extract 23 23 IR_18))) ;3 BL
+(assert (= tail_9   (bv-extract 19 0 IR_18))) ;4 BL
+(assert (= s_9   (bv-extract 30 29 IR_18))) ;5 BL
+(assert (= state_34   0b1)) ;35 CS
+(assert (= cf_9   0b0)) ;143 CS
+(assert (= (bv-not (bv-comp df_9 0b111))   0b1)) ;144 BR
+(assert (= (bv-or (bv-and (bv-comp df_9 0b101) (bv-comp B_1 0b0)) (bv-and (bv-comp df_9 0b100) (bv-comp B_1 0b1)))   0b0)) ;147 BR
+(assert (= d_18   (bv-extract 1 0 df_9))) ;149 BL
+(assert (= ff_9   0b0000)) ;150 CS
+(assert (= mf_9   0b00)) ;151 CS
+(assert (= m_18   (bv-concat 0b00000000000 tail_9))) ;152 BL
+(assert (= t_17   0b0000000000000000000000000000000)) ;165 BL
+(assert (= d_18   0b00)) ;166 CS
+(assert (= reg0_16   (bv-sub t_17 m_18))) ;167 BL
+(assert (= state_35   0b0)) ;455 NB
+
+;------------------------------------------------CLK 35-----------------------------------------------
+(assert (= state_35   0b0)) ;22 CS
+(assert (= addr_19   (bv-extract 19 0 reg3_1))) ;23 NB
+(assert (= rd_19   0b1)) ;24 NB
+(assert (= IR_19   datai_35)) ;25 NB
+(assert (= state_36   0b1)) ;26 NB
+(assert (= (bv-extract 30 29 datai_35)   0b00)) ;27 CS
+(assert (= rx_19   reg0_16)) ;28 NB
+
+;------------------------------------------------CLK 36-----------------------------------------------
+(assert (= s_10   (bv-extract 30 29 IR_19))) ;5 BL
+(assert (= tail_10   (bv-extract 19 0 IR_19))) ;4 BL
+(assert (= cf_10   (bv-extract 23 23 IR_19))) ;3 BL
+(assert (= ff_10   (bv-extract 22 19 IR_19))) ;2 BL
+(assert (= df_10   (bv-extract 26 24 IR_19))) ;1 BL
+(assert (= mf_10   (bv-extract 28 27 IR_19))) ;0 BL
+(assert (= state_36   0b1)) ;35 CS
+(assert (= cf_10   0b0)) ;143 CS
+(assert (= (bv-not (bv-comp df_10 0b111))   0b1)) ;144 BR
+(assert (= (bv-or (bv-and (bv-comp df_10 0b101) (bv-comp B_1 0b0)) (bv-and (bv-comp df_10 0b100) (bv-comp B_1 0b1)))   0b0)) ;147 BR
+(assert (= d_19   (bv-extract 1 0 df_10))) ;149 BL
+(assert (= ff_10   0b0000)) ;150 CS
+(assert (= mf_10   0b00)) ;151 CS
+(assert (= m_19   (bv-concat 0b00000000000 tail_10))) ;152 BL
+(assert (= t_18   0b0000000000000000000000000000000)) ;165 BL
+(assert (= d_19   0b01)) ;168 CS
+(assert (= reg1_3   (bv-sub t_18 m_19))) ;169 BL
+(assert (= state_37   0b0)) ;455 NB
+
+;------------------------------------------------CLK 37-----------------------------------------------
+(assert (= state_37   0b0)) ;22 CS
+(assert (= addr_20   (bv-extract 19 0 reg3_1))) ;23 NB
+(assert (= rd_20   0b1)) ;24 NB
+(assert (= IR_20   datai_37)) ;25 NB
+(assert (= state_38   0b1)) ;26 NB
+(assert (= (bv-extract 30 29 datai_37)   0b10)) ;31 CS
+(assert (= rx_20   reg2_2)) ;32 NB
+
+;------------------------------------------------CLK 38-----------------------------------------------
+(assert (= mf_11   (bv-extract 28 27 IR_20))) ;0 BL
+(assert (= df_11   (bv-extract 26 24 IR_20))) ;1 BL
+(assert (= ff_11   (bv-extract 22 19 IR_20))) ;2 BL
+(assert (= cf_11   (bv-extract 23 23 IR_20))) ;3 BL
+(assert (= tail_11   (bv-extract 19 0 IR_20))) ;4 BL
+(assert (= s_11   (bv-extract 30 29 IR_20))) ;5 BL
+(assert (= state_38   0b1)) ;35 CS
+(assert (= cf_11   0b0)) ;143 CS
+(assert (= (bv-not (bv-comp df_11 0b111))   0b1)) ;144 BR
+(assert (= (bv-or (bv-and (bv-comp df_11 0b101) (bv-comp B_1 0b0)) (bv-and (bv-comp df_11 0b100) (bv-comp B_1 0b1)))   0b0)) ;147 BR
+(assert (= d_20   (bv-extract 1 0 df_11))) ;149 BL
+(assert (= ff_11   0b0010)) ;191 CS
+(assert (= mf_11   0b11)) ;202 CS
+(assert (= addr_21   (bv-add tail_11 (bv-extract 19 0 reg2_2)))) ;203 NB
+(assert (= rd_21   0b1)) ;204 NB
+(assert (= m_20   datai_38)) ;205 BL
+(assert (= d_20   0b00)) ;206 CS
+(assert (= reg0_17   m_20)) ;207 BL
+(assert (= state_39   0b0)) ;455 NB
+
+;------------------------------------------------CLK 39-----------------------------------------------
+(assert (= state_39   0b0)) ;22 CS
+(assert (= addr_22   (bv-extract 19 0 reg3_1))) ;23 NB
+(assert (= rd_22   0b1)) ;24 NB
+(assert (= IR_21   datai_39)) ;25 NB
+(assert (= state_40   0b1)) ;26 NB
+(assert (= (bv-extract 30 29 datai_39)   0b11)) ;33 CS
+(assert (= rx_21   reg3_1)) ;34 NB
+
+;------------------------------------------------CLK 40-----------------------------------------------
+(assert (= s_12   (bv-extract 30 29 IR_21))) ;5 BL
+(assert (= tail_12   (bv-extract 19 0 IR_21))) ;4 BL
+(assert (= cf_12   (bv-extract 23 23 IR_21))) ;3 BL
+(assert (= ff_12   (bv-extract 22 19 IR_21))) ;2 BL
+(assert (= df_12   (bv-extract 26 24 IR_21))) ;1 BL
+(assert (= mf_12   (bv-extract 28 27 IR_21))) ;0 BL
+(assert (= state_40   0b1)) ;35 CS
+(assert (= cf_12   0b1)) ;36 CS
+(assert (= mf_12   0b11)) ;47 CS
+(assert (= addr_23   (bv-add tail_12 (bv-extract 19 0 reg2_2)))) ;48 NB
+(assert (= rd_23   0b1)) ;49 NB
+(assert (= m_21   datai_40)) ;50 BL
+(assert (= ff_12   0b0000)) ;51 CS
+(assert (= (bool-to-bv (bv-lt rx_21 m_21))   0b0)) ;53 BR
+(assert (= B_2   0b0)) ;55 NB
+(assert (= state_41   0b0)) ;455 NB
+
+;------------------------------------------------CLK 41-----------------------------------------------
+(assert (= state_41   0b0)) ;22 CS
+(assert (= addr_24   (bv-extract 19 0 reg3_1))) ;23 NB
+(assert (= rd_24   0b1)) ;24 NB
+(assert (= IR_22   datai_41)) ;25 NB
+(assert (= state_42   0b1)) ;26 NB
+(assert (= (bv-extract 30 29 datai_41)   0b01)) ;29 CS
+(assert (= rx_22   reg1_3)) ;30 NB
+
+;------------------------------------------------CLK 42-----------------------------------------------
+(assert (= mf_13   (bv-extract 28 27 IR_22))) ;0 BL
+(assert (= df_13   (bv-extract 26 24 IR_22))) ;1 BL
+(assert (= ff_13   (bv-extract 22 19 IR_22))) ;2 BL
+(assert (= cf_13   (bv-extract 23 23 IR_22))) ;3 BL
+(assert (= tail_13   (bv-extract 19 0 IR_22))) ;4 BL
+(assert (= s_13   (bv-extract 30 29 IR_22))) ;5 BL
+(assert (= state_42   0b1)) ;35 CS
+(assert (= cf_13   0b0)) ;143 CS
+(assert (= (bv-not (bv-comp df_13 0b111))   0b1)) ;144 BR
+(assert (= (bv-or (bv-and (bv-comp df_13 0b101) (bv-comp B_2 0b0)) (bv-and (bv-comp df_13 0b100) (bv-comp B_2 0b1)))   0b0)) ;147 BR
+(assert (= d_21   (bv-extract 1 0 df_13))) ;149 BL
+(assert (= ff_13   0b0000)) ;150 CS
+(assert (= mf_13   0b00)) ;151 CS
+(assert (= m_22   (bv-concat 0b00000000000 tail_13))) ;152 BL
+(assert (= t_19   0b0000000000000000000000000000000)) ;165 BL
+(assert (= d_21   0b00)) ;166 CS
+(assert (= reg0_18   (bv-sub t_19 m_22))) ;167 BL
+(assert (= state_43   0b0)) ;455 NB
+
+;------------------------------------------------CLK 43-----------------------------------------------
+(assert (= state_43   0b0)) ;22 CS
+(assert (= addr_25   (bv-extract 19 0 reg3_1))) ;23 NB
+(assert (= rd_25   0b1)) ;24 NB
+(assert (= IR_23   datai_43)) ;25 NB
+(assert (= state_44   0b1)) ;26 NB
+(assert (= (bv-extract 30 29 datai_43)   0b11)) ;33 CS
+(assert (= rx_23   reg3_1)) ;34 NB
+
+;------------------------------------------------CLK 44-----------------------------------------------
+(assert (= s_14   (bv-extract 30 29 IR_23))) ;5 BL
+(assert (= tail_14   (bv-extract 19 0 IR_23))) ;4 BL
+(assert (= cf_14   (bv-extract 23 23 IR_23))) ;3 BL
+(assert (= ff_14   (bv-extract 22 19 IR_23))) ;2 BL
+(assert (= df_14   (bv-extract 26 24 IR_23))) ;1 BL
+(assert (= mf_14   (bv-extract 28 27 IR_23))) ;0 BL
+(assert (= state_44   0b1)) ;35 CS
+(assert (= cf_14   0b0)) ;143 CS
+(assert (= (bv-not (bv-comp df_14 0b111))   0b1)) ;144 BR
+(assert (= (bv-or (bv-and (bv-comp df_14 0b101) (bv-comp B_2 0b0)) (bv-and (bv-comp df_14 0b100) (bv-comp B_2 0b1)))   0b0)) ;147 BR
+(assert (= d_22   (bv-extract 1 0 df_14))) ;149 BL
+(assert (= ff_14   0b1100)) ;421 CS
+(assert (= mf_14   0b11)) ;428 CS
+(assert (= t_20   (bv-concat (bv-extract 29 0 rx_23) 0b0))) ;429 BL
+(assert (= (bool-to-bv (bv-gt t_20 0b0111111111111111111111111111111))   0b0)) ;431 BR
+(assert (= B_3   0b0)) ;433 NB
+(assert (= d_22   0b00)) ;434 CS
+(assert (= reg0_19   t_20)) ;435 NB
+(assert (= state_45   0b0)) ;455 NB
+
+;------------------------------------------------CLK 45-----------------------------------------------
+(assert (= state_45   0b0)) ;22 CS
+(assert (= addr_26   (bv-extract 19 0 reg3_1))) ;23 NB
+(assert (= rd_26   0b1)) ;24 NB
+(assert (= IR_24   datai_45)) ;25 NB
+(assert (= state_46   0b1)) ;26 NB
+(assert (= (bv-extract 30 29 datai_45)   0b10)) ;31 CS
+(assert (= rx_24   reg2_2)) ;32 NB
+
+;------------------------------------------------CLK 46-----------------------------------------------
+(assert (= mf_15   (bv-extract 28 27 IR_24))) ;0 BL
+(assert (= df_15   (bv-extract 26 24 IR_24))) ;1 BL
+(assert (= ff_15   (bv-extract 22 19 IR_24))) ;2 BL
+(assert (= cf_15   (bv-extract 23 23 IR_24))) ;3 BL
+(assert (= tail_15   (bv-extract 19 0 IR_24))) ;4 BL
+(assert (= s_15   (bv-extract 30 29 IR_24))) ;5 BL
+(assert (= state_46   0b1)) ;35 CS
+(assert (= cf_15   0b0)) ;143 CS
+(assert (= (bv-not (bv-comp df_15 0b111))   0b1)) ;144 BR
+(assert (= (bv-or (bv-and (bv-comp df_15 0b101) (bv-comp B_3 0b0)) (bv-and (bv-comp df_15 0b100) (bv-comp B_3 0b1)))   0b0)) ;147 BR
+(assert (= d_23   (bv-extract 1 0 df_15))) ;149 BL
+(assert (= ff_15   0b0000)) ;150 CS
+(assert (= mf_15   0b00)) ;151 CS
+(assert (= m_23   (bv-concat 0b00000000000 tail_15))) ;152 BL
+(assert (= t_21   0b0000000000000000000000000000000)) ;165 BL
+(assert (= d_23   0b00)) ;166 CS
+(assert (= reg0_20   (bv-sub t_21 m_23))) ;167 BL
+(assert (= state_47   0b0)) ;455 NB
+
+;------------------------------------------------CLK 47-----------------------------------------------
+(assert (= state_47   0b0)) ;22 CS
+(assert (= addr_27   (bv-extract 19 0 reg3_1))) ;23 NB
+(assert (= rd_27   0b1)) ;24 NB
+(assert (= IR_25   datai_47)) ;25 NB
+(assert (= state_48   0b1)) ;26 NB
+(assert (= (bv-extract 30 29 datai_47)   0b10)) ;31 CS
+(assert (= rx_25   reg2_2)) ;32 NB
+
+;------------------------------------------------CLK 48-----------------------------------------------
+(assert (= s_16   (bv-extract 30 29 IR_25))) ;5 BL
+(assert (= tail_16   (bv-extract 19 0 IR_25))) ;4 BL
+(assert (= cf_16   (bv-extract 23 23 IR_25))) ;3 BL
+(assert (= ff_16   (bv-extract 22 19 IR_25))) ;2 BL
+(assert (= df_16   (bv-extract 26 24 IR_25))) ;1 BL
+(assert (= mf_16   (bv-extract 28 27 IR_25))) ;0 BL
+(assert (= state_48   0b1)) ;35 CS
+(assert (= cf_16   0b0)) ;143 CS
+(assert (= (bv-not (bv-comp df_16 0b111))   0b1)) ;144 BR
+(assert (= (bv-or (bv-and (bv-comp df_16 0b101) (bv-comp B_3 0b0)) (bv-and (bv-comp df_16 0b100) (bv-comp B_3 0b1)))   0b1)) ;146 BR
+(assert (= d_24   0b11)) ;148 BL
+(assert (= ff_16   0b0000)) ;150 CS
+(assert (= mf_16   0b00)) ;151 CS
+(assert (= m_24   (bv-concat 0b00000000000 tail_16))) ;152 BL
+(assert (= t_22   0b0000000000000000000000000000000)) ;165 BL
+(assert (= d_24   0b11)) ;172 CS
+(assert (= reg3_2   (bv-sub t_22 m_24))) ;173 BL
+(assert (= state_49   0b0)) ;455 NB
+
+;------------------------------------------------CLK 49-----------------------------------------------
+(assert (= state_49   0b0)) ;22 CS
+(assert (= addr_28   (bv-extract 19 0 reg3_2))) ;23 NB
+(assert (= rd_28   0b1)) ;24 NB
+(assert (= IR_26   datai_49)) ;25 NB
+(assert (= state_50   0b1)) ;26 NB
+(assert (= (bv-extract 30 29 datai_49)   0b11)) ;33 CS
+(assert (= rx_26   reg3_2)) ;34 NB
+(check)
