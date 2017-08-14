@@ -2,6 +2,54 @@
 <configurationDescriptor version="97">
   <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
     <df root="." name="0">
+      <df name=".build">
+      </df>
+      <df name="include">
+        <df name="tclap">
+          <in>Arg.h</in>
+          <in>ArgException.h</in>
+          <in>ArgTraits.h</in>
+          <in>CmdLine.h</in>
+          <in>CmdLineInterface.h</in>
+          <in>CmdLineOutput.h</in>
+          <in>Constraint.h</in>
+          <in>DocBookOutput.h</in>
+          <in>HelpVisitor.h</in>
+          <in>IgnoreRestVisitor.h</in>
+          <in>MultiArg.h</in>
+          <in>MultiSwitchArg.h</in>
+          <in>OptionalUnlabeledTracker.h</in>
+          <in>StandardTraits.h</in>
+          <in>StdOutput.h</in>
+          <in>SwitchArg.h</in>
+          <in>UnlabeledMultiArg.h</in>
+          <in>UnlabeledValueArg.h</in>
+          <in>ValueArg.h</in>
+          <in>ValuesConstraint.h</in>
+          <in>VersionVisitor.h</in>
+          <in>Visitor.h</in>
+          <in>XorHandler.h</in>
+          <in>ZshCompletionOutput.h</in>
+        </df>
+        <in>concolic.h</in>
+        <in>conquest.h</in>
+        <in>smt_lib.h</in>
+        <in>types.h</in>
+      </df>
+      <df name="src">
+        <in>concolic.cpp</in>
+        <in>conquest.cpp</in>
+        <in>event.cpp</in>
+        <in>expr.cpp</in>
+        <in>globals.cpp</in>
+        <in>logic_lpm.cpp</in>
+        <in>misc.cpp</in>
+        <in>numbers.cpp</in>
+        <in>scope.cpp</in>
+        <in>simulation.cpp</in>
+        <in>smt_lib.cpp</in>
+        <in>stmt.cpp</in>
+      </df>
       <df name="test">
         <df name="b01">
           <df name="results">
@@ -79,20 +127,6 @@
           <in>files.f</in>
         </df>
       </df>
-      <in>concolic.cpp</in>
-      <in>concolic.h</in>
-      <in>event.cpp</in>
-      <in>expr.cpp</in>
-      <in>globals.cpp</in>
-      <in>logic_lpm.cpp</in>
-      <in>misc.cpp</in>
-      <in>numbers.cpp</in>
-      <in>scope.cpp</in>
-      <in>simulation.cpp</in>
-      <in>smt_lib.cpp</in>
-      <in>smt_lib.h</in>
-      <in>stmt.cpp</in>
-      <in>udp.cpp</in>
     </df>
   </logicalFolder>
   <projectmakefile>Makefile</projectmakefile>
