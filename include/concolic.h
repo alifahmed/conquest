@@ -37,71 +37,13 @@ class SMTSigCore;
 class SMTAssign;
 struct constraint_t;
 
-extern const char* g_data_mem;
-extern uint g_unroll;
 extern uint single_indent;
-extern const char* g_reset_sig_name;
 extern std::vector<SMTExpr*> g_expr_list;
 extern std::unordered_map<std::string, SMTSigCore*> g_name_sig_map;
 extern std::vector<SMTSigCore*> g_in_port_list;
 extern std::ofstream g_define_out;
 extern FILE* f_dbg;
 extern constraint_t* last_cnst;
-
-/*
- * The design we are emitting.
- */
-extern ivl_design_t g_design;
-
-/*
- * This is the file that the converted design is written to.
- */
-extern FILE*g_out;
-
-/*
- * Keep a count of the fatal errors that happen during code generation.
- */
-extern int g_errors;
-
-/*
- * Keep the simulation time precision so that we can scale delays.
- */
-extern int g_precision;
-
-/*
- * The expression code needs to know when a parameter definition is being
- * emitted so it can emit the numeric value instead of the name.
- */
-extern ivl_parameter_t emitting_param;
-
-/*
- * The statement code needs to know what name to use for a translated
- * function return statement (disable).
- */
-extern const char *func_rtn_name;
-
-/*
- * Keep the current indent level.
- */
-extern unsigned g_ind;
-extern unsigned g_ind_incr;
-
-/*
- * Set to non-zero when the user wants to emit all the file and line
- * number information.
- */
-extern unsigned g_emit_file_line;
-
-/*
- * Some tools that are mostly 1364-1995 compliant also support signed so
- * add support for that as an extension.
- */
-extern unsigned g_allow_signed;
-
-/*
- * Version String
- */
-extern const char* g_version_string;
 
 /*
  * Emit various Verilog types.
@@ -211,7 +153,7 @@ extern std::map<std::string, sig_t> g_in_port_map;
 
 
 //Utility functions 
-void error(const char *fmt, ...);
-void info(const char *fmt, ...);
-
-#define DATA_MEM_TYPE_BIN
+extern void error(const char *fmt, ...);
+extern void info(const char *fmt, ...);
+extern bool is_file_exists(const char* file);
+extern void copy_file(const char* src_file, const char* dest_file);

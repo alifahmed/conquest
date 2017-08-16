@@ -3,10 +3,6 @@
 #include "concolic.h"
 #include "smt_lib.h"
 
-/* The expression code needs to know when a parameter definition is being
- * emitted so it can print the numeric value instead of the parameter name. */
-ivl_parameter_t emitting_param = 0;
-
 /*
  * Data type used to signify if a $signed or $unsigned should be emitted.
  */

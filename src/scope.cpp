@@ -5,7 +5,6 @@
 #include <cstdlib>
 
 using namespace std;
-const char *func_rtn_name = 0;
 
 static const char*get_time_const(int time_value) {
 	switch (time_value) {

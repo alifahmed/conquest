@@ -1,7 +1,12 @@
 #include <ctype.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdlib>
+#include <cstring>
 #include <cstdarg>
+#include <sys/stat.h>
+#include <sys/sendfile.h>
+#include <sys/types.h>
+#include <fcntl.h>
+#include <unistd.h>
 #include "concolic.h"
 #include "smt_lib.h"
 
@@ -943,4 +948,21 @@ void info(const char *fmt, ...) {
 	putchar('\n');
 
 	va_end(args);
+}
+
+inline bool is_file_exists(const char* file){
+    struct stat buffer;
+    return (stat(file, &buffer) == 0);
+}
+
+inline void copy_file(const char* src_file, const char* dest_file){
+    int source = open(src_file, O_RDONLY, 0);
+    int dest = open(dest_file, O_WRONLY | O_CREAT, 0644);
+    
+    struct stat stat_source;
+    fstat(source, &stat_source);
+    sendfile64(dest, source, 0, stat_source.st_size);
+    
+    close(source);
+    close(dest);
 }
