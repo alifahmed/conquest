@@ -1,12 +1,26 @@
+###############################################################################
+#
+# Conquest Makefile
+#
+###############################################################################
+OBJ_WRAP = conquest
 
-OBJ_WRAP=conquest
-SRC_WRAP=./src/conquest.cpp
+OBJECTS = $(patsubst %.c, %.o, $(wildcard ./src/*.cpp))
+HEADERS = $(wildcard ./include/*.h)
+BUILD_DIR = ./.build
+
 
 .PHONY: all clean
+all: $(OBJ_WRAP)
+	@echo "All done!"
 
-all: $(SRC_WRAP)
-	@g++ $(SRC_WRAP) -I./include/ -o $(OBJ_WRAP) -std=c++11 -Wall -g
-	
+%.o: %.cpp $(HEADERS)
+	g++ -g -Wall -c $< -o $@
+
 clean:
-	rm -f $(OBJ_WRAP)
+	-rm -f *.o
+#    -rm -f $(TARGET)
 
+$(OBJ_WRAP): conquest.o
+	g++ $(BUILD_DIR)/conquest.o -Wall -o $@
+	
