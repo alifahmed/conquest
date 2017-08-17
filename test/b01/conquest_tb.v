@@ -1,4 +1,4 @@
-module concolic_tb();
+module conquest_tb();
 
     // Generated top module signals
     reg  clock;

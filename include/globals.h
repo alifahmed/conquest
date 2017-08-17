@@ -22,3 +22,17 @@ extern uint     		g_unroll;
 extern const char*      g_clock_sig_name;
 extern const char*      g_reset_sig_name;
 extern const char*      g_reset_edge_active;
+
+//Configuration declarations
+//#define conc_flush(X)   fflush(X)
+#define conc_flush(X) 
+extern const bool		enable_error_check;
+extern const bool		enable_obs_padding;
+extern const bool		enable_sim_copy;
+extern const bool       enable_concrete_states;
+extern const uint		k_permit_effort;
+extern const bool		enable_yices_api;
+extern const bool		enable_yices_debug;
+extern const bool		enable_yices_incremental;
+extern const bool		enable_ud_chain;
+//extern const uint		target_branch_id;

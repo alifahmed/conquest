@@ -8,14 +8,14 @@ using namespace std;
 CTDataMem::CTDataMem(){
 	unroll = 0;
 	width = 0;
+    is_allocated = false;
 }
 
 CTDataMem::~CTDataMem(){
-	
+	_free_data();
 }
 
 void CTDataMem::load(const char* file) {
-	data.clear();
     ifstream mem(file);
     if(!mem.is_open()){
         error("Cannot open file: %s", file);
@@ -38,25 +38,36 @@ void CTDataMem::writeb(uint cycle, uint pos, char value) {
 }
 
 void CTDataMem::_alloc_data(){
-	unroll = g_unroll;
-	assert(unroll);
-	assert(width);
-	for(uint i=0; i<=unroll; i++){
-        string line;
-        line.reserve(width+1);
-        line[width+1] = 0;
-        data.push_back(line);
+    if(!is_allocated){
+        is_allocated = true;
+        string ref;
+        for(uint i=0; i<width; i++){
+            ref.append("0");
+        }
+        for(uint i=0; i<=unroll; i++){
+            data.push_back(ref);
+        }
+    }
+}
+
+void CTDataMem::_free_data() {
+    if(is_allocated){
+        data.clear();
+        is_allocated = false;
     }
 }
 
 void CTDataMem::generate(bool use_existing) {
+    unroll = g_unroll;
+    assert(unroll);
+    assert(width);
     if(use_existing){
         use_existing = false;
         //check if previous data file exists and valid
         if(is_file_exists(g_data_mem_raw)){
             ifstream f_mem(g_data_mem_raw, ifstream::ate | ifstream::binary);
             const uint size = f_mem.tellg();
-            if(size == (width+1)*unroll){
+            if(size == (width+1)*(unroll+1)){
                 use_existing = true;
 				load(g_data_mem_raw);
             }

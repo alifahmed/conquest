@@ -58,49 +58,6 @@ SMTNumber* emit_number(const char *bits, unsigned nbits, bool is_signed) {
 	return smt_number;
 }
 
-void emit_real_number(double value) {
-	/* Check for NaN. */
-	if (isnan(value)) {
-		fprintf(g_out, "(0.0/0.0)");
-		return;
-	}
-	/* Check for the infinities. */
-	if (isinf(value)) {
-		if (signbit(value)) fprintf(g_out, "(-1.0/0.0)");
-		else fprintf(g_out, "(1.0/0.0)");
-		return;
-	}
-	/* Check for +/- zero. */
-	if (value == 0.0) {
-		if (signbit(value)) fprintf(g_out, "-0.0");
-		else fprintf(g_out, "0.0");
-	} else {
-		char buffer[32];
-		char *cptr;
-		unsigned len;
-		/* Print the double to a temporary string using an extra digit. */
-		buffer[sizeof (buffer) - 1] = 0;
-		snprintf(buffer, sizeof (buffer), "%#.17g", value);
-		assert(buffer[sizeof (buffer) - 1] == 0);
-		/* Check to see if there is a digit after the decimal point and
-		 * add a digit if it is missing. */
-		len = strlen(buffer);
-		if (buffer[len - 1] == '.') {
-			assert((len + 1) < sizeof (buffer));
-			buffer[len] = '0';
-			len += 1;
-			buffer[len] = 0;
-		}
-		/* Now trim any extra trailing zero digits. */
-		cptr = buffer + len - 1;
-		while ((*cptr == '0') && (*(cptr - 1) != '.')) cptr -= 1;
-		*(cptr + 1) = 0;
-
-		/* Now print the processed output. */
-		fprintf(g_out, "%s", buffer);
-	}
-}
-
 /*
  * Extract an uint64_t value from the given number expression. If the result
  * type is 0 then the returned value is valid. If it is positive then the

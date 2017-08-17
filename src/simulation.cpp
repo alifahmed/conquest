@@ -75,7 +75,9 @@ static void build_define_stream() {
 }
 
 static inline void compile() {
-	system("iverilog_orig tb_concolic.v instrumented.v -o conc_run.vvp");
+    string cmd = "iverilog_orig " + string(g_output_file) + " " + \
+                  string(g_tb_file) + " -o conc_run.vvp";
+	system(cmd.c_str());
 }
 
 static constraint_t* create_clock(uint clock){

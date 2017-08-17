@@ -630,12 +630,12 @@ void info(const char *fmt, ...) {
 	va_end(args);
 }
 
-inline bool is_file_exists(const char* file){
+bool is_file_exists(const char* file){
     struct stat buffer;
     return (stat(file, &buffer) == 0);
 }
 
-inline void copy_file(const char* src_file, const char* dest_file){
+void copy_file(const char* src_file, const char* dest_file){
     int source = open(src_file, O_RDONLY, 0);
     int dest = open(dest_file, O_WRONLY | O_CREAT, 0644);
     

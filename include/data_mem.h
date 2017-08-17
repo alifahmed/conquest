@@ -45,6 +45,8 @@ public:
 private:
     std::vector<std::string> data;			 //structure for holding data
 	void _alloc_data();
+    void _free_data();
+    bool is_allocated;
     
     uint width;
     uint unroll;
