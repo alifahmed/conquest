@@ -12,6 +12,7 @@
 #include <map>
 #include <unordered_map>
 #include <fstream>
+#include "globals.h"
 
 typedef unsigned uint;
 
@@ -136,15 +137,6 @@ extern context_t *yices_context;
 extern void smt_yices_assert(context_t *ctx,  term_t term, SMTAssign* assign);
 extern void smt_yices_push();
 extern void smt_yices_pop();
-
-typedef struct{
-    uint msb;
-    uint lsb;
-    uint width;
-}sig_t;
-
-extern std::map<std::string, sig_t> g_in_port_map;
-
 
 /*
  * Debug routine to dump the various pieces of nexus information.

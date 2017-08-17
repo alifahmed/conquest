@@ -32,31 +32,6 @@ static const char*get_time_const(int time_value) {
 	}
 }
 
-/*static void emit_func_return(ivl_signal_t sig) {
-	if (ivl_signal_dimensions(sig) > 0) {
-		fprintf(stderr, "%s:%u: vlog95 error: A function cannot return "
-				"an array.\n", ivl_signal_file(sig),
-				ivl_signal_lineno(sig));
-		g_errors += 1;
-	} else if (ivl_signal_integer(sig)) {
-		fprintf(g_out, " integer");
-	} else if (ivl_signal_data_type(sig) == IVL_VT_REAL) {
-		fprintf(g_out, " real");
-	} else {
-		int msb, lsb;
-		get_sig_msb_lsb(sig, &msb, &lsb);
-		if (msb != 0 || lsb != 0) fprintf(g_out, " [%d:%d]", msb, lsb);
-	}
-}*/
-
-void emit_sig_file_line(ivl_signal_t sig) {
-	if (g_emit_file_line) {
-		fprintf(g_out, " /* %s:%u */",
-				ivl_signal_file(sig),
-				ivl_signal_lineno(sig));
-	}
-}
-
 static void emit_sig_id(ivl_signal_t sig) {
 	emit_id(ivl_signal_basename(sig));
 	fprintf(g_out, " = %u\'b0;\n", ivl_signal_width(sig));

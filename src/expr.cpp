@@ -279,18 +279,7 @@ static unsigned emit_power_as_shift(ivl_scope_t scope, ivl_expr_t expr,
 		emit_expr(scope, rval, 0, 0, 0, 0);
 		fprintf(g_out, " < 0 ? ");
 		if (is_signed_expr) {
-			if (expr_wid == 32) {
-				fprintf(g_out, "0");
-			} else if (g_allow_signed) {
-				fprintf(g_out, "%u'sh0", expr_wid);
-			} else {
-				fprintf(stderr, "%s:%u: vlog95 error: Sized signed "
-						"power operator l-value is not "
-						"supported.\n", ivl_expr_file(expr),
-						ivl_expr_lineno(expr));
-				g_errors += 1;
-				fprintf(g_out, "%u'h0", expr_wid);
-			}
+			fprintf(g_out, "%u'sh0", expr_wid);
 		} else {
 			fprintf(g_out, "%u'h0", expr_wid);
 		}
@@ -299,15 +288,7 @@ static unsigned emit_power_as_shift(ivl_scope_t scope, ivl_expr_t expr,
 	}
 	scale = value / 2;
 	if (is_signed_expr) {
-		if (expr_wid == 32) {
-			fprintf(g_out, "1");
-		} else if (g_allow_signed) {
 			fprintf(g_out, "%u'sh1", expr_wid);
-		} else {
-			/* This is an error condition and has already been
-			 * reported above. */
-			fprintf(g_out, "%u'h1", expr_wid);
-		}
 	} else {
 		fprintf(g_out, "%u'h1", expr_wid);
 	}

@@ -9,6 +9,7 @@
 
 #include "globals.h"
 #include "concolic.h"
+#include "data_mem.h"
 #include <cstdlib>
 #include <cstring>
 #include <string>
@@ -20,12 +21,10 @@
 
 using namespace std;
 
-static void generate_data_file(uint width, uint unroll, bool use_existing);
 static void generate_tb(ivl_scope_t root);
 static void pre_processing(ivl_design_t design);
 static void post_processing(ivl_design_t design);
 static void extract_parameters(ivl_design_t design);
-static void build_port_list(ivl_scope_t root);
 
 extern "C" int target_design(ivl_design_t design) {
 	//set globals
@@ -44,40 +43,23 @@ extern "C" int target_design(ivl_design_t design) {
 		error("Root scope type is not module");
 	}
 	
-    //build port list
-    build_port_list(roots[0]);
-    
     //generate testbench
 	generate_tb(roots[0]);
     
     //generate data files
-    generate_data_file(10, g_unroll, true);
+    g_data.generate(true);
 	
 	//draw all scopes
 	emit_root(roots[0]);
 
 	//free_emitted_scope_list();
 
-	/* Emit any UDP definitions that the design used. */
-	//emit_udp_list();
-
-	/* Emit any UDPs that are Icarus generated (D-FF). */
-	//emit_icarus_generated_udps();
-
 	SMTSigCore::print_state_variables();
 	
 	post_processing(design);
 	
-	//compile
-	//system("iverilog instrumented.v tb_concolic.v -o conc_run.vvp");
-    
 	start_concolic();
 	
-
-	/* A do nothing call to prevent warnings about this routine not
-	 * being used. */
-	//dump_nexus_information(0, 0);
-
 	return g_errors;
 }
 
@@ -137,13 +119,7 @@ void extract_parameters(ivl_design_t design){
     }
 }
 
-void build_port_list(ivl_scope_t root){
-    
-}
-
 void generate_tb(ivl_scope_t root){
-	ivl_design_t design = g_design;
-	
     const char* name;
 
     //prepare reset edge
@@ -163,7 +139,6 @@ void generate_tb(ivl_scope_t root){
     //write testbench
     FILE* f_tb = fopen(g_tb_file, "w");
     fprintf(f_tb, "module conquest_tb();\n\n");
-    uint width = 0;
     
     const uint count = ivl_scope_mod_module_ports(root);
     if(count == 0){
@@ -178,7 +153,7 @@ void generate_tb(ivl_scope_t root){
         uint temp_width = ivl_scope_mod_module_port_width(root, i);
         const char* type;
         bool is_init_val_req = true;
-        if(strcmp(name, clk_sig) == 0){
+        if(strcmp(name, g_clock_sig_name) == 0){
             if(temp_width != 1){
                 error("Clock signal width is not 1");
             }
@@ -197,12 +172,7 @@ void generate_tb(ivl_scope_t root){
             type = "reg ";
             ivl_signal_port_t port_type = ivl_scope_mod_module_port_type(root, i);
             if(port_type == IVL_SIP_INPUT){
-                sig_t temp;
-                temp.lsb = width;
-                temp.msb = width + temp_width - 1;
-                temp.width = temp_width;
-                g_in_port_map[string(name)] = temp;
-                width += temp_width;
+				g_data.add_input(name, temp_width);
             } else if(port_type == IVL_SIP_OUTPUT){
                 type = "wire";
             }
@@ -221,16 +191,14 @@ void generate_tb(ivl_scope_t root){
         fprintf(f_tb, ";\n");
     }
     if(enable_obs_padding){
+		g_data.add_input("__obs", 1);
         fprintf(f_tb, "%*creg  __obs;\n", 4, ' ');
-        sig_t temp = {width, width, 1};
-        g_in_port_map["__obs"] = temp;
-        width++;
     }
-    if(clk_found == false){
+    if(!clk_found){
         error("Clock signal not found in top module");
     }
-    if(have_reset && !reset_found){
-        error("Specified reset signal not found");
+    if(!reset_found){
+        error("Reset signal not found in top module");
     }
 
     //Dump top module instantiation
@@ -249,40 +217,32 @@ void generate_tb(ivl_scope_t root){
     }
     fprintf(f_tb, ");\n");
 
-    if(width > 1){
-#if defined(DATA_MEM_TYPE_HEX)
-        //make ram width multiple of 4
-        if(width & 0b11){
-            width += 4;
-        }
-        width = (width >> 2) << 2;
-#endif
-
+    if(g_data.get_width() > 1){
         //Dump internal use signals
         fprintf(f_tb, "\n%*c// Generated internal use signals\n", 4, ' ');
         fprintf(f_tb, "%*creg  [31:0] _conc_pc;\n", 4, ' ');
-        fprintf(f_tb, "%*creg  [%u:0] _conc_opcode;\n", 4, ' ', width-1);
-        fprintf(f_tb, "%*creg  [%u:0] _conc_ram[0:%s];\n\n", 4, ' ', width-1, unroll_cyc);
+        fprintf(f_tb, "%*creg  [%u:0] _conc_opcode;\n", 4, ' ', g_data.get_width() - 1);
+        fprintf(f_tb, "%*creg  [%u:0] _conc_ram[0:%u];\n\n", 4, ' ', g_data.get_width() - 1, g_unroll);
 
         //Dump clk toggle
         fprintf(f_tb, "\n%*c// Generated clock pulse\n", 4, ' ');
         fprintf(f_tb, "%*calways begin\n", 4, ' ');
-        fprintf(f_tb, "%*c#5 %s = ~%s;\n", 8, ' ', clk_sig, clk_sig);
+        fprintf(f_tb, "%*c#5 %s = ~%s;\n", 8, ' ', g_clock_sig_name, g_clock_sig_name);
         fprintf(f_tb, "%*cend\n", 4, ' ');
 
         //Dump pc increment
         fprintf(f_tb, "\n%*c// Generated program counter\n", 4, ' ');
-        fprintf(f_tb, "%*calways @(posedge %s) begin\n", 4, ' ', clk_sig);
+        fprintf(f_tb, "%*calways @(posedge %s) begin\n", 4, ' ', g_clock_sig_name);
         fprintf(f_tb, "%*c_conc_pc = _conc_pc + 32'b1;\n", 8, ' ');
         fprintf(f_tb, "%*c_conc_opcode = _conc_ram[_conc_pc];\n", 8, ' ');
-        map<std::string, sig_t>::iterator it = g_in_port_map.begin();
-        for(;it != g_in_port_map.end(); it++){
-            if(it->second.width > 1){
-                fprintf(f_tb, "%*c%s <= #1 _conc_opcode[%u:%u];\n", 8, ' ', it->first.c_str(), it->second.msb, it->second.lsb);
+		
+		for(auto it:g_data.in_ports){
+			if(it.second->width > 1){
+                fprintf(f_tb, "%*c%s <= #1 _conc_opcode[%u:%u];\n", 8, ' ', it.first.c_str(), it.second->msb, it.second->lsb);
             } else {
-                fprintf(f_tb, "%*c%s <= #1 _conc_opcode[%u];\n", 8, ' ', it->first.c_str(), it->second.msb);
+                fprintf(f_tb, "%*c%s <= #1 _conc_opcode[%u];\n", 8, ' ', it.first.c_str(), it.second->msb);
             }
-        }
+		}
         fprintf(f_tb, "%*c$strobe(\";_C %%d\", _conc_pc);\n", 8, ' ');
         fprintf(f_tb, "%*cend\n", 4, ' ');
 
@@ -290,35 +250,24 @@ void generate_tb(ivl_scope_t root){
         fprintf(f_tb, "\n%*c// Generated initial block\n", 4, ' ');
         fprintf(f_tb, "%*cinitial begin\n", 4, ' ');
         fprintf(f_tb, "%*c$display(\";_C 1\");\n", 8, ' ');
-        fprintf(f_tb, "%*c%s = 1'b0;\n", 8, ' ', clk_sig);
-        if(have_reset){
-            fprintf(f_tb, "%*c%s = %s;\n", 8, ' ', g_reset_sig_name, reset_inactive);
-        }
+        fprintf(f_tb, "%*c%s = 1'b0;\n", 8, ' ', g_clock_sig_name);
+        fprintf(f_tb, "%*c%s = %s;\n", 8, ' ', g_reset_sig_name, reset_edge_inactive);
         fprintf(f_tb, "%*c_conc_pc = 32'b1;\n", 8, ' ');
-#if defined(DATA_MEM_TYPE_HEX)
-        fprintf(f_tb, "%*c$readmemh(\"%s\", _conc_ram);\n", 8, ' ', g_data_mem);
-#elif defined(DATA_MEM_TYPE_BIN)
         fprintf(f_tb, "%*c$readmemb(\"%s\", _conc_ram);\n", 8, ' ', g_data_mem);
-#endif
 
         fprintf(f_tb, "%*c_conc_opcode = _conc_ram[1];\n", 8, ' ');
-        it = g_in_port_map.begin();
-        for(;it != g_in_port_map.end(); it++){
-            if(it->second.width > 1){
-                fprintf(f_tb, "%*c%s <= #1 _conc_opcode[%u:%u];\n", 8, ' ', it->first.c_str(), it->second.msb, it->second.lsb);
+        for(auto it:g_data.in_ports){
+			if(it.second->width > 1){
+                fprintf(f_tb, "%*c%s <= #1 _conc_opcode[%u:%u];\n", 8, ' ', it.first.c_str(), it.second->msb, it.second->lsb);
             } else {
-                fprintf(f_tb, "%*c%s <= #1 _conc_opcode[%u];\n", 8, ' ', it->first.c_str(), it->second.msb);
+                fprintf(f_tb, "%*c%s <= #1 _conc_opcode[%u];\n", 8, ' ', it.first.c_str(), it.second->msb);
             }
-        }
-        fprintf(f_tb, "%*c#2 %s = 1'b1;\n", 8, ' ', clk_sig);
-        if(have_reset){
-            fprintf(f_tb, "%*c%s = %s;\n", 8, ' ', g_reset_sig_name, reset_active);
-            fprintf(f_tb, "%*c#5 %s = %s;\n", 8, ' ', g_reset_sig_name, reset_inactive);
-        }
-        fprintf(f_tb, "%*c#%d $finish;\n", 8, ' ', (atoi(unroll_cyc)) * 10);
+		}
+        fprintf(f_tb, "%*c#2 %s = 1'b1;\n", 8, ' ', g_clock_sig_name);
+        fprintf(f_tb, "%*c%s = %s;\n", 8, ' ', g_reset_sig_name, g_reset_edge_active);
+        fprintf(f_tb, "%*c#5 %s = %s;\n", 8, ' ', g_reset_sig_name, reset_edge_inactive);
+        fprintf(f_tb, "%*c#%d $finish;\n", 8, ' ', g_unroll * 10);
         fprintf(f_tb, "%*cend\n\n", 4, ' ');
-
-        generate_data_file(width, g_unroll);
     } else{
         error("TODO: Testbench for input width of 1");
     }

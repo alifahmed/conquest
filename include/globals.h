@@ -2,6 +2,7 @@
 
 #include "types.h"
 #include "ivl_target.h"
+#include "data_mem.h"
 #include <cstdio>
 
 //global variables
@@ -14,6 +15,7 @@ extern const char*      g_output_file;
 extern const char*      g_tb_file;
 extern const char*		g_data_mem;
 extern const char*		g_data_mem_raw;
+extern CTDataMem		g_data;
 
 //Parameters
 extern uint     		g_unroll;

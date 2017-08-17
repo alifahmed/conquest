@@ -49,7 +49,6 @@ static char sim_file_name[64];
 static char cnst_file_name[64];
 static char mem_file_name[64];
 static uint hash_table[1024*16];
-vector<string> data_mem;
 static uint sim_num;
 FILE* f_dbg;
 uint total_constraints_before = 0;
@@ -375,72 +374,6 @@ static inline void dump_constraints(ofstream &f_cons, uint top_idx) {
     }
 }
 
-static void read_data_mem(){
-    ifstream in(g_data_mem);
-	string str;
-	while(in >> str){
-		data_mem.push_back(str);
-	}
-    in.close();
-}
-
-static void modify_data_mem(uint clock, const sig_t &sig, const string &value){
-    string &str = data_mem[clock];
-    str.replace(str.length() - sig.msb - 1, sig.width, value);
-}
-
-static void write_data_mem(){
-    ofstream out(g_data_mem);
-    const uint count = data_mem.size();
-    for(uint i=0; i<count; i++){
-        out << data_mem[i] << '\n';
-    }
-    out.close();
-    data_mem.clear();
-}
-
-static void build_input_vectors(ifstream& f_in, uint clock_obs){
-    read_data_mem();
-    while(true){
-		string line;
-        getline(f_in, line);
-		if(f_in.eof()){
-			break;
-		}
-        string name;
-        uint clock = 0;
-        
-        //parse
-        uint pos = 3;
-        while(line[pos] != ' ') pos++;
-        uint mark1 = pos + 3;
-        line[pos] = 0;
-        pos--;
-        while(line[pos] != '_') pos--;
-        name = line.substr(3, (pos-3));
-        map<string, sig_t>::iterator it = g_in_port_map.find(name);
-        if(it != g_in_port_map.end()){
-            pos++;
-            while(line[pos]){
-                clock = clock*10 + line[pos]-'0';
-                pos++;
-            }
-            pos = mark1 + 1;
-            while(line[pos] != ')') pos++;
-            modify_data_mem(clock, it->second, line.substr(mark1, pos - mark1));
-        }
-    }
-	/*if(enable_obs_padding){
-		for(uint i = 0; i < clock_obs; i++){
-			data_mem[i][0] = '0';
-		}
-		for(uint i = clock_obs; i <= g_unroll; i++){
-			data_mem[i][0] = '1';
-		}
-	}*/
-    write_data_mem();
-}
-
 static inline bool check_sat(ifstream &f_in, const string &sim_cnst){
 	string cmd = "yices --logic=QF_BV " + sim_cnst + " > model.log";
 	system(cmd.c_str());
@@ -472,34 +405,16 @@ static bool check_yices_status(){
 }
 
 static bool solve_constraints(uint clock) {
-	if(enable_yices_api){
-		bool is_sat = check_yices_status();
-		if(is_sat){
-			model_t *model = yices_get_model(yices_context, true);
-			FILE *f_out = fopen("model.log", "w");
-			yices_print_model(f_out, model);
-			fclose(f_out);
-			ifstream f_in("model.log");
-			build_input_vectors(f_in, clock);
-			f_in.close();
-			yices_free_model(model);
-		}
-		return is_sat;
+	bool is_sat = check_yices_status();
+	if(is_sat){
+		model_t *model = yices_get_model(yices_context, true);
+		FILE *f_out = fopen("model.log", "w");
+		yices_print_model(f_out, model);
+		fclose(f_out);
+		g_data.update_and_dump("model.log", g_data_mem);
+		yices_free_model(model);
 	}
-	else{
-		ifstream f_in;	
-		bool is_sat = check_sat(f_in, "constraints_temp.ys");
-		if(is_sat){
-			if(enable_sim_copy){
-				string cmd = "cp constraints_temp.ys ";
-				cmd.append(cnst_file_name);
-				system(cmd.c_str());
-			}
-			build_input_vectors(f_in, clock);
-		}
-		f_in.close();
-		return is_sat;
-	}
+	return is_sat;
 }
 
 static void clear_branch_covered(SMTBranch* br, uint start_clock){

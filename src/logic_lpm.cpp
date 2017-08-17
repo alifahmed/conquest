@@ -1525,14 +1525,6 @@ void emit_lpm(ivl_scope_t scope, ivl_lpm_t lpm) {
 	}
 }
 
-static void emit_logic_file_line(ivl_net_logic_t nlogic) {
-	if (g_emit_file_line) {
-		fprintf(g_out, " /* %s:%u */",
-				ivl_logic_file(nlogic),
-				ivl_logic_lineno(nlogic));
-	}
-}
-
 /*
  * A BUFZ is a simple variable assignment possibly with strength and/or delay.
  */
@@ -1759,9 +1751,7 @@ void emit_logic(ivl_scope_t scope, ivl_net_logic_t nlogic) {
 		assert(count == 0);
 		emit_name_of_logic_nexus(scope, nlogic, ivl_logic_pin(nlogic, idx));
 	}
-	fprintf(g_out, ");");
-	emit_logic_file_line(nlogic);
-	fprintf(g_out, "\n");
+	fprintf(g_out, ");\n");
 }
 
 void emit_tran(ivl_scope_t scope, ivl_switch_t tran) {
@@ -1845,13 +1835,7 @@ void emit_tran(ivl_scope_t scope, ivl_switch_t tran) {
 		fprintf(g_out, ", ");
 		emit_nexus_as_ca(scope, ivl_switch_enable(tran), 0, 0);
 	}
-	fprintf(g_out, ");");
-	if (g_emit_file_line) {
-		fprintf(g_out, " /* %s:%u */",
-				ivl_switch_file(tran),
-				ivl_switch_lineno(tran));
-	}
-	fprintf(g_out, "\n");
+	fprintf(g_out, ");\n");
 }
 
 void emit_signal_net_const_as_ca(ivl_scope_t scope, ivl_signal_t sig) {

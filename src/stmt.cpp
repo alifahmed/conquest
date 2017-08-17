@@ -25,12 +25,6 @@ static inline void inst_cond(){
 	smt_assign->instrument();
 }
 
-static void emit_stmt_file_line(ivl_statement_t stmt) {
-	if (g_emit_file_line) {
-		fprintf(g_out, " // %s:%u", ivl_stmt_file(stmt), ivl_stmt_lineno(stmt));
-	}
-}
-
 static inline void emit_block_begin(){
 	fprintf(g_out, "%*cbegin\n", get_indent(), ' ');
 	g_ind += g_ind_incr;
@@ -483,14 +477,6 @@ static void emit_assign_and_opt_opcode(ivl_scope_t scope, ivl_statement_t stmt,
 		unsigned twid = emit_stmt_lval(scope, stmt, smt_assign);
 		assert(twid == wid);
 		fprintf(g_out, " %s ", opcode_str);
-		/* The >>>= assignment operator is only allowed when the allow
-		 * signed flag is true. */
-		if ((!g_allow_signed) && (opcode == 'R')) {
-			fprintf(stderr, "%s:%u: vlog95 error: >>>= operator is not "
-					"supported.\n",
-					ivl_stmt_file(stmt), ivl_stmt_lineno(stmt));
-			g_errors += 1;
-		}
 	}
 	smt_assign->rval = emit_expr(scope, ivl_stmt_rval(stmt), wid, 1, 0, 0);
 }
@@ -878,7 +864,6 @@ static void emit_stmt_block_named(ivl_scope_t scope, ivl_statement_t stmt) {
 	ivl_scope_t my_scope = ivl_stmt_block_scope(stmt);
 	fprintf(g_out, "%*cbegin: ", get_indent(), ' ');
 	emit_id(ivl_scope_basename(my_scope));
-	emit_stmt_file_line(stmt);
 	fprintf(g_out, "\n");
 	emit_stmt_block_body(scope, stmt);
 	fprintf(g_out, "%*cend  /* %s */\n", get_indent(), ' ',
@@ -976,9 +961,7 @@ static void emit_stmt_cassign(ivl_scope_t scope, ivl_statement_t stmt, SMTAssign
 	wid = emit_stmt_lval(scope, stmt, smt_assign);
 	fprintf(g_out, " = ");
 	smt_assign->rval = emit_expr(scope, ivl_stmt_rval(stmt), wid, 1, 0, 0);
-	fprintf(g_out, ";");
-	emit_stmt_file_line(stmt);
-	fprintf(g_out, "\n");
+	fprintf(g_out, ";\n");
 }
 
 static void emit_stmt_condit(ivl_scope_t scope, ivl_statement_t stmt) {
