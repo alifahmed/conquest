@@ -414,16 +414,6 @@ static SMTExpr* emit_logic_as_ca(ivl_scope_t scope, ivl_net_logic_t nlogic) {
 	return smt_logic;
 }
 
-/*static void emit_lpm_array(ivl_scope_t scope, ivl_lpm_t lpm) {
-	ivl_signal_t sig = ivl_lpm_array(lpm);
-	emit_scope_module_path(scope, ivl_signal_scope(sig));
-	emit_id(ivl_signal_basename(sig));
-	fprintf(g_out, "[");
-	// HERE: Need to remove the scale to match array base instead of adding it back.
-	emit_nexus_as_ca(scope, ivl_lpm_select(lpm), 0, 0);
-	fprintf(g_out, " + %d]", ivl_signal_array_base(sig));
-}*/
-
 static SMTConcat* emit_lpm_concat(ivl_scope_t scope, ivl_lpm_t lpm) {
 	SMTConcat* smt_concat = new SMTConcat();
 	unsigned idx, count = ivl_lpm_size(lpm);
@@ -642,23 +632,6 @@ static SMTExpr* emit_lpm_part_select(ivl_scope_t scope, ivl_lpm_t lpm, uint sign
 	
 	return smt_sig;
 }
-
-// HERE: No support for trigger. Is this actually needed?
-
-/*static void emit_lpm_func(ivl_scope_t scope, ivl_lpm_t lpm) {
-	unsigned count = ivl_lpm_size(lpm);
-	if (count) {
-		unsigned idx;
-		count -= 1;
-		fprintf(g_out, "(");
-		for (idx = 0; idx < count; idx += 1) {
-			emit_nexus_as_ca(scope, ivl_lpm_data(lpm, idx), 0, 0);
-			fprintf(g_out, ", ");
-		}
-		emit_nexus_as_ca(scope, ivl_lpm_data(lpm, count), 0, 0);
-		fprintf(g_out, ")");
-	}
-}*/
 
 static SMTExpr* emit_lpm_as_ca(ivl_scope_t scope, ivl_lpm_t lpm, uint sign_extend) {
 	switch (ivl_lpm_type(lpm)) {
