@@ -273,6 +273,9 @@ static void emit_module_port_defs(ivl_scope_t scope) {
 
 // Emit root module
 void emit_root(ivl_scope_t root) {
+    //check if hierarchy is flattened 
+	assert(ivl_scope_childs(root) == 0);
+    
 	// Output module declaration
 	emit_scope_file_line(root);
 	fprintf(g_out, "module %s", ivl_scope_basename(root));
@@ -300,10 +303,6 @@ void emit_root(ivl_scope_t root) {
 
 	/* Output the initial/always blocks for this module. */
 	ivl_design_process(g_design, (ivl_process_f) find_process, root);
-
-	//check if hierarchy is flattened 
-	assert(ivl_scope_childs(root) == 0);
-	//ivl_scope_children(root, emit_child_module, root);
 
 	fprintf(g_out, "endmodule\n\n");
 }

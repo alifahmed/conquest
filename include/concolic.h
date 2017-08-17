@@ -20,6 +20,7 @@ class SMTSignal;
 class SMTExpr;
 class SMTSigCore;
 class SMTAssign;
+class SMTProcess;
 struct constraint_t;
 
 extern uint single_indent;
@@ -42,7 +43,7 @@ extern SMTExpr* emit_expr(ivl_scope_t scope, ivl_expr_t expr, unsigned width,
 		unsigned is_full_prec);
 extern void emit_logic(ivl_scope_t scope, ivl_net_logic_t nlogic);
 extern void emit_lpm(ivl_scope_t scope, ivl_lpm_t lpm);
-extern void emit_process(ivl_scope_t scope, ivl_process_t proc);
+extern SMTProcess* emit_process(ivl_scope_t scope, ivl_process_t proc);
 void emit_stmt(ivl_scope_t scope, ivl_statement_t stmt);
 extern void emit_scaled_expr(ivl_scope_t scope, ivl_expr_t expr,
 		int msb, int lsb, SMTSignal* smt_sig);

@@ -184,13 +184,12 @@ static unsigned emit_stmt_lval(ivl_scope_t scope, ivl_statement_t stmt, SMTAssig
  * A common routine to emit the basic assignment construct. It can also
  * translate an assignment with an opcode when allowed.
  */
-static void emit_assign_and_opt_opcode(ivl_scope_t scope, ivl_statement_t stmt,
-		unsigned allow_opcode, SMTAssign* smt_assign) {
+static SMTBlockingAssign* emit_assign_and_opt_opcode(ivl_scope_t scope, ivl_statement_t stmt,
+		unsigned allow_opcode) {
 	unsigned wid;
 	char opcode;
 	const char *opcode_str;
 
-	assert(ivl_statement_type(stmt) == IVL_ST_ASSIGN);
 	// HERE: Do we need to calculate the width? The compiler should have already
 	//       done this for us.
 	wid = emit_stmt_lval(scope, stmt, smt_assign);
@@ -258,17 +257,13 @@ typedef struct port_expr_s {
 	} expr;
 } *port_expr_t;
 
-static void emit_stmt_assign(ivl_scope_t scope, ivl_statement_t stmt, SMTAssign* smt_assign) {
+static SMTBlockingAssign* emit_stmt_assign(ivl_scope_t scope, ivl_statement_t stmt) {
 	fprintf(g_out, "%*c", get_indent(), ' ');
-	/* Emit the basic assignment (an opcode is allowed).*/
-	//alif: opcode is disabled for now
-	emit_assign_and_opt_opcode(scope, stmt, 0, smt_assign);
+	emit_assign_and_opt_opcode(scope, stmt, 0);
 	fprintf(g_out, ";");
-	//emit_stmt_file_line(stmt);
-	//fprintf(g_out, "\n");
 }
 
-static void emit_stmt_assign_nb(ivl_scope_t scope, ivl_statement_t stmt, SMTAssign* smt_assign) {
+static SMTNonBlockingAssign* emit_stmt_assign_nb(ivl_scope_t scope, ivl_statement_t stmt) {
 	unsigned wid;
 	fprintf(g_out, "%*c", get_indent(), ' ');
 	// HERE: Do we need to calculate the width? The compiler should have already
@@ -636,11 +631,12 @@ void emit_stmt(ivl_scope_t scope, ivl_statement_t stmt) {
 	single_indent = 0;
 }
 
-void emit_process(ivl_scope_t scope, ivl_process_t proc) {
+SMTProcess* emit_process(ivl_scope_t scope, ivl_process_t proc) {
+    SMTProcess* smt_proc = new SMTProcess();
 	ivl_statement_t stmt = ivl_process_stmt(proc);
 	if (ivl_statement_type(stmt) == IVL_ST_NOOP) {
 		info("Process statement type IVL_ST_NOOP");
-		return;
+		return smt_proc;
 	}
 	//reset indent
 	g_ind = g_ind_incr;
@@ -664,11 +660,12 @@ void emit_process(ivl_scope_t scope, ivl_process_t proc) {
         error("process without sensitivity list");
 		emit_blocked_stmt(scope, stmt);
 	} else {
-		SMTProcess::curr_proc = new SMTProcess();
+		SMTProcess::curr_proc = smt_proc;
 		emit_stmt(scope, stmt);
-        SMTProcess::curr_proc->exit_block = SMTProcess::curr_proc->top_bb;
-        SMTProcess::curr_proc->print();
+        smt_proc->exit_block = smt_proc->top_bb;
+        smt_proc->print();
 		//SMTProcess::curr_proc = NULL;
 	}
 	fprintf(g_out, "\n");
+    return smt_proc;
 }
