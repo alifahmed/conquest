@@ -341,22 +341,7 @@ void SMTUnary::set_opcode(const ivl_expr_t expr) {
 
 void SMTUnary::redraw(SMTClkType clk_type) {
 	assert(exprList.size() == 1);
-	if(!enable_yices_api){
-		SMTExpr* child = exprList[0];
-		if(child->is_inverted){
-			if(is_inverted){
-				//- - is +
-				is_inverted = false;
-				child->is_inverted = false;
-			}
-			else{
-				//inherit
-				child->is_inverted = false;
-				is_inverted = true;
-			}
-		}
-	}
-	
+
 	//print
 	if(is_inverted){
 		bv_str << "(bv-not ";
@@ -401,10 +386,8 @@ void SMTBinary::set_opcode(char ivl_code) {
 			func = yices_bvmul;
 			break;
 		case 'p':
+            error("TODO: bvpower");
 			opcode = "bv-pow";
-			if(enable_yices_api){
-				error("TODO: bvpower");
-			}
 			break;
         case 'n':
 			opcode = "bv-comp";				//converted from bool to bitvector
@@ -665,10 +648,6 @@ std::string SMTAssign::pad_and_update(bool is_commit) {
         sig_core->update_next_version();
         new_str += name + '_' + to_string(sig_core->next_version);
         start_pos = name_pos + 1;
-		if(enable_ud_chain && last_cnst){
-			sig_core->connected_cnst_at_ver[sig_core->next_version].push_back(last_cnst);
-			last_cnst->sig_list.push_back(sig_core->connected_cnst_at_ver + sig_core->next_version);
-		}
     }
     while((at_pos = orig_str.find('#', start_pos)) != string::npos){
         new_str.append(orig_str, start_pos, at_pos - start_pos);
@@ -679,10 +658,6 @@ std::string SMTAssign::pad_and_update(bool is_commit) {
         assert(sig_core);
         new_str += name + '_' + to_string(sig_core->curr_version);
         start_pos = name_pos + 1;
-		if(enable_ud_chain && last_cnst){
-			sig_core->connected_cnst_at_ver[sig_core->curr_version].push_back(last_cnst);
-			last_cnst->sig_list.push_back(sig_core->connected_cnst_at_ver + sig_core->curr_version);
-		}
     }
     new_str.append(orig_str, start_pos, 0xFFFFFF);
 	if(is_commit){
@@ -944,23 +919,6 @@ void SMTBranch::clear_covered_clk(uint clock) {
     coverage[clock] = false;
 }
 
-SMTBranch* SMTBranch::get_next_uncovered() {
-	return parent_node->get_next_uncovered(list_idx);
-}
-
-SMTBranch* SMTBranch::get_next_uncovered(uint clock) {
-	return parent_node->get_next_uncovered(clock, list_idx);
-}
-
-SMTBranch* SMTBranch::get_next_uncovered_cd(uint sel_clk) {
-	return parent_node->get_next_uncovered_cd(sel_clk, list_idx);
-}
-
-SMTBranch* SMTBranch::get_k_permit() {
-	return parent_node->get_k_permit(list_idx);
-}
-
-
 void SMTBranch::clear_flag() {
 	parent_node->clear_flag();
 }
@@ -1117,55 +1075,6 @@ SMTBranchNode::SMTBranchNode() {
     curr_check_idx = 0;
 }
 
-SMTBranch* SMTBranchNode::get_next_uncovered(uint list_idx) {
-	const uint count = branch_list.size();
-    for(; curr_check_idx < count; curr_check_idx++){
-		if(curr_check_idx != list_idx){
-			if(!(branch_list[curr_check_idx]->is_covered())){
-				return branch_list[curr_check_idx++];
-			}
-		}
-    }
-	return NULL;
-}
-
-SMTBranch* SMTBranchNode::get_next_uncovered(uint clock, uint list_idx) {
-    const uint count = branch_list.size();
-    for(; curr_check_idx < count; curr_check_idx++){
-		if(curr_check_idx != list_idx){
-			if(!(branch_list[curr_check_idx]->is_covered_clk(clock))){
-				return branch_list[curr_check_idx++];
-			}
-		}
-    }
-    return NULL;
-}
-
-SMTBranch* SMTBranchNode::get_next_uncovered_cd(uint sel_clock, uint list_idx) {
-    const uint count = branch_list.size();
-    for(; curr_check_idx < count; curr_check_idx++){
-		if(curr_check_idx != list_idx){
-			if(sel_clock < branch_list[curr_check_idx]->last_selected_clock){
-				branch_list[curr_check_idx]->last_selected_clock = sel_clock;
-				return branch_list[curr_check_idx++];
-			}
-		}
-    }
-    return NULL;
-}
-
-SMTBranch* SMTBranchNode::get_k_permit(uint list_idx) {
-	const uint count = branch_list.size();
-    for(; curr_check_idx < count; curr_check_idx++){
-		if(curr_check_idx != list_idx){
-			if(branch_list[curr_check_idx]->k_permit_covered < k_permit_effort){
-				return branch_list[curr_check_idx++];
-			}
-		}
-    }
-    return NULL;
-}
-
 void SMTBranchNode::clear_flag() {
 	curr_check_idx = 0;
 }
@@ -1235,17 +1144,11 @@ bool SMTNumber::is_equal(SMTNumber* num) {
 core_map_t SMTSigCore::regDir;
 core_map_t SMTSigCore::wireDir;
 vector<SMTSigCore*> SMTSigCore::state_variables;
+vector<SMTSigCore*> SMTSigCore::input_port_list;
 SMTSigCore::SMTSigCore(ivl_signal_t sig){
     name = ivl_signal_basename(sig);
     width = ivl_signal_width(sig);
     zeros = smt_zeros(width);
-    if(enable_concrete_states){
-        if(width > 32){
-            error("max signal width is currently 32 bits with concrete inputs enabled");
-        }
-        //states = new uint[g_unroll + 2];
-        temp_state = 0;
-    }
     int msb;
     int lsb;
     get_sig_msb_lsb(sig, &msb, &lsb);
@@ -1263,64 +1166,38 @@ SMTSigCore::SMTSigCore(ivl_signal_t sig){
         wireDir[sig] = this;
 		is_dep = true;
 		is_state_variable = false;
+        input_port_list.push_back(this);
     }
 	curr_version = 0;
     next_version = 0;
     last_defined_version = g_unroll + 1;
 	g_name_sig_map[name] = this;
 	was_in_queue = false;
-	if(enable_yices_api){
-		//set width type
-		bv_type = yices_bv_type(width);
+    //set width type
+    bv_type = yices_bv_type(width);
 
-		//create g_unroll number of terms
-		for(uint i = 0; i <= g_unroll; i++){
-			term_t new_term = yices_new_uninterpreted_term(bv_type);
-			yices_set_term_name(new_term, (name.c_str() + string("_") + to_string(i)).c_str());
-			term_stack.push_back(new_term);
-		}
+    //create g_unroll number of terms
+    for(uint i = 0; i <= g_unroll; i++){
+        term_t new_term = yices_new_uninterpreted_term(bv_type);
+        yices_set_term_name(new_term, (name.c_str() + string("_") + to_string(i)).c_str());
+        term_stack.push_back(new_term);
+    }
 
-		//create zero term
-		init_term = yices_eq(term_stack[0], yices_bvconst_zero(width));
-	}
-	if(enable_ud_chain){
-		connected_cnst_at_ver = new cnst_list_t[g_unroll<<2];
-	}
+    //create zero term
+    init_term = yices_eq(term_stack[0], yices_bvconst_zero(width));
 }
 
 SMTSigCore::~SMTSigCore() {
-    //delete [] flag_spec_bit;
-    //delete [] mult_last_node_map;
-    /*if(states){
-        delete [] states;
-        states = NULL;
-    }*/
-	if(enable_ud_chain){
-		delete [] connected_cnst_at_ver;
-	}
 }
 
 void SMTSigCore::update_next_version() {
     next_version++;
 	
-	if(enable_yices_api){
-		if(next_version == term_stack.size()){
-			term_t new_term = yices_new_uninterpreted_term(bv_type);
-			yices_set_term_name(new_term, (name.c_str() + string("_") + std::to_string(next_version)).c_str());
-			term_stack.push_back(new_term);
-		}
-	}
-	else{
-		if(next_version > last_defined_version){
-			//dump define
-			assert(g_define_out.is_open());
-			print_define(g_define_out, next_version);
-			last_defined_version = next_version;
-		}
-	}
-    //if(is_commit){
-    //    commit();
-    //}
+    if(next_version == term_stack.size()){
+        term_t new_term = yices_new_uninterpreted_term(bv_type);
+        yices_set_term_name(new_term, (name.c_str() + string("_") + std::to_string(next_version)).c_str());
+        term_stack.push_back(new_term);
+    }
 }
 
 term_t SMTSigCore::get_term(SMTClkType clk) {
@@ -1329,12 +1206,6 @@ term_t SMTSigCore::get_term(SMTClkType clk) {
 		version = curr_version;
 	} else {
 		version = next_version;
-	}
-	
-	if(enable_ud_chain && last_cnst){
-		assert(version < (g_unroll<<2));
-		connected_cnst_at_ver[version].push_back(last_cnst);
-		last_cnst->sig_list.push_back(connected_cnst_at_ver + version);
 	}
 	
 	return term_stack[version];
@@ -1499,12 +1370,8 @@ void SMTSigCore::yices_insert_reg_init(context_t* ctx) {
 
 void SMTSigCore::free_connected() {
 	uint size;
-	if(enable_yices_api){
-		size = term_stack.size();
-	}
-	else{
-		size = last_defined_version + 1;
-	}
+	size = term_stack.size();
+    
 	for(uint i=0; i<size; i++){
 		connected_cnst_at_ver[i].clear();
 	}
@@ -1532,6 +1399,13 @@ void SMTSigCore::print_state_variables() {
 	}
 	fprintf(g_out, "\n\n");
 }
+
+void SMTSigCore::set_input_version(uint version) {
+    for(auto it:input_port_list){
+        it->curr_version = version;
+    }
+}
+
 
 //----------------------------SMT Signal----------------------------------------
 SMTSignal::SMTSignal() : SMTExpr(SMT_EXPR_SIGNAL) {

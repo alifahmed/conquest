@@ -552,30 +552,8 @@ void emit_scope_path(ivl_scope_t scope, ivl_scope_t call_scope) {
 	}
 }
 
-static unsigned is_escaped(const char *id) {
-	assert(id);
-	/* The first digit must be alpha or '_' to be a normal id. */
-	if (isalpha((int) id[0]) || id[0] == '_') {
-		unsigned idx;
-		for (idx = 1; id[idx] != '\0'; idx += 1) {
-			if (!(isalnum((int) id[idx]) ||
-					id[idx] == '_' || id[idx] == '$')) {
-				return 1;
-			}
-		}
-		/* Any Verilog keyword should also be escaped. */
-		// HERE: Create a keyword.gperf file to do this check.
-		if ((strcmp(id, "input") == 0) ||
-				(strcmp(id, "output") == 0)) return 1;
-		/* We looked at all the digits, so this is a normal id. */
-		return 0;
-	}
-	return 1;
-}
-
 void emit_id(const char *id) {
-	if (is_escaped(id)) fprintf(g_out, "\\%s ", id);
-	else fprintf(g_out, "%s", id);
+	fprintf(g_out, "%s", id);
 }
 
 /*

@@ -241,11 +241,7 @@ public:
 	bool is_covered_clk(uint clock);
 	void set_covered_clk(uint sim_num, uint clock);
     void clear_covered_clk(uint clock);
-	SMTBranch* get_next_uncovered();
-	SMTBranch* get_next_uncovered(uint clock);
-	SMTBranch* get_k_permit();
 	void clear_flag();
-	SMTBranch* get_next_uncovered_cd(uint sel_clk);
 	
 	void instrument() override;
 	static SMTBranch* create_true_branch(SMTBranchNode* parent);
@@ -276,10 +272,6 @@ public:
     constraint_t* mult_last_node;
     uint mult_last_id = 0xFFFFFFFF;
     
-	virtual SMTBranch* get_next_uncovered(uint list_idx);
-	virtual SMTBranch* get_next_uncovered(uint clock, uint list_idx);
-	virtual SMTBranch* get_next_uncovered_cd(uint sel_clock, uint list_idx);
-	virtual SMTBranch* get_k_permit(uint list_idx);
 	void clear_flag();
 };
 
@@ -471,6 +463,7 @@ public:
     std::vector<SMTProcess*> dependent_process;
 	cnst_list_t* connected_cnst_at_ver;
 	static std::vector<SMTSigCore*> state_variables;
+    static std::vector<SMTSigCore*> input_port_list;
 	
 	
     SMTSigCore(ivl_signal_t sig);
@@ -498,6 +491,7 @@ public:
 	static void yices_insert_reg_init(context_t * ctx);
 	static void free_connected_cnst();
 	static void print_state_variables();
+    static void set_input_version(uint version);
 };
 
 

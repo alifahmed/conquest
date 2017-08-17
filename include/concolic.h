@@ -25,7 +25,6 @@ struct constraint_t;
 extern uint single_indent;
 extern std::vector<SMTExpr*> g_expr_list;
 extern std::unordered_map<std::string, SMTSigCore*> g_name_sig_map;
-extern std::vector<SMTSigCore*> g_in_port_list;
 extern std::ofstream g_define_out;
 extern FILE* f_dbg;
 extern constraint_t* last_cnst;

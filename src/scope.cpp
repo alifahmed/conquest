@@ -12,8 +12,6 @@ static void emit_sig_id(ivl_signal_t sig) {
 }
 
 static void emit_var_def(ivl_signal_t sig) {
-	if (ivl_signal_local(sig)) return;
-    new SMTSigCore(sig);
 	fprintf(g_out, "%*c", g_ind, ' ');
 	int msb, lsb;
 	get_sig_msb_lsb(sig, &msb, &lsb);
@@ -71,7 +69,6 @@ static void emit_net_def(ivl_scope_t scope, ivl_signal_t sig) {
 	int msb, lsb;
 	get_sig_msb_lsb(sig, &msb, &lsb);
 	if (ivl_signal_local(sig)) return;
-    new SMTSigCore(sig);
 	fprintf(g_out, "%*c", g_ind, ' ');
 	switch (ivl_signal_type(sig)) {
 		case IVL_SIT_TRI:
@@ -114,16 +111,15 @@ void emit_scope_variables(ivl_scope_t scope) {
 	const uint count = ivl_scope_sigs(scope);
 	for (uint idx = 0; idx < count; idx += 1) {
 		ivl_signal_t sig = ivl_scope_sig(scope, idx);
+        if (ivl_signal_local(sig)) continue;
+        
+        new SMTSigCore(sig);    //create and register signal
 		if (ivl_signal_type(sig) == IVL_SIT_REG) {
 			emit_var_def(sig);
-		} 
+		}
         else if (ivl_signal_port(sig) != IVL_SIP_INPUT){
 			emit_net_def(scope, sig);
 		}
-        else if(ivl_signal_port(sig) == IVL_SIP_INPUT){
-            SMTSigCore* sig_core = new SMTSigCore(sig);
-            g_in_port_list.push_back(sig_core);
-        }
 	}
 	if (count) fprintf(g_out, "\n");
 	if (emit_and_free_net_const_list(scope)){
@@ -249,6 +245,7 @@ static void emit_port(ivl_signal_t port) {
 	fprintf(g_out, " ");
 	/* Split port (arg[7:4],arg[3:0]) are generated using local signals. */
 	if (ivl_signal_local(port)) {
+        error("Check local port");
 		fprintf(g_out, "ivlog%s", ivl_signal_basename(port));
 	} else {
 		emit_id(ivl_signal_basename(port));
@@ -261,8 +258,9 @@ static void emit_module_port_defs(ivl_scope_t scope) {
 	for (idx = 0; idx < count; idx += 1) {
 		ivl_nexus_t nex = ivl_scope_mod_port(scope, idx);
 		ivl_signal_t port = get_port_from_nexus(scope, nex, &word);
-		// HERE: Do we need to use word?
-		if (port) emit_port(port);
+		if (port){
+            emit_port(port);
+        }
 		else {
 			error("Port not found");
 		}
@@ -273,198 +271,8 @@ static void emit_module_port_defs(ivl_scope_t scope) {
 	if (count) fprintf(g_out, "\n");
 }
 
-/*
- * Recursively look for the named block in the given statement.
- */
-static int has_named_block(ivl_scope_t scope, ivl_statement_t stmt) {
-	unsigned idx, count;
-	int rtn = 0;
-	if (!stmt) return 0;
-	switch (ivl_statement_type(stmt)) {
-			/* Block or fork items can contain a named block. */
-		case IVL_ST_BLOCK:
-		case IVL_ST_FORK:
-		case IVL_ST_FORK_JOIN_ANY:
-		case IVL_ST_FORK_JOIN_NONE:
-			if (ivl_stmt_block_scope(stmt) == scope) return 1;
-			count = ivl_stmt_block_count(stmt);
-			for (idx = 0; (idx < count) && !rtn; idx += 1) {
-				rtn |= has_named_block(scope,
-						ivl_stmt_block_stmt(stmt, idx));
-			}
-			break;
-			/* Case items can contain a named block. */
-		case IVL_ST_CASE:
-		case IVL_ST_CASER:
-		case IVL_ST_CASEX:
-		case IVL_ST_CASEZ:
-			count = ivl_stmt_case_count(stmt);
-			for (idx = 0; (idx < count) && !rtn; idx += 1) {
-				rtn |= has_named_block(scope,
-						ivl_stmt_case_stmt(stmt, idx));
-			}
-			break;
-			/* Either the true or false clause may have a named block. */
-		case IVL_ST_CONDIT:
-			rtn = has_named_block(scope, ivl_stmt_cond_true(stmt));
-			if (!rtn) {
-				rtn = has_named_block(scope, ivl_stmt_cond_false(stmt));
-			}
-			break;
-			/* The looping statements may have a named block. */
-		case IVL_ST_DO_WHILE:
-		case IVL_ST_FOREVER:
-		case IVL_ST_REPEAT:
-		case IVL_ST_WHILE:
-			/* The delay and wait statements may have a named block. */
-		case IVL_ST_DELAY:
-		case IVL_ST_DELAYX:
-		case IVL_ST_WAIT:
-			rtn = has_named_block(scope, ivl_stmt_sub_stmt(stmt));
-			break;
-		default: /* The rest cannot have a named block. */;
-	}
-	return rtn;
-}
-
-/*
- * Look for a disable in the statement (function body) for this scope.
- */
-static unsigned has_func_disable(ivl_scope_t scope, ivl_statement_t stmt) {
-	unsigned idx, count, rtn = 0;
-	/* If there is a statement then look to see if it is or has a
-	 * disable for this function scope. */
-	if (!stmt) return 0;
-	assert(ivl_scope_type(scope) == IVL_SCT_FUNCTION);
-	switch (ivl_statement_type(stmt)) {
-			/* These are not allowed in a function. */
-		case IVL_ST_ASSIGN_NB:
-		case IVL_ST_DELAY:
-		case IVL_ST_DELAYX:
-		case IVL_ST_FORK:
-		case IVL_ST_FORK_JOIN_ANY:
-		case IVL_ST_FORK_JOIN_NONE:
-		case IVL_ST_UTASK:
-		case IVL_ST_WAIT:
-			assert(0);
-			break;
-			/* These are allowed in a function and cannot have a disable. */
-		case IVL_ST_NOOP:
-		case IVL_ST_ALLOC:
-		case IVL_ST_ASSIGN:
-		case IVL_ST_CASSIGN:
-		case IVL_ST_DEASSIGN:
-		case IVL_ST_FORCE:
-		case IVL_ST_FREE:
-		case IVL_ST_RELEASE:
-		case IVL_ST_STASK:
-		case IVL_ST_TRIGGER:
-			break;
-			/* Look for a disable in each block statement. */
-		case IVL_ST_BLOCK:
-			count = ivl_stmt_block_count(stmt);
-			for (idx = 0; (idx < count) && !rtn; idx += 1) {
-				rtn |= has_func_disable(scope,
-						ivl_stmt_block_stmt(stmt, idx));
-			}
-			break;
-			/* Look for a disable in each case branch. */
-		case IVL_ST_CASE:
-		case IVL_ST_CASER:
-		case IVL_ST_CASEX:
-		case IVL_ST_CASEZ:
-			count = ivl_stmt_case_count(stmt);
-			for (idx = 0; (idx < count) && !rtn; idx += 1) {
-				rtn |= has_func_disable(scope,
-						ivl_stmt_case_stmt(stmt, idx));
-			}
-			break;
-			/* Either the true or false clause may have a disable. */
-		case IVL_ST_CONDIT:
-			rtn = has_func_disable(scope, ivl_stmt_cond_true(stmt));
-			if (!rtn) {
-				rtn = has_func_disable(scope, ivl_stmt_cond_false(stmt));
-			}
-			break;
-			/* These have a single sub-statement so look for a disable there. */
-		case IVL_ST_DO_WHILE:
-		case IVL_ST_FOREVER:
-		case IVL_ST_REPEAT:
-		case IVL_ST_WHILE:
-			rtn = has_func_disable(scope, ivl_stmt_sub_stmt(stmt));
-			break;
-			/* The function has a disable if the disable scope matches the
-			 * function scope. */
-		case IVL_ST_DISABLE:
-			rtn = scope == ivl_stmt_call(stmt);
-			break;
-		default:
-			fprintf(stderr, "%s:%u: vlog95 error: Unknown statement type (%d) "
-					"in function disable check.\n",
-					ivl_stmt_file(stmt),
-					ivl_stmt_lineno(stmt),
-					(int) ivl_statement_type(stmt));
-
-			g_errors += 1;
-			break;
-	}
-	return rtn;
-}
-
-/*
- * This search method may be slow for a large structural design with a
- * large number of gate types. That's not what this converter was built
- * for so this is probably OK. If this becomes an issue then we need a
- * better method/data structure.
- */
-static vector<const char*> scopes_emitted_list;
-
-static void check_scope_unsupported(ivl_scope_t scope) {
-	//check for unsupported features
-	if (ivl_scope_type(scope) != IVL_SCT_MODULE) {
-		error("Unsupported scope type");
-	}		//else if(ivl_scope_lpms(scope)){
-		//	error("LPM not supported");
-		//} 
-		//else if(ivl_scope_logs(scope)){
-		//	error("Logic device not supported");
-		//} 
-	else if (ivl_scope_switches(scope)) {
-		error("Switches not supported");
-	}
-}
-
-/*static int emit_child_module(ivl_scope_t module, void* parent) {
-	check_scope_unsupported(module);
-	
-	//emit variables
-	emit_scope_variables(module);
-
-	uint count = ivl_scope_lpms(module);
-	for (uint idx = 0; idx < count; idx += 1) {
-		emit_lpm(module, ivl_scope_lpm(module, idx));
-	}
-
-	count = ivl_scope_logs(module);
-	for (uint idx = 0; idx < count; idx += 1) {
-		emit_logic(module, ivl_scope_log(module, idx));
-	}
-	
-	count = ivl_scope_switches(module);
-	for (uint idx = 0; idx < count; idx += 1) {
-		emit_tran(module, ivl_scope_switch(module, idx));
-	}
-	
-	//output design process
-	ivl_design_process(g_design, find_process, module);
-	
-	return 0;
-}*/
-
 // Emit root module
 void emit_root(ivl_scope_t root) {
-	check_scope_unsupported(root);
-
 	// Output module declaration
 	emit_scope_file_line(root);
 	fprintf(g_out, "module %s", ivl_scope_basename(root));
@@ -493,10 +301,6 @@ void emit_root(ivl_scope_t root) {
 	/* Output the initial/always blocks for this module. */
 	ivl_design_process(g_design, (ivl_process_f) find_process, root);
 
-    if(enable_concrete_states){
-        SMTSigCore::print_reg_monitor();
-    }
-	
 	//check if hierarchy is flattened 
 	assert(ivl_scope_childs(root) == 0);
 	//ivl_scope_children(root, emit_child_module, root);

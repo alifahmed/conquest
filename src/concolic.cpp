@@ -43,19 +43,11 @@ extern "C" int target_design(ivl_design_t design) {
 		error("Root scope type is not module");
 	}
 	
-    //generate testbench
 	generate_tb(roots[0]);
-    
-    //generate data files
     g_data.generate(true);
-	
-	//draw all scopes
 	emit_root(roots[0]);
 
-	//free_emitted_scope_list();
-
 	SMTSigCore::print_state_variables();
-	
 	post_processing(design);
 	
 	start_concolic();

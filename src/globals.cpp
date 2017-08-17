@@ -29,5 +29,4 @@ const char*     g_reset_edge_active;
 
 
 std::unordered_map<std::string, SMTSigCore*> g_name_sig_map;
-std::vector<SMTSigCore*> g_in_port_list;
 std::ofstream g_define_out;

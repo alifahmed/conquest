@@ -28,7 +28,7 @@ clean:
 	@echo "Compiling $<..."
 
 $(TARGET): $(OBJECTS)
-	@g++ $(OBJECTS) -Wall -g -o $@ -std=c++11 -fpic -shared -lyices -Wno-unused-result
+	@g++ $(OBJECTS) -Wall -g -o $@ -std=c++11 -fpic -shared -lyices
 	@echo "Linking..."
 
 $(CONFIG_TARGET): $(CONFIG_FILE)
