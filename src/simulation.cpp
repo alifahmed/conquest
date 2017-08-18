@@ -130,7 +130,7 @@ static void build_stack() {
             SMTSigCore::commit_versions();
 		}
 		else if (strcmp(tag, ";A") == 0){
-			SMTDispAssign* assign = SMTDispAssign::get_assign(val);
+			SMTAssign* assign = SMTAssign::get_assign(val);
 			constraints_stack.push_back(create_constraint(clock, assign));
 		}
 		total_constraints_after++;
@@ -463,10 +463,10 @@ void start_concolic() {
 	init();
 	SMTBranch::save_coverage();
 	if(search_algo == SEARCH_ALGO_CFG_DIRECTED){
-		const uint count = SMTDispAssign::get_assign_count();
+		const uint count = SMTAssign::get_assign_count();
 		ofstream report("report_cov.log");
 		for(uint i=0; i<count; i++){
-			SMTDispAssign* assign = SMTDispAssign::get_assign(i);
+			SMTAssign* assign = SMTAssign::get_assign(i);
 			if(assign->assign_type == SMT_ASSIGN_BRANCH){
 				system("cp -f data_raw.mem data.mem");
 				target_branch = dynamic_cast<SMTBranch*>(assign);
@@ -495,7 +495,6 @@ void start_concolic() {
 		report.close();
         yices_free_context(yices_context);
         yices_exit();
-		SMTContAssign::free_print_map();
 		SMTFreeAll();
 		exit(0);
 	}
@@ -526,7 +525,7 @@ void end_concolic(){
 	//report << "[CNST AFTER] " << total_constraints_after << '\n';
 	//report << "[TOTAL BRANCH] " << SMTBranch::total_branch_count << '\n';
 	//report << "[COVERED BRANCH] " << SMTBranch::covered_branch_count << '\n';
-    SMTDispAssign::print_coverage(report);
+    SMTAssign::print_coverage(report);
     report.close();
     
     //printf("[TIME] %.0lf sec\n", difftime(end_time, start_time));
@@ -538,7 +537,6 @@ void end_concolic(){
 	
     yices_free_context(yices_context);
     yices_exit();
-    SMTContAssign::free_print_map();
     SMTFreeAll();
     exit(0);
 }

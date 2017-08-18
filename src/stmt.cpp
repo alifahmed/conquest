@@ -190,8 +190,7 @@ static SMTSignal* emit_stmt_lval(ivl_scope_t scope, ivl_statement_t stmt) {
 static SMTBlockingAssign* emit_assign_and_opt_opcode(ivl_scope_t scope, ivl_statement_t stmt) {
 	char opcode;
 	const char *opcode_str;
-	SMTBlockingAssign* smt_assign = new SMTBlockingAssign();
-	smt_assign->lval = emit_stmt_lval(scope, stmt);
+	SMTExpr* lval = emit_stmt_lval(scope, stmt);
 	/* Get the opcode and the string version of the opcode. */
 	opcode = ivl_stmt_opcode(stmt);
 	switch (opcode) {
@@ -229,18 +228,20 @@ static SMTBlockingAssign* emit_assign_and_opt_opcode(ivl_scope_t scope, ivl_stat
 			break;
 	}
 	fprintf(g_out, " = ");
+	SMTExpr* rval;
 	if (opcode) {
 		SMTBinary* smt_bi = new SMTBinary();
 		smt_bi->set_opcode(opcode);
 		smt_bi->add(emit_stmt_lval(scope, stmt));
 		fprintf(g_out, " %s ", opcode_str);
 		smt_bi->add(emit_expr(scope, ivl_stmt_rval(stmt)));
-		smt_assign->rval = smt_bi;
+		rval = smt_bi;
 	}
 	else{
-		smt_assign->rval = emit_expr(scope, ivl_stmt_rval(stmt));
+		rval = emit_expr(scope, ivl_stmt_rval(stmt));
 	}
-	return smt_assign;
+	
+	return new SMTBlockingAssign(lval, rval);
 }
 
 /*
@@ -264,12 +265,11 @@ static SMTBlockingAssign* emit_stmt_assign(ivl_scope_t scope, ivl_statement_t st
 
 static SMTNonBlockingAssign* emit_stmt_assign_nb(ivl_scope_t scope, ivl_statement_t stmt) {
 	fprintf(g_out, "%*c", get_indent(), ' ');
-	SMTNonBlockingAssign* smt_assign = new SMTNonBlockingAssign();
-	smt_assign->lval = emit_stmt_lval(scope, stmt);
+	SMTExpr* lval = emit_stmt_lval(scope, stmt);
 	fprintf(g_out, " <= #1 ");
-	smt_assign->rval = emit_expr(scope, ivl_stmt_rval(stmt));
+	SMTExpr* rval = emit_expr(scope, ivl_stmt_rval(stmt));
 	fprintf(g_out, ";");
-	return smt_assign;
+	return new SMTNonBlockingAssign(lval, rval);
 }
 
 static void emit_stmt_block(ivl_scope_t scope, ivl_statement_t stmt) {
@@ -375,13 +375,12 @@ static void emit_stmt_case(ivl_scope_t scope, ivl_statement_t stmt) {
 }
 
 static SMTBlockingAssign* emit_stmt_cassign(ivl_scope_t scope, ivl_statement_t stmt) {
-	SMTBlockingAssign* smt_assign = new SMTBlockingAssign();
 	fprintf(g_out, "%*cassign ", get_indent(), ' ');
-	smt_assign->lval = emit_stmt_lval(scope, stmt);
+	SMTExpr* lval = emit_stmt_lval(scope, stmt);
 	fprintf(g_out, " = ");
-	smt_assign->rval = emit_expr(scope, ivl_stmt_rval(stmt));
+	SMTExpr* rval = emit_expr(scope, ivl_stmt_rval(stmt));
 	fprintf(g_out, ";\n");
-	return smt_assign;
+	return new SMTBlockingAssign(lval, rval);
 }
 
 static void emit_stmt_condit(ivl_scope_t scope, ivl_statement_t stmt) {

@@ -614,14 +614,15 @@ term_t SMTTernary::eval_term(SMTClkType clk) {
 
 
 //----------------------------SMT Assign----------------------------------------
-SMTAssign::SMTAssign(SMTClkType _clk_type, SMTAssignType _assign_type, uint _id):
-			clk_type(_clk_type), assign_type(_assign_type), id(_id) {
-	lval = NULL;
-	rval = NULL;
+vector<SMTAssign*> SMTAssign::assign_map;
+SMTAssign::SMTAssign(SMTClkType _clk_type, SMTAssignType _assign_type,
+		SMTExpr* _lval, SMTExpr* _rval, bool _is_commit):
+			clk_type(_clk_type), assign_type(_assign_type), id(assign_map.size()),
+			lval(_lval), rval(_rval), is_commit(_is_commit){
 	covered_any_clock = false;
-    is_commit = false;
 	yices_term = NULL_TERM;
 	block = NULL;
+	assign_map.push_back(this);
 }
 
 std::string SMTAssign::pad_and_update(bool is_commit) {
@@ -704,69 +705,17 @@ SMTSigCore* SMTAssign::get_lval_sig_core() {
     return lval_sig->parent;
 }
 
-//--------------------------SMT Cont Assign-------------------------------------
-vector<SMTContAssign*> SMTContAssign::assign_map;
-std::string* SMTContAssign::print_map;
-bool SMTContAssign::print_map_init = false;
-SMTContAssign::SMTContAssign() : SMTAssign(SMT_CLK_CURR, SMT_ASSIGN_CONT, assign_map.size()) {
-	assign_map.push_back(this);
-	covered_any_clock = true;
-    is_commit = true;
-}
-
-void SMTContAssign::redraw(SMTClkType clk_type) {
-    bv_str << "(assert (= " << lval->print(SMT_CLK_NEXT);
-	bv_str << "   " << rval->print(SMT_CLK_CURR) << ")) ;" << id << " AS\n";
-    partial_assign_check();
-}
-
-void SMTContAssign::instrument() {
-    const string &str = print(SMT_CLK_CURR);
-	fprintf(g_out, "\t\t//%s", str.c_str());
-	conc_flush(g_out);
-	update_signal_dependency(this);	
-}
-
-void SMTContAssign::print_all(std::vector<constraint_t*> &cnst_stack, uint clock) {
-    const uint count = assign_map.size();
-    for(uint idx = 0; idx < count; idx++){
-        constraint_t* cnst = new constraint_t;
-        cnst->clock = clock;
-        cnst->obj = assign_map[idx];
-        cnst->constraint = assign_map[idx]->print_cnst();
-        cnst->type = CNST_ASSIGN;
-        cnst_stack.push_back(cnst);
-    }
-}
-
-void SMTContAssign::free_print_map() {
-    delete [] print_map;
-    print_map = NULL;
-}
-
-SMTContAssign* SMTContAssign::get_assign(uint id) {
-    assert(id < assign_map.size());
+SMTAssign* SMTAssign::get_assign(uint id) {
+	assert(id < assign_map.size());
     return assign_map[id];
 }
 
-//--------------------------SMT Disp Assign-------------------------------------
-vector<SMTDispAssign*> SMTDispAssign::assign_map;
-SMTDispAssign::SMTDispAssign(SMTClkType clk_type, SMTAssignType assign_type):
-        SMTAssign(clk_type, assign_type, assign_map.size()){
-    assign_map.push_back(this);
-}
-
-SMTDispAssign* SMTDispAssign::get_assign(uint id) {
-    assert(id < assign_map.size());
-    return assign_map[id];
-}
-
-uint SMTDispAssign::get_assign_count() {
+uint SMTAssign::get_assign_count() {
 	return assign_map.size();
 }
 
-void SMTDispAssign::instrument() {
-    const string &str = print(clk_type);
+void SMTAssign::instrument() {
+	const string &str = print(clk_type);
     if(skip_assign(str)){
 		this->set_covered(0);
         return;
@@ -777,7 +726,7 @@ void SMTDispAssign::instrument() {
 	update_signal_dependency(this);
 }
 
-void SMTDispAssign::print_coverage(std::ofstream &report) {
+void SMTAssign::print_coverage(std::ofstream& report) {
     //report << "      BRANCH |         SIM |\n";
     //report << "----------------------------\n";
     //puts("\n------------------------------------REPORT------------------------------------");
@@ -787,7 +736,7 @@ void SMTDispAssign::print_coverage(std::ofstream &report) {
 	uint covered_branch = 0;
 	const uint count = assign_map.size();
 	for(uint i=0; i<count; i++){
-		SMTDispAssign* assign = assign_map[i];
+		SMTAssign* assign = assign_map[i];
 		switch(assign->assign_type){
 			case SMT_ASSIGN_BLOCKING:
 			case SMT_ASSIGN_NON_BLOCKING:
@@ -817,11 +766,13 @@ void SMTDispAssign::print_coverage(std::ofstream &report) {
 	printf("[COVERED BRANCH] %u\n", covered_branch);
 }
 
+
 //------------------------SMT Blocking Assign-----------------------------------
-SMTBlockingAssign::SMTBlockingAssign() :
-        SMTDispAssign(SMT_CLK_CURR, SMT_ASSIGN_BLOCKING){
-    is_commit = true;
+SMTBlockingAssign::SMTBlockingAssign(SMTExpr* lval, SMTExpr* rval) : 
+	SMTAssign(SMT_CLK_CURR, SMT_ASSIGN_BLOCKING, lval, rval, true){
+
 }
+
 
 void SMTBlockingAssign::redraw(SMTClkType clk_type) {
     bv_str << "(assert (= " << lval->print(SMT_CLK_NEXT);
@@ -830,9 +781,9 @@ void SMTBlockingAssign::redraw(SMTClkType clk_type) {
 }
 
 //----------------------SMT Non Blocking Assign---------------------------------
-SMTNonBlockingAssign::SMTNonBlockingAssign() :
-        SMTDispAssign(SMT_CLK_NEXT, SMT_ASSIGN_NON_BLOCKING){
-    is_commit = false;
+SMTNonBlockingAssign::SMTNonBlockingAssign(SMTExpr* lval, SMTExpr* rval) :
+	SMTAssign(SMT_CLK_NEXT, SMT_ASSIGN_NON_BLOCKING, lval, rval, false) {
+
 }
 
 void SMTNonBlockingAssign::redraw(SMTClkType clk_type) {
@@ -848,8 +799,9 @@ uint SMTBranch::covered_branch_count;
 uint SMTBranch::saved_total_branch;
 uint SMTBranch::saved_covered_branch;
 vector<SMTBranch*> SMTBranch::all_branches_list;
-SMTBranch::SMTBranch(SMTBranchNode* _parent_node, SMTBranchType type) :
-		SMTDispAssign(SMT_CLK_CURR, SMT_ASSIGN_BRANCH), 
+SMTBranch::SMTBranch(SMTBranchNode* _parent_node, SMTBranchType type, 
+			SMTExpr* lval, SMTExpr* rval) :
+		SMTAssign(SMT_CLK_CURR, SMT_ASSIGN_BRANCH, lval, rval, false), 
         type(type),
 		list_idx(_parent_node->branch_list.size()),
 		parent_node(_parent_node){
@@ -857,7 +809,6 @@ SMTBranch::SMTBranch(SMTBranchNode* _parent_node, SMTBranchType type) :
 	memset(coverage, false, sizeof(bool)*(g_unroll+2));
 	parent_node->branch_list.push_back(this);
 	covered_any_clock = false;
-    is_commit = false;
 	k_permit_covered = 0;
 	all_branches_list.push_back(this);
 	last_selected_clock = 0x8FFFFFFF;
@@ -918,14 +869,10 @@ void SMTBranch::instrument() {
 }
 
 SMTBranch* SMTBranch::create_case_branch(SMTBranchNode* parent, SMTExpr* case_expr) {
-	SMTBranch* br = new SMTBranch(parent, SMT_BRANCH_CASE);
-	br->lval = parent->cond;
-	br->rval = case_expr;
-	return br;
+	return new SMTBranch(parent, SMT_BRANCH_CASE, parent->cond, case_expr);
 }
 
 SMTBranch* SMTBranch::_create_condit_branch(SMTBranchNode* parent, const char* num_expr) {
-	SMTBranch* br = new SMTBranch(parent, SMT_BRANCH_CONDIT);
 	if(parent->cond_width > 1){
 		SMTUnary* un = new SMTUnary();
 		un->set_opcode('|');
@@ -934,9 +881,7 @@ SMTBranch* SMTBranch::_create_condit_branch(SMTBranchNode* parent, const char* n
 		parent->cond_width = 1;
 	} 
 	SMTNumber* smt_number = new SMTNumber(num_expr, 1, false);
-	br->rval = smt_number;
-	br->lval = parent->cond;
-	return br;
+	return new SMTBranch(parent, SMT_BRANCH_CONDIT, parent->cond, smt_number);
 }
 
 SMTBranch* SMTBranch::create_true_branch(SMTBranchNode* parent) {
@@ -958,10 +903,7 @@ SMTBranch* SMTBranch::create_default_branch(SMTBranchNode* parent) {
         smt_and->add(smt_neq);
     }
     
-	SMTBranch* br = new SMTBranch(parent, SMT_BRANCH_CASE);
-    br->lval = smt_and;
-    br->rval = new SMTCust("true");
-	return br;
+	return new SMTBranch(parent, SMT_BRANCH_CASE, smt_and, new SMTCust("true"));
 }
 
 void SMTBranch::clear_last_selected_clocks() {

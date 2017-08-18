@@ -1861,12 +1861,12 @@ module b14(clock, reset, datai, addr, datao, rd, wr, __obs);
 
 [139] weight: 1 distance: 268435455
 (assert (= #ff    0b0011)) ;214 CS
-[S] 144 141 142 143
+[S] 141 142 143 144
 [P] 109
 
 [140] weight: 1 distance: 268435455
 [S] 146 147 148 149
-[P] 144 141 142 143
+[P] 141 142 143 144
 
 [141] weight: 0 distance: 268435455
 (assert (= #mf    0b00)) ;215 CS

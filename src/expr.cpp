@@ -3,15 +3,6 @@
 #include "concolic.h"
 #include "smt_lib.h"
 
-/*
- * Data type used to signify if a $signed or $unsigned should be emitted.
- */
-typedef enum expr_sign_e {
-	NO_SIGN = 0,
-	NEED_SIGNED = 1,
-	NEED_UNSIGNED = 2
-} expr_sign_t;
-
 static SMTBinary* emit_expr_binary(ivl_scope_t scope, ivl_expr_t expr) {
 	ivl_expr_t oper1 = ivl_expr_oper1(expr);
 	ivl_expr_t oper2 = ivl_expr_oper2(expr);
@@ -199,20 +190,6 @@ static SMTConcat* emit_expr_concat(ivl_scope_t scope, ivl_expr_t expr) {
  */
 static SMTNumber* emit_expr_number(ivl_expr_t expr) {
 	return emit_number(ivl_expr_bits(expr), ivl_expr_width(expr), ivl_expr_signed(expr));
-}
-
-static void emit_expr_scope_piece(ivl_scope_t scope) {
-	ivl_scope_t parent = ivl_scope_parent(scope);
-	/* If this scope has a parent then emit it first. */
-	if (parent) {
-		emit_expr_scope_piece(parent);
-		fprintf(g_out, ".");
-	}
-	emit_id(ivl_scope_basename(scope));
-}
-
-static void emit_expr_scope(ivl_expr_t expr) {
-	emit_expr_scope_piece(ivl_expr_scope(expr));
 }
 
 static SMTExpr* emit_select_name(ivl_scope_t scope, ivl_expr_t expr) {
@@ -437,10 +414,6 @@ SMTExpr* emit_expr(ivl_scope_t scope, ivl_expr_t expr) {
 			break;
 		case IVL_EX_NUMBER:		//done
 			ret_expr = emit_expr_number(expr);
-			break;
-		case IVL_EX_SCOPE:		//done
-			info("Entered scope expression");
-			emit_expr_scope(expr);
 			break;
 		case IVL_EX_SELECT:
 			ret_expr = emit_expr_select(scope, expr);

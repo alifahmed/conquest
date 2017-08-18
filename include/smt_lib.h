@@ -23,7 +23,6 @@ class SMTNumber;
 class SMTBranchNode;
 class SMTBranch;
 class SMTSigCore;
-class SMTDispAssign;
 class SMTBasicBlock;
 class SMTProcess;
 struct constraint_t;
@@ -126,12 +125,16 @@ public:
 
 //----------------------------SMT Assign----------------------------------------
 class SMTAssign: public SMTCommons{
+private:
+	static std::vector<SMTAssign*> assign_map;
+	
 protected:
     const SMTClkType clk_type;
 	bool covered_any_clock;
     uint covered_in_sim;
 	
-	SMTAssign(SMTClkType clk_type, SMTAssignType assign_type, uint id);
+	SMTAssign(SMTClkType clk_type, SMTAssignType assign_type, 
+				SMTExpr* lval, SMTExpr* rval, bool is_commit);
     virtual void redraw(SMTClkType clk_type) override = 0;
     virtual std::string pad_and_update(bool is_commit);
     
@@ -140,11 +143,11 @@ public:
     const uint id;
 	SMTExpr* lval;
 	SMTExpr* rval;
-    bool is_commit;
+    const bool is_commit;
 	term_t yices_term;
 	SMTBasicBlock* block;
 	
-    virtual void instrument() = 0;
+    virtual void instrument();
     virtual std::string print_cnst();
 	virtual term_t update_term();
 	
@@ -152,71 +155,41 @@ public:
 	void set_covered(uint sim_num);
     void partial_assign_check();
     SMTSigCore* get_lval_sig_core();
-};
-
-
-//--------------------------SMT Cont Assign-------------------------------------
-class SMTContAssign: public SMTAssign{
-private:
-	static std::vector<SMTContAssign*> assign_map;
-    static std::string *print_map;
-    static bool print_map_init;
-	void redraw(SMTClkType clk_type) override;
-    
-public:
-	SMTContAssign();
-	void instrument() override;
 	
-	static void print_all(std::vector<constraint_t*> &cnst_stack, uint clock);
-	static SMTContAssign* get_assign(uint id);
-    static void free_print_map();
-};
-
-
-//--------------------------SMT Disp Assign-------------------------------------
-class SMTDispAssign: public SMTAssign{
-private:
-	static std::vector<SMTDispAssign*> assign_map;
-	
-protected:
-    virtual void redraw(SMTClkType clk_type) override = 0;
-    
-public:
-	SMTDispAssign(SMTClkType clk_type, SMTAssignType assign_type);
-	static SMTDispAssign* get_assign(uint id);
+	static SMTAssign* get_assign(uint id);
 	static uint get_assign_count();
-    virtual void instrument() override;
 	static void print_coverage(std::ofstream &report);
 };
 
 
 //------------------------SMT Blocking Assign-----------------------------------
-class SMTBlockingAssign: public SMTDispAssign{
+class SMTBlockingAssign: public SMTAssign{
 private:
     void redraw(SMTClkType clk_type) override;
-    
+	
 public:
-	SMTBlockingAssign();
+	SMTBlockingAssign(SMTExpr* lval, SMTExpr* rval);
 };
 
 
 //----------------------SMT Non Blocking Assign---------------------------------
-class SMTNonBlockingAssign: public SMTDispAssign{
+class SMTNonBlockingAssign: public SMTAssign{
 private:
     void redraw(SMTClkType clk_type) override;
     
 public:
-	SMTNonBlockingAssign();
+	SMTNonBlockingAssign(SMTExpr* lval, SMTExpr* rval);
 };
 
 
 //-----------------------------SMT Branch---------------------------------------
-class SMTBranch: public SMTDispAssign{
+class SMTBranch: public SMTAssign{
 private:
 	static std::vector<SMTBranch*> all_branches_list;
 	bool* coverage;			//coverage at index clock
 	
-	SMTBranch(SMTBranchNode* parent_node, SMTBranchType type);
+	SMTBranch(SMTBranchNode* parent_node, SMTBranchType type, SMTExpr* lval, 
+			SMTExpr* rval);
 	static SMTBranch* _create_condit_branch(SMTBranchNode* parent, const char* num_expr);
     void redraw(SMTClkType clk_type) override;
 	//bool check_is_dep_expr(SMTExpr* expr);
