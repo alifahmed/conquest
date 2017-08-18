@@ -285,41 +285,6 @@ public:
 	term_t eval_term(SMTClkType clk) override;
 };
 
-/*typedef enum{
-    SMT_NARY_EQ,
-    SMT_NARY_NEQ,
-    SMT_NARY_AND,
-    SMT_NARY_OR,
-    SMT_NARY_ITE,
-    SMT_NARY_DISTINCT,
-    
-    SMT_NARY_BV_ADD,
-    SMT_NARY_BV_SUB,
-    SMT_NARY_BV_MUL,
-    SMT_NARY_BV_DIV,
-    SMT_NARY_BV_REM,
-    SMT_NARY_BV_LE,
-    SMT_NARY_BV_GE,
-    SMT_NARY_BV_LT,
-    SMT_NARY_BV_GT,
-    SMT_NARY_BV_AND,
-    SMT_NARY_BV_NAND,
-    SMT_NARY_BV_REDAND,
-    SMT_NARY_BV_OR,
-    SMT_NARY_BV_NOR,        
-    SMT_NARY_BV_REDOR,
-    SMT_NARY_BV_NOT,
-    SMT_NARY_BV_NEG,
-    SMT_NARY_BV_POW,
-    SMT_NARY_BV_REPEAT,
-    SMT_NARY_BV_XOR,
-    SMT_NARY_BV_XNOR,
-    SMT_NARY_BV_SHL,
-    SMT_NARY_BV_LSHR,
-    SMT_NARY_BV_ASHR,
-    SMT_NARY_BV_CONCAT,
-    SMT_NARY_BV_EXTRACT
-} SMTNaryType;*/
 //-----------------------------SMT Cust-----------------------------------------
 class SMTCust : public SMTExpr{
 private:
@@ -334,21 +299,6 @@ public:
 
 
 //----------------------------SMT Unary----------------------------------------
-/*typedef enum{
-    SMT_INVALID,        //error check
-    SMT_RE_AND,
-    SMT_RE_NAND,        //will be converted to RE_AND
-    SMT_RE_OR,
-    SMT_RE_NOR,         //will be converted to RE_OR
-    SMT_RE_XOR,
-    SMT_RE_XNOR,        //will be converted to RE_XOR
-    SMT_BUFF,       
-    SMT_BV_NOT,            //will be converted to BUFF
-    SMT_LOG_NOT,
-    SMT_NEG,
-    SMT_REPEAT
-} SMTUnaryOpcode;*/
-
 class SMTUnary : public SMTExpr{
 private:
     std::string opcode;

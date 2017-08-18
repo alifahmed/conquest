@@ -188,7 +188,6 @@ static SMTSignal* emit_stmt_lval(ivl_scope_t scope, ivl_statement_t stmt) {
  * translate an assignment with an opcode when allowed.
  */
 static SMTBlockingAssign* emit_assign_and_opt_opcode(ivl_scope_t scope, ivl_statement_t stmt) {
-	unsigned wid;
 	char opcode;
 	const char *opcode_str;
 	SMTBlockingAssign* smt_assign = new SMTBlockingAssign();
@@ -235,11 +234,11 @@ static SMTBlockingAssign* emit_assign_and_opt_opcode(ivl_scope_t scope, ivl_stat
 		smt_bi->set_opcode(opcode);
 		smt_bi->add(emit_stmt_lval(scope, stmt));
 		fprintf(g_out, " %s ", opcode_str);
-		smt_bi->add(emit_expr(scope, ivl_stmt_rval(stmt), wid, 1, 0, 0));
+		smt_bi->add(emit_expr(scope, ivl_stmt_rval(stmt)));
 		smt_assign->rval = smt_bi;
 	}
 	else{
-		smt_assign->rval = emit_expr(scope, ivl_stmt_rval(stmt), wid, 1, 0, 0);
+		smt_assign->rval = emit_expr(scope, ivl_stmt_rval(stmt));
 	}
 	return smt_assign;
 }
@@ -268,7 +267,7 @@ static SMTNonBlockingAssign* emit_stmt_assign_nb(ivl_scope_t scope, ivl_statemen
 	SMTNonBlockingAssign* smt_assign = new SMTNonBlockingAssign();
 	smt_assign->lval = emit_stmt_lval(scope, stmt);
 	fprintf(g_out, " <= #1 ");
-	smt_assign->rval = emit_expr(scope, ivl_stmt_rval(stmt), 0);
+	smt_assign->rval = emit_expr(scope, ivl_stmt_rval(stmt));
 	fprintf(g_out, ";");
 	return smt_assign;
 }
@@ -313,7 +312,7 @@ static void emit_stmt_case(ivl_scope_t scope, ivl_statement_t stmt) {
 	
 	fprintf(g_out, "%*c%s (", get_indent(), ' ', case_type);
 	ivl_expr_t cond_expr = ivl_stmt_cond_expr(stmt);
-	parent_node->cond = emit_expr(scope, cond_expr, 0, 0, 0, 0);
+	parent_node->cond = emit_expr(scope, cond_expr);
 	parent_node->cond_width = ivl_expr_width(cond_expr);
 	fprintf(g_out, ")\n");
 	g_ind += g_ind_incr;
@@ -330,7 +329,7 @@ static void emit_stmt_case(ivl_scope_t scope, ivl_statement_t stmt) {
 			continue;
 		}
 		fprintf(g_out, "%*c", get_indent(), ' ');
-		SMTExpr* case_expr = emit_expr(scope, expr, 0, 0, 0, 0);
+		SMTExpr* case_expr = emit_expr(scope, expr);
 		SMTBranch* smt_br = SMTBranch::create_case_branch(parent_node, case_expr);
         SMTBasicBlock* smt_bb = new SMTBasicBlock();
 		smt_br->block = smt_bb;
@@ -376,14 +375,13 @@ static void emit_stmt_case(ivl_scope_t scope, ivl_statement_t stmt) {
 }
 
 static SMTBlockingAssign* emit_stmt_cassign(ivl_scope_t scope, ivl_statement_t stmt) {
-	unsigned wid;
+	SMTBlockingAssign* smt_assign = new SMTBlockingAssign();
 	fprintf(g_out, "%*cassign ", get_indent(), ' ');
-	// HERE: Do we need to calculate the width? The compiler should have already
-	//       done this for us.
-	wid = emit_stmt_lval(scope, stmt, smt_assign);
+	smt_assign->lval = emit_stmt_lval(scope, stmt);
 	fprintf(g_out, " = ");
-	smt_assign->rval = emit_expr(scope, ivl_stmt_rval(stmt), wid, 1, 0, 0);
+	smt_assign->rval = emit_expr(scope, ivl_stmt_rval(stmt));
 	fprintf(g_out, ";\n");
+	return smt_assign;
 }
 
 static void emit_stmt_condit(ivl_scope_t scope, ivl_statement_t stmt) {
@@ -393,7 +391,7 @@ static void emit_stmt_condit(ivl_scope_t scope, ivl_statement_t stmt) {
 	ivl_statement_t false_stmt = ivl_stmt_cond_false(stmt);
 	ivl_expr_t cond_expr = ivl_stmt_cond_expr(stmt);
 	fprintf(g_out, "%*cif (", get_indent(), ' ');
-	branch_node->cond = emit_expr(scope, cond_expr, 0, 0, 0, 0);
+	branch_node->cond = emit_expr(scope, cond_expr);
     branch_node->cond_width = ivl_expr_width(cond_expr);
 	fprintf(g_out, ")");
     SMTBranch* true_br = SMTBranch::create_true_branch(branch_node);
@@ -553,8 +551,7 @@ void emit_stmt(ivl_scope_t scope, ivl_statement_t stmt) {
 	SMTSigCore* lval_sig;
 	switch (ivl_statement_type(stmt)) {
 		case IVL_ST_ASSIGN:
-			smt_assign = new SMTBlockingAssign();
-			emit_stmt_assign(scope, stmt, smt_assign);
+			smt_assign = emit_stmt_assign(scope, stmt);
 			single_indent = 1;
 			smt_assign->instrument();
             SMTProcess::curr_proc->add_assign(smt_assign);
@@ -566,8 +563,7 @@ void emit_stmt(ivl_scope_t scope, ivl_statement_t stmt) {
 			}
 			break;
 		case IVL_ST_ASSIGN_NB:
-			smt_assign = new SMTNonBlockingAssign();
-			emit_stmt_assign_nb(scope, stmt, smt_assign);
+			smt_assign = emit_stmt_assign_nb(scope, stmt);
 			single_indent = 1;
 			smt_assign->instrument();
             SMTProcess::curr_proc->add_assign(smt_assign);
@@ -594,8 +590,7 @@ void emit_stmt(ivl_scope_t scope, ivl_statement_t stmt) {
 			break;
 		case IVL_ST_CASSIGN:
 			error("CASSIGN entry (%s:%u)", ivl_stmt_file(stmt), ivl_stmt_lineno(stmt));
-			smt_assign = new SMTContAssign();
-			emit_stmt_cassign(scope, stmt, smt_assign);
+			smt_assign = emit_stmt_cassign(scope, stmt);
 			single_indent = 1;
 			smt_assign->instrument();
 			break;

@@ -150,7 +150,7 @@ module b01(clock, line1, line2, reset, outp, overflw, __obs);
 
 [3] weight: 1 distance: 268435455
 (assert (= (bv-comp #reset  0b1)   0b0)) ;1 BR
-[S] 6 14 10 22 26 18 30 34
+[S] 6 10 14 18 22 26 30 34
 [P] 1
 
 [4] weight: 0 distance: 268435455

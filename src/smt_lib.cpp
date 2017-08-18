@@ -57,20 +57,15 @@ void add_to_rval(set<SMTSigCore*> &assign_set, SMTExpr* expr){
 }
 
 static void update_signal_dependency(SMTAssign* assign){
-	SMTExpr* lval = assign->lval;
+	SMTSignal* lval = dynamic_cast<SMTSignal*>(assign->lval);
 	assert(lval);
-    assert(lval->exprList.size() == 1);
 	
 	set<SMTSigCore*> right;
 	add_to_rval(right, assign->rval);
 	
 	for(auto it_r:right){
-		for(auto it_l:(lval->exprList)){
-			SMTSignal* sig = dynamic_cast<SMTSignal*>(it_l);
-			assert(sig);
-			if(it_r != sig->parent){
-				it_r->assigned_to.insert(sig->parent);
-			}
+		if(it_r != lval->parent){
+			it_r->assigned_to.insert(lval->parent);
 		}
 	}
 }
@@ -673,19 +668,12 @@ std::string SMTAssign::print_cnst() {
 }
 
 term_t SMTAssign::update_term() {
-	//printf("%s", print(clk_type).c_str());
-	for(auto it:lval->exprList){
-		SMTSignal* sig = dynamic_cast<SMTSignal*>(it);
-		assert(sig);
-		sig->parent->update_next_version();
-	}
+	SMTSignal* sig = dynamic_cast<SMTSignal*>(lval);
+	assert(sig);
+	sig->parent->update_next_version();
 	yices_term = yices_eq(lval->eval_term(SMT_CLK_NEXT), rval->eval_term(SMT_CLK_CURR));
 	if(is_commit){
-		for(auto it:lval->exprList){
-			SMTSignal* sig = dynamic_cast<SMTSignal*>(it);
-			assert(sig);
-			sig->parent->commit();
-		}
+		sig->parent->commit();
 	}
 	return yices_term;
 }
@@ -702,20 +690,16 @@ void SMTAssign::set_covered(uint sim_num) {
 }
 
 void SMTAssign::partial_assign_check() {
-    const uint size = lval->exprList.size();
-    for(uint i=0; i<size; i++){
-        SMTSignal* sig = dynamic_cast<SMTSignal*>(lval->exprList[i]);
-        assert(sig);
-        SMTSigCore* parent = sig->parent;
-        if((sig->msb - sig->lsb) != (parent->width - 1)){
-            error("Part select lval for assignment: %s", parent->name.c_str());
-        }
-    }
+	SMTSignal* sig = dynamic_cast<SMTSignal*>(lval);
+	assert(sig);
+	SMTSigCore* parent = sig->parent;
+	if((sig->msb - sig->lsb) != (parent->width - 1)){
+		error("Part select lval for assignment: %s", parent->name.c_str());
+	}
 }
 
 SMTSigCore* SMTAssign::get_lval_sig_core() {
-    assert(lval->exprList.size() == 1);
-    SMTSignal* lval_sig = dynamic_cast<SMTSignal*>(lval->exprList[0]);
+    SMTSignal* lval_sig = dynamic_cast<SMTSignal*>(lval);
     assert(lval_sig);
     return lval_sig->parent;
 }

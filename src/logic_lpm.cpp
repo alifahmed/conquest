@@ -1046,10 +1046,10 @@ void emit_lpm(ivl_scope_t scope, ivl_lpm_t lpm) {
 	fprintf(g_out, "%*c", g_ind, ' ');
 	SMTAssign* smt_assign = new SMTBlockingAssign();
 	if (type == IVL_LPM_PART_PV) {
-		smt_assign->lval->add(emit_lpm_part_pv(scope, lpm));
+		smt_assign->lval = emit_lpm_part_pv(scope, lpm);
 	}
 	else {
-		smt_assign->lval->add(emit_name_of_nexus(scope, output, 0));
+		smt_assign->lval = emit_name_of_nexus(scope, output, 0);
 	}
 
     fprintf(g_out, " = ");
@@ -1081,7 +1081,7 @@ static void emit_bufz(ivl_scope_t scope, ivl_net_logic_t nlogic) {
 	SMTAssign* smt_assign = new SMTBlockingAssign();
 	fprintf(g_out, "always @(*) begin\n");
 	g_ind += g_ind_incr;
-	smt_assign->lval->add(emit_name_of_nexus(scope, ivl_logic_pin(nlogic, 0), 0));
+	smt_assign->lval = emit_name_of_nexus(scope, ivl_logic_pin(nlogic, 0), 0);
 	fprintf(g_out, " = ");
 	smt_assign->rval = emit_nexus_as_ca(scope, ivl_logic_pin(nlogic, 1), 0, 0);
 	fprintf(g_out, ";");
@@ -1143,7 +1143,7 @@ void emit_logic(ivl_scope_t scope, ivl_net_logic_t nlogic) {
 		g_ind += g_ind_incr;
 		fprintf(g_out, "%*c", g_ind, ' ');
 		
-		smt_assign->lval->add(emit_name_of_nexus(scope, ivl_logic_pin(nlogic, 0), 0));
+		smt_assign->lval = emit_name_of_nexus(scope, ivl_logic_pin(nlogic, 0), 0);
 		fprintf(g_out, " = ");
 		smt_assign->rval = emit_logic_as_ca(scope, nlogic);
 		fprintf(g_out, ";");
@@ -1310,7 +1310,7 @@ void emit_signal_net_const_as_ca(ivl_scope_t scope, ivl_signal_t sig) {
 		fprintf(g_out, "%*calways @(*) begin\n", g_ind, ' ');
 		g_ind += g_ind_incr;
 		emit_id(ivl_signal_basename(sig));
-		smt_assign->lval->add(new SMTSignal(sig));
+		smt_assign->lval = new SMTSignal(sig);
 		fprintf(g_out, " = ");
 		smt_assign->rval = emit_const_nexus(scope, net_const);
 		fprintf(g_out, ";");

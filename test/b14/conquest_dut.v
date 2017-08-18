@@ -1164,12 +1164,12 @@ module b14(clock, reset, datai, addr, datao, rd, wr, __obs);
 (assert (= @rd    0b1)) ;24 NB
 (assert (= @IR    #datai )) ;25 NB
 (assert (= @state    0b1)) ;26 NB
-[S] 14 15 16 17
+[S] 17 14 15 16
 [P] 9
 
 [13] weight: 0 distance: 268435455
 [S] 11
-[P] 14 15 16 17
+[P] 17 14 15 16
 
 [14] weight: 0 distance: 268435455
 (assert (= (bv-extract 30 29 #datai )   0b00)) ;27 CS
@@ -1207,12 +1207,12 @@ module b14(clock, reset, datai, addr, datao, rd, wr, __obs);
 
 [20] weight: 1 distance: 268435455
 (assert (= #cf    0b1)) ;36 CS
-[S] 25 22 23 24
+[S] 22 23 24 25
 [P] 18
 
 [21] weight: 1 distance: 268435455
-[S] 31 27 35 39 43 47 51 96 58 65 69 73 77 81 85 89
-[P] 25 22 23 24
+[S] 31 27 35 81 39 43 47 51 96 58 65 69 73 77 85 89
+[P] 22 23 24 25
 
 [22] weight: 0 distance: 268435455
 (assert (= #mf    0b00)) ;37 CS
@@ -1681,7 +1681,7 @@ module b14(clock, reset, datai, addr, datao, rd, wr, __obs);
 
 [110] weight: 0 distance: 268435455
 [S] 106
-[P] 145 117 123 178 134 156 167 189 200 211 222 233 247
+[P] 117 123 145 178 134 156 167 189 200 211 222 233 247
 
 [111] weight: 1 distance: 268435455
 (assert (= #ff    0b0000)) ;150 CS
@@ -1753,14 +1753,14 @@ module b14(clock, reset, datai, addr, datao, rd, wr, __obs);
 
 [122] weight: 1 distance: 268435455
 (assert (= #ff    0b0001)) ;174 CS
-[S] 126 124 125 127
+[S] 124 125 126 127
 [P] 109
 
 [123] weight: 0 distance: 268435455
 (assert (= @reg2    #reg3 )) ;189 BL
 (assert (= @reg3    #m )) ;190 BL
 [S] 110
-[P] 126 124 125 127
+[P] 124 125 126 127
 
 [124] weight: 0 distance: 268435455
 (assert (= #mf    0b00)) ;175 CS
@@ -1861,12 +1861,12 @@ module b14(clock, reset, datai, addr, datao, rd, wr, __obs);
 
 [139] weight: 1 distance: 268435455
 (assert (= #ff    0b0011)) ;214 CS
-[S] 141 142 143 144
+[S] 144 141 142 143
 [P] 109
 
 [140] weight: 1 distance: 268435455
 [S] 146 147 148 149
-[P] 141 142 143 144
+[P] 144 141 142 143
 
 [141] weight: 0 distance: 268435455
 (assert (= #mf    0b00)) ;215 CS
@@ -2263,12 +2263,12 @@ module b14(clock, reset, datai, addr, datao, rd, wr, __obs);
 
 [205] weight: 1 distance: 268435455
 (assert (= #ff    0b1001)) ;352 CS
-[S] 210 209 207 208
+[S] 209 207 208 210
 [P] 109
 
 [206] weight: 1 distance: 268435455
 [S] 212 213 214 215
-[P] 210 209 207 208
+[P] 209 207 208 210
 
 [207] weight: 0 distance: 268435455
 (assert (= #mf    0b00)) ;353 CS
@@ -2541,7 +2541,7 @@ module b14(clock, reset, datai, addr, datao, rd, wr, __obs);
 
 [252] weight: 1 distance: 268435455
 (assert (= (bv-comp #df  0b111)   0b1)) ;442 BR
-[S] 256 257 258 259
+[S] 258 256 257 259
 [P] 105
 
 [253] weight: 0 distance: 268435455
@@ -2558,7 +2558,7 @@ module b14(clock, reset, datai, addr, datao, rd, wr, __obs);
 (assert (= @wr    0b1)) ;453 NB
 (assert (= @datao    #rx )) ;454 NB
 [S] 254
-[P] 256 257 258 259
+[P] 258 256 257 259
 
 [256] weight: 0 distance: 268435455
 (assert (= #mf    0b00)) ;444 CS

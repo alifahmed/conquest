@@ -12,31 +12,7 @@ typedef enum expr_sign_e {
 	NEED_UNSIGNED = 2
 } expr_sign_t;
 
-static unsigned calc_can_skip_unsigned(ivl_expr_t oper1, ivl_expr_t oper2) {
-	unsigned oper1_signed, oper2_signed;
-	/* Check to see if the operands are signed or softly signed.
-	 *   The expression is signed (hard).
-	 *   It is a signed signal cast to unsigned (soft).
-	 *   It is a padding cast from signed to unsigned (soft). */
-	oper1_signed = ivl_expr_signed(oper1);
-	oper1_signed |= (ivl_expr_type(oper1) == IVL_EX_SIGNAL) &&
-			(ivl_signal_signed(ivl_expr_signal(oper1)));
-	oper1_signed |= (ivl_expr_type(oper1) == IVL_EX_SELECT) &&
-			(!ivl_expr_oper2(oper1)) &&
-			(ivl_expr_signed(ivl_expr_oper1(oper1)));
-	oper2_signed = ivl_expr_signed(oper2);
-	oper2_signed |= (ivl_expr_type(oper2) == IVL_EX_SIGNAL) &&
-			(ivl_signal_signed(ivl_expr_signal(oper2)));
-	oper2_signed |= (ivl_expr_type(oper2) == IVL_EX_SELECT) &&
-			(!ivl_expr_oper2(oper2)) &&
-			(ivl_expr_signed(ivl_expr_oper1(oper2)));
-	/* If either operand is a hard unsigned skip adding an explicit
-	 * $unsigned() since it will be added implicitly. */
-	return !oper1_signed || !oper2_signed;
-}
-
-static SMTBinary* emit_expr_binary(ivl_scope_t scope, ivl_expr_t expr, unsigned wid,
-		unsigned is_full_prec) {
+static SMTBinary* emit_expr_binary(ivl_scope_t scope, ivl_expr_t expr) {
 	ivl_expr_t oper1 = ivl_expr_oper1(expr);
 	ivl_expr_t oper2 = ivl_expr_oper2(expr);
 	
@@ -47,10 +23,6 @@ static SMTBinary* emit_expr_binary(ivl_scope_t scope, ivl_expr_t expr, unsigned 
 	SMTExpr* tmp_expr2 = NULL;
 	smt_binary->set_opcode_from_expr(expr);
 	const char *oper = "<invalid>";
-	
-	//unsigned can_skip_unsigned = calc_can_skip_unsigned(oper1, oper2);
-	unsigned can_skip_unsigned = true;
-	uint oper2_width = ivl_expr_width(oper2);
 	
 	switch (ivl_expr_opcode(expr)) {
 		case '+': oper = "+";
@@ -109,7 +81,6 @@ static SMTBinary* emit_expr_binary(ivl_scope_t scope, ivl_expr_t expr, unsigned 
 			break;
 	}
 
-	SMTSignal* smt_sig;
 	fprintf(g_out, "(");
 	switch (ivl_expr_opcode(expr)) {
 		case '%':
@@ -123,17 +94,17 @@ static SMTBinary* emit_expr_binary(ivl_scope_t scope, ivl_expr_t expr, unsigned 
 		case '-':
 		case '*':
 		case '/':
-			tmp_expr1 = emit_expr(scope, oper1, wid, 0, can_skip_unsigned, is_full_prec);
+			tmp_expr1 = emit_expr(scope, oper1);
 			fprintf(g_out, " %s ", oper);
-			tmp_expr2 = emit_expr(scope, oper2, wid, 0,	can_skip_unsigned, is_full_prec);
+			tmp_expr2 = emit_expr(scope, oper2);
 			break;
 		case '&':
 		case '|':
 		case '^':
 		case 'X':
-			tmp_expr1 = emit_expr(scope, oper1, wid, 0, can_skip_unsigned, is_full_prec);
+			tmp_expr1 = emit_expr(scope, oper1);
 			fprintf(g_out, " %s ", oper);
-			tmp_expr2 = emit_expr(scope, oper2, wid, 0, can_skip_unsigned, is_full_prec);
+			tmp_expr2 = emit_expr(scope, oper2);
 			break;
 		case 'E':
 		case 'e':
@@ -145,64 +116,41 @@ static SMTBinary* emit_expr_binary(ivl_scope_t scope, ivl_expr_t expr, unsigned 
 		case 'G':
 		case 'a':
 		case 'o':
-			tmp_expr1 = emit_expr(scope, oper1, ivl_expr_width(oper1), 0, 1, 0);
-			if((smt_sig = dynamic_cast<SMTSignal*>(tmp_expr1))){
-				oper2_width = smt_sig->msb - smt_sig->lsb + 1;
-			}
+			tmp_expr1 = emit_expr(scope, oper1);
 			fprintf(g_out, " %s ", oper);
-			tmp_expr2 = emit_expr(scope, oper2, oper2_width, 0, 1, 0);
+			tmp_expr2 = emit_expr(scope, oper2);
 			break;
 		case 'R':
 		case 'l':
 		case 'r':
-			tmp_expr1 = emit_expr(scope, oper1, wid, 0, 0, 0);
+			tmp_expr1 = emit_expr(scope, oper1);
 			fprintf(g_out, " %s ", oper);
-			tmp_expr2 = emit_expr(scope, oper2, ivl_expr_width(oper2), 0, 2, 0);
+			tmp_expr2 = emit_expr(scope, oper2);
 			break;
 		case 'A':
 		case 'O':
 			fprintf(g_out, "~(");
-			tmp_expr1 = emit_expr(scope, oper1, wid, 0, can_skip_unsigned, is_full_prec);
+			tmp_expr1 = emit_expr(scope, oper1);
 			fprintf(g_out, " %s ", oper);
-			tmp_expr2 = emit_expr(scope, oper2, wid, 0, can_skip_unsigned, is_full_prec);
+			tmp_expr2 = emit_expr(scope, oper2);
 			fprintf(g_out, ")");
 			break;
 		case 'p':
 			error("TODO: opcode **");
-            tmp_expr1 = emit_expr(scope, oper1, wid, 0, 0, is_full_prec);
+            tmp_expr1 = emit_expr(scope, oper1);
             fprintf(g_out, " ** ");
-            tmp_expr2 = emit_expr(scope, oper2, ivl_expr_width(oper2), 0, 0, 0);
+            tmp_expr2 = emit_expr(scope, oper2);
 			break;
 			/* Convert the Verilog-A min() or max() functions. */
 		case 'm':
 		case 'M':
 			error("$min/$max not supported");
-			if (ivl_expr_value(expr) == IVL_VT_REAL) {
-				/* For a real expression use the $min()/$max() function. */
-				if (ivl_expr_opcode(expr) == 'm') fprintf(g_out, "$min(");
-				else fprintf(g_out, "$max(");
-				emit_expr(scope, oper1, wid, 0, 0, 0);
-				fprintf(g_out, ",");
-				emit_expr(scope, oper2, wid, 0, 0, 0);
-				fprintf(g_out, ")");
-			} else {
-				/* This only works when the argument has no side effect. */
-				fprintf(g_out, "((");
-				emit_expr(scope, oper1, wid, 0, 0, 0);
-				fprintf(g_out, ") %s (", oper);
-				emit_expr(scope, oper2, wid, 0, 0, 0);
-				fprintf(g_out, ") ? (");
-				emit_expr(scope, oper1, wid, 0, 0, 0);
-				fprintf(g_out, ") : (");
-				emit_expr(scope, oper2, wid, 0, 0, 0);
-				fprintf(g_out, "))");
-			}
 			break;
 		default:
 			error("Unknown binary");
-			emit_expr(scope, oper1, wid, 0, can_skip_unsigned, 0);
+			emit_expr(scope, oper1);
 			fprintf(g_out, "<unknown>");
-			emit_expr(scope, oper2, wid, 0, can_skip_unsigned, 0);
+			emit_expr(scope, oper2);
 			fprintf(stderr, "%s:%u: vlog95 error: Unknown expression "
 					"operator (%c).\n",
 					ivl_expr_file(expr),
@@ -223,12 +171,11 @@ static SMTBinary* emit_expr_binary(ivl_scope_t scope, ivl_expr_t expr, unsigned 
 	return smt_binary;
 }
 
-static SMTConcat* emit_expr_concat(ivl_scope_t scope, ivl_expr_t expr, unsigned wid) {
+static SMTConcat* emit_expr_concat(ivl_scope_t scope, ivl_expr_t expr) {
 	unsigned repeat = ivl_expr_repeat(expr);
 	unsigned idx, count = ivl_expr_parms(expr);
 	SMTConcat* smt_concat = new SMTConcat();
 
-	(void) wid; /* Parameter is not used. */
 	if (repeat != 1) {
 		fprintf(g_out, "{%u", repeat);
 		smt_concat->repeat = repeat;
@@ -236,10 +183,10 @@ static SMTConcat* emit_expr_concat(ivl_scope_t scope, ivl_expr_t expr, unsigned 
 	fprintf(g_out, "{");
 	count -= 1;
 	for (idx = 0; idx < count; idx += 1) {
-		smt_concat->add(emit_expr(scope, ivl_expr_parm(expr, idx), 0, 0, 0, 0));
+		smt_concat->add(emit_expr(scope, ivl_expr_parm(expr, idx)));
 		fprintf(g_out, ", ");
 	}
-	smt_concat->add(emit_expr(scope, ivl_expr_parm(expr, count), 0, 0, 0, 0));
+	smt_concat->add(emit_expr(scope, ivl_expr_parm(expr, count)));
 	fprintf(g_out, "}");
 	if (repeat != 1) fprintf(g_out, "}");
     return smt_concat;
@@ -250,8 +197,8 @@ static SMTConcat* emit_expr_concat(ivl_scope_t scope, ivl_expr_t expr, unsigned 
  * reference then emit the appropriate parameter name instead of the
  * numeric value unless this is the actual parameter definition.
  */
-static SMTNumber* emit_expr_number(ivl_expr_t expr, unsigned wid) {
-	return emit_number(ivl_expr_bits(expr), wid, ivl_expr_signed(expr));
+static SMTNumber* emit_expr_number(ivl_expr_t expr) {
+	return emit_number(ivl_expr_bits(expr), ivl_expr_width(expr), ivl_expr_signed(expr));
 }
 
 static void emit_expr_scope_piece(ivl_scope_t scope) {
@@ -264,9 +211,7 @@ static void emit_expr_scope_piece(ivl_scope_t scope) {
 	emit_id(ivl_scope_basename(scope));
 }
 
-static void emit_expr_scope(ivl_scope_t scope, ivl_expr_t expr, unsigned wid) {
-	(void) scope; /* Parameter is not used. */
-	(void) wid; /* Parameter is not used. */
+static void emit_expr_scope(ivl_expr_t expr) {
 	emit_expr_scope_piece(ivl_expr_scope(expr));
 }
 
@@ -287,15 +232,14 @@ static SMTExpr* emit_select_name(ivl_scope_t scope, ivl_expr_t expr) {
 		}
 		return NULL;
 	} else {
-		return emit_expr(scope, expr, 0, 0, 0, 0);
+		return emit_expr(scope, expr);
 	}
 }
 
-static SMTExpr* emit_expr_select(ivl_scope_t scope, ivl_expr_t expr, unsigned wid) {
+static SMTExpr* emit_expr_select(ivl_scope_t scope, ivl_expr_t expr) {
 	ivl_expr_t sel_expr = ivl_expr_oper2(expr);
 	ivl_expr_t sig_expr = ivl_expr_oper1(expr);
 	ivl_select_type_t sel_type = ivl_expr_sel_type(expr);
-	(void) wid; /* Parameter is not used. */
 	/* If this is a dynamic array or queue select, translate the
 	 * select differently. */
 	if ((ivl_expr_type(sig_expr) == IVL_EX_SIGNAL) &&
@@ -305,7 +249,7 @@ static SMTExpr* emit_expr_select(ivl_scope_t scope, ivl_expr_t expr, unsigned wi
 		assert(sel_expr);
 		emit_select_name(scope, sig_expr);
 		fprintf(g_out, "[");
-		emit_expr(scope, sel_expr, 0, 0, 0, 1);
+		emit_expr(scope, sel_expr);
 		fprintf(g_out, "]");
 		return NULL;
 	}
@@ -358,7 +302,7 @@ static SMTExpr* emit_expr_select(ivl_scope_t scope, ivl_expr_t expr, unsigned wi
             // HERE: Should this sign extend if the expression is signed?
             unsigned width = ivl_expr_width(expr);				//width of selection
             unsigned sig_wid = ivl_expr_width(sig_expr);		//total signal width
-            smt_signal = dynamic_cast<SMTSignal*>(emit_expr(scope, sig_expr, sig_wid, 0, 0, 0));
+            smt_signal = dynamic_cast<SMTSignal*>(emit_expr(scope, sig_expr));
             assert(smt_signal);
 
             // Select part of a signal when needed.
@@ -376,14 +320,13 @@ static SMTExpr* emit_expr_select(ivl_scope_t scope, ivl_expr_t expr, unsigned wi
         }
         return smt_signal;
     } else {
-        return emit_expr(scope, sig_expr, ivl_expr_width(sig_expr), 0, 0, 0);
+        return emit_expr(scope, sig_expr);
     }
 }
 
-static SMTSignal* emit_expr_signal(ivl_scope_t scope, ivl_expr_t expr, unsigned wid) {
+static SMTSignal* emit_expr_signal(ivl_scope_t scope, ivl_expr_t expr) {
 	ivl_signal_t sig = ivl_expr_signal(expr);
     SMTSignal* smt_signal = new SMTSignal(sig);
-	(void) wid; /* Parameter is not used. */
 	emit_scope_call_path(scope, ivl_signal_scope(sig));
 	emit_id(ivl_signal_basename(sig));
 	
@@ -398,26 +341,23 @@ static SMTSignal* emit_expr_signal(ivl_scope_t scope, ivl_expr_t expr, unsigned 
 	return smt_signal;
 }
 
-static SMTTernary* emit_expr_ternary(ivl_scope_t scope, ivl_expr_t expr, unsigned wid,
-		unsigned is_full_prec) {
+static SMTTernary* emit_expr_ternary(ivl_scope_t scope, ivl_expr_t expr) {
 	SMTTernary* smt_ternary = new SMTTernary();
 	ivl_expr_t oper2 = ivl_expr_oper2(expr);
 	ivl_expr_t oper3 = ivl_expr_oper3(expr);
-	unsigned can_skip_unsigned = calc_can_skip_unsigned(oper2, oper3);
 	fprintf(g_out, "(");
-	smt_ternary->add(emit_expr(scope, ivl_expr_oper1(expr), 0, 0, 0, 0));
+	smt_ternary->add(emit_expr(scope, ivl_expr_oper1(expr)));
 	fprintf(g_out, " ? ");
 	// HERE: Do these two emits need to use get_cast_width() like the binary
 	//       arithmetic operators?
-	smt_ternary->add(emit_expr(scope, oper2, wid, 0, can_skip_unsigned, is_full_prec));
+	smt_ternary->add(emit_expr(scope, oper2));
 	fprintf(g_out, " : ");
-	smt_ternary->add(emit_expr(scope, oper3, wid, 0, can_skip_unsigned, is_full_prec));
+	smt_ternary->add(emit_expr(scope, oper3));
 	fprintf(g_out, ")");
 	return smt_ternary;
 }
 
-static SMTUnary* emit_expr_unary(ivl_scope_t scope, ivl_expr_t expr, unsigned wid,
-		unsigned is_full_prec) {
+static SMTUnary* emit_expr_unary(ivl_scope_t scope, ivl_expr_t expr) {
 	SMTUnary* smt_unary = new SMTUnary();
 	SMTExpr* tmp_expr = NULL;
 	smt_unary->set_opcode(expr);
@@ -447,7 +387,7 @@ static SMTUnary* emit_expr_unary(ivl_scope_t scope, ivl_expr_t expr, unsigned wi
 		case '-':
 		case '~':
 			fprintf(g_out, "(%s", oper);
-			tmp_expr = emit_expr(scope, oper1, wid, 0, 0, is_full_prec);
+			tmp_expr = emit_expr(scope, oper1);
 			fprintf(g_out, ")");
 			break;
 		case '&':
@@ -458,13 +398,13 @@ static SMTUnary* emit_expr_unary(ivl_scope_t scope, ivl_expr_t expr, unsigned wi
 		case 'X':
 		case '!':
 			fprintf(g_out, "(%s", oper);
-			tmp_expr = emit_expr(scope, oper1, 0, 0, 0, 0);
+			tmp_expr = emit_expr(scope, oper1);
 			fprintf(g_out, ")");
 			break;
 		default:
 			error("Unknown unary");
 			fprintf(g_out, "<unknown>");
-			emit_expr(scope, oper1, wid, 0, 0, 0);
+			emit_expr(scope, oper1);
 			fprintf(stderr, "%s:%u: vlog95 error: Unknown unary "
 					"operator (%c).\n",
 					ivl_expr_file(expr),
@@ -480,10 +420,9 @@ static SMTUnary* emit_expr_unary(ivl_scope_t scope, ivl_expr_t expr, unsigned wi
 	return smt_unary;
 }
 
-SMTExpr* emit_expr(ivl_scope_t scope, ivl_expr_t expr, unsigned is_full_prec) {
+SMTExpr* emit_expr(ivl_scope_t scope, ivl_expr_t expr) {
 
 	SMTExpr* ret_expr = NULL;
-	uint wid = ivl_expr_width(expr);
 
 	/* Emit the expression. */
 	switch (ivl_expr_type(expr)) {
@@ -491,29 +430,29 @@ SMTExpr* emit_expr(ivl_scope_t scope, ivl_expr_t expr, unsigned is_full_prec) {
 		//	emit_expr_array(scope, expr, wid);
 		//	break;
 		case IVL_EX_BINARY:		//done
-			ret_expr = emit_expr_binary(scope, expr, wid, is_full_prec);
+			ret_expr = emit_expr_binary(scope, expr);
 			break;
 		case IVL_EX_CONCAT:		//done
-			ret_expr = emit_expr_concat(scope, expr, wid);
+			ret_expr = emit_expr_concat(scope, expr);
 			break;
 		case IVL_EX_NUMBER:		//done
-			ret_expr = emit_expr_number(expr, wid);
+			ret_expr = emit_expr_number(expr);
 			break;
 		case IVL_EX_SCOPE:		//done
 			info("Entered scope expression");
-			emit_expr_scope(scope, expr, wid);
+			emit_expr_scope(expr);
 			break;
 		case IVL_EX_SELECT:
-			ret_expr = emit_expr_select(scope, expr, wid);
+			ret_expr = emit_expr_select(scope, expr);
 			break;
 		case IVL_EX_SIGNAL:		//done
-			ret_expr = emit_expr_signal(scope, expr, wid);
+			ret_expr = emit_expr_signal(scope, expr);
 			break;
 		case IVL_EX_TERNARY:	//done
-			ret_expr = emit_expr_ternary(scope, expr, wid, is_full_prec);
+			ret_expr = emit_expr_ternary(scope, expr);
 			break;
 		case IVL_EX_UNARY:		//done
-			ret_expr = emit_expr_unary(scope, expr, wid, is_full_prec);
+			ret_expr = emit_expr_unary(scope, expr);
 			break;
 		default:
 			fprintf(g_out, "<unsupported>");

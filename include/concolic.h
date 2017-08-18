@@ -38,7 +38,7 @@ class SMTSignal;
 class SMTNumber;
 
 extern void emit_event(ivl_scope_t scope, ivl_statement_t stmt);
-extern SMTExpr* emit_expr(ivl_scope_t scope, ivl_expr_t expr, unsigned is_full_prec);
+extern SMTExpr* emit_expr(ivl_scope_t scope, ivl_expr_t expr);
 extern void emit_logic(ivl_scope_t scope, ivl_net_logic_t nlogic);
 extern void emit_lpm(ivl_scope_t scope, ivl_lpm_t lpm);
 extern SMTProcess* emit_process(ivl_scope_t scope, ivl_process_t proc);
