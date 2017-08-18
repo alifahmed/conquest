@@ -2,6 +2,7 @@
 #include <cstring>
 #include <vector>
 #include <stack>
+#include <algorithm>
 #include "concolic.h"
 #include "smt_lib.h"
 
@@ -188,7 +189,8 @@ static SMTSignal* emit_stmt_lval(ivl_scope_t scope, ivl_statement_t stmt) {
  * translate an assignment with an opcode when allowed.
  */
 static SMTBlockingAssign* emit_assign_and_opt_opcode(ivl_scope_t scope, ivl_statement_t stmt) {
-	char opcode;
+	fprintf(g_out, "%*c", get_indent(), ' ');
+    char opcode;
 	const char *opcode_str;
 	SMTExpr* lval = emit_stmt_lval(scope, stmt);
 	/* Get the opcode and the string version of the opcode. */
@@ -240,7 +242,7 @@ static SMTBlockingAssign* emit_assign_and_opt_opcode(ivl_scope_t scope, ivl_stat
 	else{
 		rval = emit_expr(scope, ivl_stmt_rval(stmt));
 	}
-	
+	fprintf(g_out, ";");
 	return new SMTBlockingAssign(lval, rval);
 }
 
@@ -257,10 +259,7 @@ typedef struct port_expr_s {
 } *port_expr_t;
 
 static SMTBlockingAssign* emit_stmt_assign(ivl_scope_t scope, ivl_statement_t stmt) {
-	fprintf(g_out, "%*c", get_indent(), ' ');
-	SMTBlockingAssign* smt_assign = emit_assign_and_opt_opcode(scope, stmt);
-	fprintf(g_out, ";");
-	return smt_assign;
+	return emit_assign_and_opt_opcode(scope, stmt);
 }
 
 static SMTNonBlockingAssign* emit_stmt_assign_nb(ivl_scope_t scope, ivl_statement_t stmt) {
@@ -379,7 +378,7 @@ static SMTBlockingAssign* emit_stmt_cassign(ivl_scope_t scope, ivl_statement_t s
 	SMTExpr* lval = emit_stmt_lval(scope, stmt);
 	fprintf(g_out, " = ");
 	SMTExpr* rval = emit_expr(scope, ivl_stmt_rval(stmt));
-	fprintf(g_out, ";\n");
+	fprintf(g_out, ";");
 	return new SMTBlockingAssign(lval, rval);
 }
 
@@ -576,7 +575,7 @@ void emit_stmt(ivl_scope_t scope, ivl_statement_t stmt) {
 			break;
 		case IVL_ST_DELAY:
 			//emit_stmt_delay(scope, stmt);
-			break;
+			//break;
 		case IVL_ST_DELAYX:
 			//emit_stmt_delayx(scope, stmt);
 			break;
@@ -634,8 +633,7 @@ SMTProcess* emit_process(ivl_scope_t scope, ivl_process_t proc) {
 		SMTProcess::curr_proc = smt_proc;
 		emit_stmt(scope, stmt);
         smt_proc->exit_block = smt_proc->top_bb;
-        smt_proc->print();
-		//SMTProcess::curr_proc = NULL;
+		SMTProcess::curr_proc = NULL;
 	}
 	fprintf(g_out, "\n");
     return smt_proc;

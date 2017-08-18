@@ -865,6 +865,10 @@ void SMTBranch::clear_flag() {
 	parent_node->clear_flag();
 }
 
+void SMTBranch::update_distance() {
+    block->update_distance();
+}
+
 void SMTBranch::instrument() {
     const string &str = print(SMT_CLK_CURR);
 	total_branch_count++;
@@ -873,7 +877,7 @@ void SMTBranch::instrument() {
 		this->set_covered(0);
         return;
     }
-	fprintf(g_out, " $display(\";A %u\");\t\t//%s", id, str.c_str());
+	fprintf(g_out, "%*c$display(\";A %u\");\t\t//%s", get_indent(), ' ', id, str.c_str());
 	conc_flush(g_out);
 }
 
@@ -1318,18 +1322,18 @@ void SMTSigCore::free_connected_cnst() {
 	}
 }
 
-void SMTSigCore::print_state_variables() {
+void SMTSigCore::print_state_variables(ofstream &out) {
 	//first update state variables
 	for(auto it:regDir){
 		if(it.second->is_state_variable){
 			state_variables.push_back(it.second);
 		}
 	}
-	fprintf(g_out, "//state variables:");
+	out << "//state variables:";
 	for(auto it:state_variables){
-		fprintf(g_out, " %s", it->name.c_str());
+        out << ' ' << it->name;
 	}
-	fprintf(g_out, "\n\n");
+    out << "\n\n";
 }
 
 void SMTSigCore::set_input_version(uint version) {
@@ -1423,11 +1427,6 @@ void SMTProcess::update_sensitivity_list(SMTExpr* rval) {
     }
 }
 
-
-void SMTProcess::print() {
-    SMTBasicBlock::print_all();
-}
-
 //static void merge(SMTBasicBlock* block, uint pos, SMTProcess* proc){
     
 //}
@@ -1480,28 +1479,15 @@ void SMTProcess::combine_processes() {
     }
 }
 
-void SMTProcess::update_distances(SMTBranch* target_br) {
-	if(entry_block->predecessors.size() < 1){
-		entry_block->predecessors.insert(exit_block);
-	}
-	SMTBasicBlock* target_bb = target_br->block;
-	assert(target_bb);
-	target_bb->distance = 0;
-	queue<SMTBasicBlock*> bb_queue;
-	bb_queue.push(target_bb);
-	while(!bb_queue.empty()){
-		SMTBasicBlock* top_bb = bb_queue.front();
-		bb_queue.pop();
-		const uint curr_dist = top_bb->distance;
-		for(auto it:top_bb->predecessors){
-			if((curr_dist + it->weight) < it->distance){
-				it->distance = curr_dist + it->weight;
-				bb_queue.push(it);
-			}
-		}
-	}
+void SMTProcess::make_circular() {
+    for(auto it:process_list){
+        if(it->entry_block != it->exit_block){
+            if(it->entry_block->predecessors.size() == 0){
+                it->entry_block->predecessors.insert(it->exit_block);
+            }
+        }
+    }
 }
-
 
 //--------------------------SMT Basic Block-------------------------------------
 uint SMTBasicBlock::id_counter = 0;
@@ -1520,45 +1506,61 @@ SMTBasicBlock::SMTBasicBlock() : id(id_counter) {
 	
 }*/
 
-void SMTBasicBlock::print_assigns() {
+void SMTBasicBlock::print_assigns(ofstream &out) {
     for(auto it:assign_list){
-        fprintf(g_out, "%s", it->print(SMT_CLK_CURR).c_str());
+        out << it->print(SMT_CLK_CURR);
     }
 }
 
-void SMTBasicBlock::print() {
-    fprintf(g_out, "[%u] weight: %u distance: %u\n", id, weight, distance);
-    print_assigns();
+void SMTBasicBlock::print(ofstream &out) {
+    out << "[" << id << "] weight: " << weight << " distance: " << distance << '\n';
+    print_assigns(out);
     if(successors.size()){
-        fprintf(g_out, "[S]");
+        out << "[S]";
         for(auto it:successors){
-            fprintf(g_out, " %u", it->id);
+            out << ' ' << it->id;
         }
-        fprintf(g_out, "\n");
+        out << '\n';
     }
     if(predecessors.size()){
-        fprintf(g_out, "[P]");
+        out << "[P]";
         for(auto it:predecessors){
-            fprintf(g_out, " %u", it->id);
+            out << ' ' << it->id;
         }
-        fprintf(g_out, "\n");
+        out << '\n';
     }
-    fprintf(g_out, "\n");
+    out << '\n';
 }
 
-void SMTBasicBlock::print_all() {
-    fprintf(g_out, "/*\n");
+void SMTBasicBlock::update_distance() {
+	distance = 0;
+	queue<SMTBasicBlock*> bb_queue;
+	bb_queue.push(this);
+	while(!bb_queue.empty()){
+		SMTBasicBlock* top_bb = bb_queue.front();
+		bb_queue.pop();
+		const uint curr_dist = top_bb->distance;
+		for(auto it:top_bb->predecessors){
+			if((curr_dist + it->weight) < it->distance){
+				it->distance = curr_dist + it->weight;
+				bb_queue.push(it);
+			}
+		}
+	}
+}
+
+void SMTBasicBlock::print_all(ofstream &out) {
+    out << "/*\n";
     for(auto it:block_list){
-        it->print();
+        it->print(out);
     }
-    fprintf(g_out, "*/\n");
+    out << "*/\n\n";
 }
 
 void SMTBasicBlock::reset_distances() {
-	const uint size = block_list.size();
-	for(uint i=0; i<size; i++){
-		block_list[i]->distance = 0xFFFFFFF;
-	}
+    for(auto it:block_list){
+        it->distance = 0xFFFFFFF;
+    }
 }
 
 //----------------------------SMT Globals---------------------------------------

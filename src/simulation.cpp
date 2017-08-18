@@ -468,7 +468,7 @@ void start_concolic() {
 		for(uint i=0; i<count; i++){
 			SMTAssign* assign = SMTAssign::get_assign(i);
 			if(assign->assign_type == SMT_ASSIGN_BRANCH){
-				system("cp -f data_raw.mem data.mem");
+                copy_file(g_data_mem_raw, g_data_mem);
 				target_branch = dynamic_cast<SMTBranch*>(assign);
 				assert(target_branch);
 				target_branch->k_permit_covered = 0;
@@ -476,7 +476,7 @@ void start_concolic() {
 				SMTBranch::clear_coverage(0);
 				SMTBranch::restore_coverage();
 				path_hash_map.clear();
-				SMTProcess::curr_proc->update_distances(target_branch);
+				target_branch->update_distance();
 				sim_num = 0;
 				selected_branch = NULL;
 				while (concolic_iteration(sim_num)) {

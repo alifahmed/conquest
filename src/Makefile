@@ -24,11 +24,11 @@ clean:
 
 
 %.o: %.cpp	$(HEADERS)
-	@g++ -Wall -g -std=c++11 -c $< -o $@ -I../include/ -I$(IVERILOG_INC) -I$(IVERILOG_DIR) -fpic
+	@g++ -Wall -ggdb3 -std=c++11 -c $< -o $@ -I../include/ -I$(IVERILOG_INC) -I$(IVERILOG_DIR) -fpic
 	@echo "Compiling $<..."
 
 $(TARGET): $(OBJECTS)
-	@g++ $(OBJECTS) -Wall -g -o $@ -std=c++11 -fpic -shared -lyices
+	@g++ $(OBJECTS) -Wall -ggdb3 -o $@ -std=c++11 -fpic -shared -lyices
 	@echo "Linking..."
 
 $(CONFIG_TARGET): $(CONFIG_FILE)

@@ -46,8 +46,7 @@ extern "C" int target_design(ivl_design_t design) {
 	generate_tb(roots[0]);
     g_data.generate(true);
 	emit_root(roots[0]);
-
-	SMTSigCore::print_state_variables();
+    
 	post_processing(design);
 	
 	start_concolic();
@@ -82,6 +81,14 @@ void pre_processing(ivl_design_t design){
 void post_processing(ivl_design_t design){
     fclose(g_out);
     g_out = NULL;
+    
+    ofstream out("cfg_info.txt");
+	SMTSigCore::print_state_variables(out);
+    SMTBasicBlock::print_all(out);
+    out.close();
+    
+    //Make all SMTProcess circular
+    SMTProcess::make_circular();
 }
 
 void extract_parameters(ivl_design_t design){

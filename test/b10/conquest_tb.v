@@ -1,4 +1,4 @@
-module concolic_tb();
+module conquest_tb();
 
     // Generated top module signals
     reg  r_button = 1'b0;

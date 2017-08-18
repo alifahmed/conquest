@@ -216,6 +216,7 @@ public:
 	void set_covered_clk(uint sim_num, uint clock);
     void clear_covered_clk(uint clock);
 	void clear_flag();
+    void update_distance();
 	
 	void instrument() override;
 	static SMTBranch* create_true_branch(SMTBranchNode* parent);
@@ -414,7 +415,7 @@ public:
 	static void update_is_dep();
 	static void yices_insert_reg_init(context_t * ctx);
 	static void free_connected_cnst();
-	static void print_state_variables();
+	static void print_state_variables(std::ofstream &out);
     static void set_input_version(uint version);
 };
 
@@ -456,10 +457,9 @@ public:
     //Update sensitivity and dependency list for always @* blocks
     void update_sensitivity_list(SMTExpr* rval);
     
-    void print();
     void expand();
     static void combine_processes();
-    void update_distances(SMTBranch* target_br);
+    static void make_circular();
 	
 private:
     bool is_expanded;
@@ -480,12 +480,14 @@ public:
 	uint weight;
 	uint distance;
     
-    void print();
-    static void print_all();
+    void print(std::ofstream &out);
+    void update_distance();
+    
+    static void print_all(std::ofstream &out);
 	static void reset_distances();
 	
 private:
-    void print_assigns();
+    void print_assigns(std::ofstream &out);
     static uint id_counter;
     static std::vector<SMTBasicBlock*> block_list;
 };
