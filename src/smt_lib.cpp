@@ -727,7 +727,6 @@ bool SMTContAssign::print_map_init = false;
 SMTContAssign::SMTContAssign() : SMTAssign(SMT_CLK_CURR, SMT_ASSIGN_CONT, assign_map.size()) {
 	assign_map.push_back(this);
 	covered_any_clock = true;
-    lval = new SMTConcat();
     is_commit = true;
 }
 
@@ -837,7 +836,6 @@ void SMTDispAssign::print_coverage(std::ofstream &report) {
 //------------------------SMT Blocking Assign-----------------------------------
 SMTBlockingAssign::SMTBlockingAssign() :
         SMTDispAssign(SMT_CLK_CURR, SMT_ASSIGN_BLOCKING){
-    lval = new SMTConcat();
     is_commit = true;
 }
 
@@ -850,7 +848,6 @@ void SMTBlockingAssign::redraw(SMTClkType clk_type) {
 //----------------------SMT Non Blocking Assign---------------------------------
 SMTNonBlockingAssign::SMTNonBlockingAssign() :
         SMTDispAssign(SMT_CLK_NEXT, SMT_ASSIGN_NON_BLOCKING){
-    lval = new SMTConcat();
     is_commit = false;
 }
 

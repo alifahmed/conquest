@@ -91,7 +91,7 @@ static void emit_stmt_lval_name(ivl_scope_t scope, ivl_lval_t lval,
 	}
 }
 
-static SMTExpr* emit_stmt_lval_piece(ivl_scope_t scope, ivl_lval_t lval) {
+static SMTSignal* emit_stmt_lval_piece(ivl_scope_t scope, ivl_lval_t lval) {
 	ivl_signal_t sig = ivl_lval_sig(lval);
 	ivl_expr_t sel_expr;
 	ivl_select_type_t sel_type;
@@ -155,11 +155,16 @@ static SMTExpr* emit_stmt_lval_piece(ivl_scope_t scope, ivl_lval_t lval) {
 	return tmp_sig;
 }
 
-static unsigned emit_stmt_lval(ivl_scope_t scope, ivl_statement_t stmt, SMTAssign* smt_assign) {
+static SMTSignal* emit_stmt_lval(ivl_scope_t scope, ivl_statement_t stmt) {
+	SMTSignal* sig = NULL;
 	unsigned count = ivl_stmt_lvals(stmt);
-	unsigned wid = 0;
+	if(count != 1){
+		error("Multiple lval (%s:%u)", ivl_stmt_file(stmt), ivl_stmt_lineno(stmt));
+	}
+	
 	if (count > 1) {
-		ivl_lval_t lval;
+		error("TODO: split into multiple assignments");
+		/*ivl_lval_t lval;
 		fprintf(g_out, "{");
 		for (uint idx = count - 1; idx > 0; idx -= 1) {
 			lval = ivl_stmt_lval(stmt, idx);
@@ -170,29 +175,24 @@ static unsigned emit_stmt_lval(ivl_scope_t scope, ivl_statement_t stmt, SMTAssig
 		lval = ivl_stmt_lval(stmt, 0);
 		wid += ivl_lval_width(lval);
 		smt_assign->lval->add(emit_stmt_lval_piece(scope, lval));
-		fprintf(g_out, "}");
+		fprintf(g_out, "}");*/
 	} else {
 		ivl_lval_t lval = ivl_stmt_lval(stmt, 0);
-		wid = ivl_lval_width(lval);
-		smt_assign->lval->add(emit_stmt_lval_piece(scope, lval));
+		sig = emit_stmt_lval_piece(scope, lval);
 	}
-	assert(wid == ivl_stmt_lwidth(stmt));
-	return wid;
+	return sig;
 }
 
 /*
  * A common routine to emit the basic assignment construct. It can also
  * translate an assignment with an opcode when allowed.
  */
-static SMTBlockingAssign* emit_assign_and_opt_opcode(ivl_scope_t scope, ivl_statement_t stmt,
-		unsigned allow_opcode) {
+static SMTBlockingAssign* emit_assign_and_opt_opcode(ivl_scope_t scope, ivl_statement_t stmt) {
 	unsigned wid;
 	char opcode;
 	const char *opcode_str;
-
-	// HERE: Do we need to calculate the width? The compiler should have already
-	//       done this for us.
-	wid = emit_stmt_lval(scope, stmt, smt_assign);
+	SMTBlockingAssign* smt_assign = new SMTBlockingAssign();
+	smt_assign->lval = emit_stmt_lval(scope, stmt);
 	/* Get the opcode and the string version of the opcode. */
 	opcode = ivl_stmt_opcode(stmt);
 	switch (opcode) {
@@ -229,20 +229,19 @@ static SMTBlockingAssign* emit_assign_and_opt_opcode(ivl_scope_t scope, ivl_stat
 			opcode_str = "<unknown>";
 			break;
 	}
-	if (opcode && !allow_opcode) {
-		fprintf(stderr, "%s:%u: vlog95 error: assignment operator %s= is "
-				"not allowed in this context.\n",
-				ivl_stmt_file(stmt), ivl_stmt_lineno(stmt),
-				opcode_str);
-		g_errors += 1;
-	}
 	fprintf(g_out, " = ");
 	if (opcode) {
-		unsigned twid = emit_stmt_lval(scope, stmt, smt_assign);
-		assert(twid == wid);
+		SMTBinary* smt_bi = new SMTBinary();
+		smt_bi->set_opcode(opcode);
+		smt_bi->add(emit_stmt_lval(scope, stmt));
 		fprintf(g_out, " %s ", opcode_str);
+		smt_bi->add(emit_expr(scope, ivl_stmt_rval(stmt), wid, 1, 0, 0));
+		smt_assign->rval = smt_bi;
 	}
-	smt_assign->rval = emit_expr(scope, ivl_stmt_rval(stmt), wid, 1, 0, 0);
+	else{
+		smt_assign->rval = emit_expr(scope, ivl_stmt_rval(stmt), wid, 1, 0, 0);
+	}
+	return smt_assign;
 }
 
 /*
@@ -259,19 +258,19 @@ typedef struct port_expr_s {
 
 static SMTBlockingAssign* emit_stmt_assign(ivl_scope_t scope, ivl_statement_t stmt) {
 	fprintf(g_out, "%*c", get_indent(), ' ');
-	emit_assign_and_opt_opcode(scope, stmt, 0);
+	SMTBlockingAssign* smt_assign = emit_assign_and_opt_opcode(scope, stmt);
 	fprintf(g_out, ";");
+	return smt_assign;
 }
 
 static SMTNonBlockingAssign* emit_stmt_assign_nb(ivl_scope_t scope, ivl_statement_t stmt) {
-	unsigned wid;
 	fprintf(g_out, "%*c", get_indent(), ' ');
-	// HERE: Do we need to calculate the width? The compiler should have already
-	//       done this for us.
-	wid = emit_stmt_lval(scope, stmt, smt_assign);
+	SMTNonBlockingAssign* smt_assign = new SMTNonBlockingAssign();
+	smt_assign->lval = emit_stmt_lval(scope, stmt);
 	fprintf(g_out, " <= #1 ");
-	smt_assign->rval = emit_expr(scope, ivl_stmt_rval(stmt), wid, 1, 0, 0);
+	smt_assign->rval = emit_expr(scope, ivl_stmt_rval(stmt), 0);
 	fprintf(g_out, ";");
+	return smt_assign;
 }
 
 static void emit_stmt_block(ivl_scope_t scope, ivl_statement_t stmt) {
@@ -376,7 +375,7 @@ static void emit_stmt_case(ivl_scope_t scope, ivl_statement_t stmt) {
     SMTProcess::curr_proc->top_bb = exit_bb;
 }
 
-static void emit_stmt_cassign(ivl_scope_t scope, ivl_statement_t stmt, SMTAssign* smt_assign) {
+static SMTBlockingAssign* emit_stmt_cassign(ivl_scope_t scope, ivl_statement_t stmt) {
 	unsigned wid;
 	fprintf(g_out, "%*cassign ", get_indent(), ' ');
 	// HERE: Do we need to calculate the width? The compiler should have already

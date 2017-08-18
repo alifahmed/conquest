@@ -480,20 +480,10 @@ static SMTUnary* emit_expr_unary(ivl_scope_t scope, ivl_expr_t expr, unsigned wi
 	return smt_unary;
 }
 
-SMTExpr* emit_expr(ivl_scope_t scope, ivl_expr_t expr, unsigned wid,
-		unsigned is_lval_width, unsigned can_skip_unsigned,
-		unsigned is_full_prec) {
+SMTExpr* emit_expr(ivl_scope_t scope, ivl_expr_t expr, unsigned is_full_prec) {
 
 	SMTExpr* ret_expr = NULL;
-	/* If the width is from an L-value (assignment) then the actual
-	 * expression width can be larger. */
-	if (is_lval_width) {
-		unsigned expr_wid = ivl_expr_width(expr);
-		//if (wid < expr_wid) wid = expr_wid;
-		assert(wid == expr_wid);
-	}
-	/* In a self-determined context the expression set the width. */
-	if (!wid) wid = ivl_expr_width(expr);
+	uint wid = ivl_expr_width(expr);
 
 	/* Emit the expression. */
 	switch (ivl_expr_type(expr)) {
@@ -506,23 +496,9 @@ SMTExpr* emit_expr(ivl_scope_t scope, ivl_expr_t expr, unsigned wid,
 		case IVL_EX_CONCAT:		//done
 			ret_expr = emit_expr_concat(scope, expr, wid);
 			break;
-		//case IVL_EX_DELAY:
-		//	info("Delay assignment used. Might cause wrong test case generation");
-		//	emit_expr_delay(scope, expr, wid);
-		//	break;
-		//case IVL_EX_EVENT:
-		//	emit_expr_event(scope, expr, wid);
-		//	info("IVL_EX_EVENT used (%s:%u)", ivl_expr_file(expr), ivl_expr_lineno(expr));
-		//	break;
 		case IVL_EX_NUMBER:		//done
 			ret_expr = emit_expr_number(expr, wid);
 			break;
-		//case IVL_EX_PROPERTY:
-		//	emit_class_property(scope, expr, wid);
-		//	break;
-		//case IVL_EX_REALNUM:
-		//	emit_expr_real_number(scope, expr, wid);
-		//	break;
 		case IVL_EX_SCOPE:		//done
 			info("Entered scope expression");
 			emit_expr_scope(scope, expr, wid);
@@ -536,10 +512,6 @@ SMTExpr* emit_expr(ivl_scope_t scope, ivl_expr_t expr, unsigned wid,
 		case IVL_EX_TERNARY:	//done
 			ret_expr = emit_expr_ternary(scope, expr, wid, is_full_prec);
 			break;
-		//case IVL_EX_UFUNC:
-		//	emit_scope_path(scope, ivl_expr_def(expr));
-		//	emit_expr_func(scope, expr, wid);
-		//	break;
 		case IVL_EX_UNARY:		//done
 			ret_expr = emit_expr_unary(scope, expr, wid, is_full_prec);
 			break;
