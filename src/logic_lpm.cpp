@@ -1037,9 +1037,7 @@ void emit_lpm(ivl_scope_t scope, ivl_lpm_t lpm) {
 	// HERE: Look for a select passed to a pull device (pr2019553).
 	/* Skip assignments to a module instantiation input. */
 	if (output_is_module_instantiation_input(scope, output)) return;
-	SMTProcess* proc = new SMTProcess();
-	proc->is_edge_triggered = false;
-	proc->exit_block = proc->entry_block;
+    SMTProcess::curr_proc = new SMTProcess();
 	
 	fprintf(g_out, "%*calways @(*) begin\n", g_ind, ' ');
 	g_ind += g_ind_incr;
@@ -1055,23 +1053,12 @@ void emit_lpm(ivl_scope_t scope, ivl_lpm_t lpm) {
     fprintf(g_out, " = ");
 	SMTExpr* rval = emit_lpm_as_ca(scope, lpm, 0);
 	fprintf(g_out, ";");
-	single_indent = 1;
 	SMTAssign* smt_assign = new SMTBlockingAssign(lval, rval);
-	smt_assign->instrument();
 	g_ind -= g_ind_incr;
 	fprintf(g_out, "%*cend\n\n", g_ind, ' ');
 	
-	add_to_rval(proc->sensitivity_list, smt_assign->rval);
-    for(auto it:proc->sensitivity_list){
-        it->dependent_process.push_back(proc);
-    }
-    proc->add_assign(smt_assign);
-	smt_assign->block = proc->top_bb;
-	SMTSigCore* lval_sig = smt_assign->get_lval_sig_core();
-	lval_sig->assignments.push_back(smt_assign);
-	if(smt_assign->rval->type != SMT_EXPR_NUMBER){
-		lval_sig->is_state_variable = false;
-	}
+    SMTProcess::curr_proc->update_sensitivity_list(smt_assign->rval);
+    SMTProcess::curr_proc = NULL;
 }
 
 /*
@@ -1079,24 +1066,20 @@ void emit_lpm(ivl_scope_t scope, ivl_lpm_t lpm) {
  */
 static void emit_bufz(ivl_scope_t scope, ivl_net_logic_t nlogic) {
 	assert(ivl_logic_pins(nlogic) == 2);
-	
+    
+	SMTProcess::curr_proc = new SMTProcess();
 	fprintf(g_out, "always @(*) begin\n");
 	g_ind += g_ind_incr;
 	SMTExpr* lval = emit_name_of_nexus(scope, ivl_logic_pin(nlogic, 0), 0);
 	fprintf(g_out, " = ");
 	SMTExpr* rval = emit_nexus_as_ca(scope, ivl_logic_pin(nlogic, 1), 0, 0);
 	fprintf(g_out, ";");
-	single_indent = 1;
 	SMTAssign* smt_assign = new SMTBlockingAssign(lval, rval);
-	smt_assign->instrument();
 	g_ind -= g_ind_incr;
 	fprintf(g_out, "%*cend\n", g_ind, ' ');
-	
-	SMTSigCore* lval_sig = smt_assign->get_lval_sig_core();
-	lval_sig->assignments.push_back(smt_assign);
-	if(smt_assign->rval->type != SMT_EXPR_NUMBER){
-		lval_sig->is_state_variable = false;
-	}
+    
+    SMTProcess::curr_proc->update_sensitivity_list(smt_assign->rval);
+    SMTProcess::curr_proc = NULL;
 }
 
 static void emit_name_of_logic_nexus(ivl_scope_t scope, ivl_net_logic_t nlogic,
@@ -1137,9 +1120,7 @@ void emit_logic(ivl_scope_t scope, ivl_net_logic_t nlogic) {
 		if (ivl_logic_type(nlogic) != IVL_LO_NOT) pin_count += 1;
 		assert(ivl_logic_pins(nlogic) == pin_count);
 		
-		SMTProcess* proc = new SMTProcess();
-		proc->is_edge_triggered = false;
-		proc->exit_block = proc->entry_block;
+        SMTProcess::curr_proc = new SMTProcess();
 		
 		fprintf(g_out, "always @(*) begin\n");
 		g_ind += g_ind_incr;
@@ -1149,24 +1130,12 @@ void emit_logic(ivl_scope_t scope, ivl_net_logic_t nlogic) {
 		fprintf(g_out, " = ");
 		SMTExpr* rval = emit_logic_as_ca(scope, nlogic);
 		fprintf(g_out, ";");
-		single_indent = 1;
 		SMTAssign* smt_assign = new SMTBlockingAssign(lval, rval);
-		smt_assign->instrument();
 		g_ind -= g_ind_incr;
 		fprintf(g_out, "%*cend\n", g_ind, ' ');
 		
-		add_to_rval(proc->sensitivity_list, smt_assign->rval);
-        //add this process to dependency list of signals that its sensitive to
-        for(auto it:proc->sensitivity_list){
-            it->dependent_process.push_back(proc);
-        }
-		proc->add_assign(smt_assign);
-		smt_assign->block = proc->top_bb;
-		SMTSigCore* lval_sig = smt_assign->get_lval_sig_core();
-		lval_sig->assignments.push_back(smt_assign);
-		if(smt_assign->rval->type != SMT_EXPR_NUMBER){
-			lval_sig->is_state_variable = false;
-		}
+        SMTProcess::curr_proc->update_sensitivity_list(smt_assign->rval);
+        SMTProcess::curr_proc = NULL;   
 		return;
 	}
 	switch (ivl_logic_type(nlogic)) {
@@ -1310,6 +1279,7 @@ void emit_signal_net_const_as_ca(ivl_scope_t scope, ivl_signal_t sig) {
 			continue;
 		}
 		
+        SMTProcess::curr_proc = new SMTProcess();
 		fprintf(g_out, "%*calways @(*) begin\n", g_ind, ' ');
 		g_ind += g_ind_incr;
 		emit_id(ivl_signal_basename(sig));
@@ -1317,17 +1287,12 @@ void emit_signal_net_const_as_ca(ivl_scope_t scope, ivl_signal_t sig) {
 		fprintf(g_out, " = ");
 		SMTExpr* rval = emit_const_nexus(scope, net_const);
 		fprintf(g_out, ";");
-		single_indent = 1;
-		SMTAssign* smt_assign = new SMTBlockingAssign(lval, rval);
-		smt_assign->instrument();
+		new SMTBlockingAssign(lval, rval);
 		g_ind -= g_ind_incr;
 		fprintf(g_out, "%*cend\n", g_ind, ' ');
 		
-		SMTSigCore* lval_sig = smt_assign->get_lval_sig_core();
-		lval_sig->assignments.push_back(smt_assign);
-		if(smt_assign->rval->type != SMT_EXPR_NUMBER){
-			lval_sig->is_state_variable = false;
-		}
+        SMTProcess::curr_proc = NULL;
+        
 		/* Increment the emitted constant count by one. */
 		ivl_nexus_set_private(nex,
 				(void *) ((uintptr_t) ivl_nexus_get_private(nex) + 1U));

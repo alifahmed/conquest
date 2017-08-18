@@ -137,6 +137,7 @@ protected:
 				SMTExpr* lval, SMTExpr* rval, bool is_commit);
     virtual void redraw(SMTClkType clk_type) override = 0;
     virtual std::string pad_and_update(bool is_commit);
+    virtual void init_assign();
     
 public:
     const SMTAssignType assign_type;
@@ -451,6 +452,10 @@ public:
     SMTBasicBlock* top_bb;
 	static SMTProcess* curr_proc;
     void add_assign(SMTAssign* assign);
+    
+    //Update sensitivity and dependency list for always @* blocks
+    void update_sensitivity_list(SMTExpr* rval);
+    
     void print();
     void expand();
     static void combine_processes();

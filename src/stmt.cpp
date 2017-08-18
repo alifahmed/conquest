@@ -546,32 +546,12 @@ static void emit_stmt_wait(ivl_scope_t scope, ivl_statement_t stmt) {
 }
 
 void emit_stmt(ivl_scope_t scope, ivl_statement_t stmt) {
-	SMTAssign* smt_assign;
-	SMTSigCore* lval_sig;
 	switch (ivl_statement_type(stmt)) {
 		case IVL_ST_ASSIGN:
-			smt_assign = emit_stmt_assign(scope, stmt);
-			single_indent = 1;
-			smt_assign->instrument();
-            SMTProcess::curr_proc->add_assign(smt_assign);
-			smt_assign->block = SMTProcess::curr_proc->top_bb;
-			lval_sig = smt_assign->get_lval_sig_core();
-			lval_sig->assignments.push_back(smt_assign);
-			if(smt_assign->rval->type != SMT_EXPR_NUMBER){
-				lval_sig->is_state_variable = false;
-			}
+			emit_stmt_assign(scope, stmt);
 			break;
 		case IVL_ST_ASSIGN_NB:
-			smt_assign = emit_stmt_assign_nb(scope, stmt);
-			single_indent = 1;
-			smt_assign->instrument();
-            SMTProcess::curr_proc->add_assign(smt_assign);
-			smt_assign->block = SMTProcess::curr_proc->top_bb;
-			lval_sig = smt_assign->get_lval_sig_core();
-			lval_sig->assignments.push_back(smt_assign);
-			if(smt_assign->rval->type != SMT_EXPR_NUMBER){
-				lval_sig->is_state_variable = false;
-			}
+			emit_stmt_assign_nb(scope, stmt);
 			break;
 		case IVL_ST_BLOCK:
 			if (ivl_stmt_block_scope(stmt)) {
@@ -589,9 +569,7 @@ void emit_stmt(ivl_scope_t scope, ivl_statement_t stmt) {
 			break;
 		case IVL_ST_CASSIGN:
 			error("CASSIGN entry (%s:%u)", ivl_stmt_file(stmt), ivl_stmt_lineno(stmt));
-			smt_assign = emit_stmt_cassign(scope, stmt);
-			single_indent = 1;
-			smt_assign->instrument();
+			emit_stmt_cassign(scope, stmt);
 			break;
 		case IVL_ST_CONDIT:
 			emit_stmt_condit(scope, stmt);

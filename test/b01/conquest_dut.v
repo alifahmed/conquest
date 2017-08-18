@@ -23,13 +23,13 @@ module b01(clock, line1, line2, reset, outp, overflw, __obs);
             case (stato)
                 3'b000 :
                     begin
-                        $display(";A 5");		//(assert (= #stato    0b000)) ;5 CS
+ $display(";A 5");		//(assert (= #stato    0b000)) ;5 CS
                         if (((line1 == 1'b1) && (line2 == 1'b1))) begin
-                            $display(";A 6");		//(assert (= (bv-and (bv-comp #line1  0b1) (bv-comp #line2  0b1))   0b1)) ;6 BR
+ $display(";A 6");		//(assert (= (bv-and (bv-comp #line1  0b1) (bv-comp #line2  0b1))   0b1)) ;6 BR
                             stato <= #1 3'b100; $display(";A 8");		//(assert (= @stato    0b100)) ;8 NB
                         end
                         else begin
-                            $display(";A 7");		//(assert (= (bv-and (bv-comp #line1  0b1) (bv-comp #line2  0b1))   0b0)) ;7 BR
+ $display(";A 7");		//(assert (= (bv-and (bv-comp #line1  0b1) (bv-comp #line2  0b1))   0b0)) ;7 BR
                             stato <= #1 3'b001; $display(";A 9");		//(assert (= @stato    0b001)) ;9 NB
                         end
                         outp <= #1 (line1 | line2); $display(";A 10");		//(assert (= @outp    (bv-or #line1  #line2 ))) ;10 NB
@@ -37,13 +37,13 @@ module b01(clock, line1, line2, reset, outp, overflw, __obs);
                     end
                 3'b011 :
                     begin
-                        $display(";A 12");		//(assert (= #stato    0b011)) ;12 CS
+ $display(";A 12");		//(assert (= #stato    0b011)) ;12 CS
                         if (((line1 == 1'b1) && (line2 == 1'b1))) begin
-                            $display(";A 13");		//(assert (= (bv-and (bv-comp #line1  0b1) (bv-comp #line2  0b1))   0b1)) ;13 BR
+ $display(";A 13");		//(assert (= (bv-and (bv-comp #line1  0b1) (bv-comp #line2  0b1))   0b1)) ;13 BR
                             stato <= #1 3'b100; $display(";A 15");		//(assert (= @stato    0b100)) ;15 NB
                         end
                         else begin
-                            $display(";A 14");		//(assert (= (bv-and (bv-comp #line1  0b1) (bv-comp #line2  0b1))   0b0)) ;14 BR
+ $display(";A 14");		//(assert (= (bv-and (bv-comp #line1  0b1) (bv-comp #line2  0b1))   0b0)) ;14 BR
                             stato <= #1 3'b001; $display(";A 16");		//(assert (= @stato    0b001)) ;16 NB
                         end
                         outp <= #1 (line1 | line2); $display(";A 17");		//(assert (= @outp    (bv-or #line1  #line2 ))) ;17 NB
@@ -51,13 +51,13 @@ module b01(clock, line1, line2, reset, outp, overflw, __obs);
                     end
                 3'b001 :
                     begin
-                        $display(";A 19");		//(assert (= #stato    0b001)) ;19 CS
+ $display(";A 19");		//(assert (= #stato    0b001)) ;19 CS
                         if (((line1 == 1'b1) && (line2 == 1'b1))) begin
-                            $display(";A 20");		//(assert (= (bv-and (bv-comp #line1  0b1) (bv-comp #line2  0b1))   0b1)) ;20 BR
+ $display(";A 20");		//(assert (= (bv-and (bv-comp #line1  0b1) (bv-comp #line2  0b1))   0b1)) ;20 BR
                             stato <= #1 3'b101; $display(";A 22");		//(assert (= @stato    0b101)) ;22 NB
                         end
                         else begin
-                            $display(";A 21");		//(assert (= (bv-and (bv-comp #line1  0b1) (bv-comp #line2  0b1))   0b0)) ;21 BR
+ $display(";A 21");		//(assert (= (bv-and (bv-comp #line1  0b1) (bv-comp #line2  0b1))   0b0)) ;21 BR
                             stato <= #1 3'b010; $display(";A 23");		//(assert (= @stato    0b010)) ;23 NB
                         end
                         outp <= #1 (line1 | line2); $display(";A 24");		//(assert (= @outp    (bv-or #line1  #line2 ))) ;24 NB
@@ -65,13 +65,13 @@ module b01(clock, line1, line2, reset, outp, overflw, __obs);
                     end
                 3'b100 :
                     begin
-                        $display(";A 26");		//(assert (= #stato    0b100)) ;26 CS
+ $display(";A 26");		//(assert (= #stato    0b100)) ;26 CS
                         if (((line1 == 1'b1) || (line2 == 1'b1))) begin
-                            $display(";A 27");		//(assert (= (bv-or (bv-comp #line1  0b1) (bv-comp #line2  0b1))   0b1)) ;27 BR
+ $display(";A 27");		//(assert (= (bv-or (bv-comp #line1  0b1) (bv-comp #line2  0b1))   0b1)) ;27 BR
                             stato <= #1 3'b101; $display(";A 29");		//(assert (= @stato    0b101)) ;29 NB
                         end
                         else begin
-                            $display(";A 28");		//(assert (= (bv-or (bv-comp #line1  0b1) (bv-comp #line2  0b1))   0b0)) ;28 BR
+ $display(";A 28");		//(assert (= (bv-or (bv-comp #line1  0b1) (bv-comp #line2  0b1))   0b0)) ;28 BR
                             stato <= #1 3'b010; $display(";A 30");		//(assert (= @stato    0b010)) ;30 NB
                         end
                         outp <= #1 (~(line1 ^ line2)); $display(";A 31");		//(assert (= @outp    (bv-not (bv-xor #line1  #line2 )))) ;31 NB
@@ -79,13 +79,13 @@ module b01(clock, line1, line2, reset, outp, overflw, __obs);
                     end
                 3'b010 :
                     begin
-                        $display(";A 33");		//(assert (= #stato    0b010)) ;33 CS
+ $display(";A 33");		//(assert (= #stato    0b010)) ;33 CS
                         if (((line1 == 1'b1) && (line2 == 1'b1))) begin
-                            $display(";A 34");		//(assert (= (bv-and (bv-comp #line1  0b1) (bv-comp #line2  0b1))   0b1)) ;34 BR
+ $display(";A 34");		//(assert (= (bv-and (bv-comp #line1  0b1) (bv-comp #line2  0b1))   0b1)) ;34 BR
                             stato <= #1 3'b111; $display(";A 36");		//(assert (= @stato    0b111)) ;36 NB
                         end
                         else begin
-                            $display(";A 35");		//(assert (= (bv-and (bv-comp #line1  0b1) (bv-comp #line2  0b1))   0b0)) ;35 BR
+ $display(";A 35");		//(assert (= (bv-and (bv-comp #line1  0b1) (bv-comp #line2  0b1))   0b0)) ;35 BR
                             stato <= #1 3'b110; $display(";A 37");		//(assert (= @stato    0b110)) ;37 NB
                         end
                         outp <= #1 (line1 | line2); $display(";A 38");		//(assert (= @outp    (bv-or #line1  #line2 ))) ;38 NB
@@ -93,13 +93,13 @@ module b01(clock, line1, line2, reset, outp, overflw, __obs);
                     end
                 3'b101 :
                     begin
-                        $display(";A 40");		//(assert (= #stato    0b101)) ;40 CS
+ $display(";A 40");		//(assert (= #stato    0b101)) ;40 CS
                         if (((line1 == 1'b1) || (line2 == 1'b1))) begin
-                            $display(";A 41");		//(assert (= (bv-or (bv-comp #line1  0b1) (bv-comp #line2  0b1))   0b1)) ;41 BR
+ $display(";A 41");		//(assert (= (bv-or (bv-comp #line1  0b1) (bv-comp #line2  0b1))   0b1)) ;41 BR
                             stato <= #1 3'b111; $display(";A 43");		//(assert (= @stato    0b111)) ;43 NB
                         end
                         else begin
-                            $display(";A 42");		//(assert (= (bv-or (bv-comp #line1  0b1) (bv-comp #line2  0b1))   0b0)) ;42 BR
+ $display(";A 42");		//(assert (= (bv-or (bv-comp #line1  0b1) (bv-comp #line2  0b1))   0b0)) ;42 BR
                             stato <= #1 3'b110; $display(";A 44");		//(assert (= @stato    0b110)) ;44 NB
                         end
                         outp <= #1 (~(line1 | line2)); $display(";A 45");		//(assert (= @outp    (bv-not (bv-or #line1  #line2 )))) ;45 NB
@@ -107,13 +107,13 @@ module b01(clock, line1, line2, reset, outp, overflw, __obs);
                     end
                 3'b110 :
                     begin
-                        $display(";A 47");		//(assert (= #stato    0b110)) ;47 CS
+ $display(";A 47");		//(assert (= #stato    0b110)) ;47 CS
                         if (((line1 == 1'b1) && (line2 == 1'b1))) begin
-                            $display(";A 48");		//(assert (= (bv-and (bv-comp #line1  0b1) (bv-comp #line2  0b1))   0b1)) ;48 BR
+ $display(";A 48");		//(assert (= (bv-and (bv-comp #line1  0b1) (bv-comp #line2  0b1))   0b1)) ;48 BR
                             stato <= #1 3'b011; $display(";A 50");		//(assert (= @stato    0b011)) ;50 NB
                         end
                         else begin
-                            $display(";A 49");		//(assert (= (bv-and (bv-comp #line1  0b1) (bv-comp #line2  0b1))   0b0)) ;49 BR
+ $display(";A 49");		//(assert (= (bv-and (bv-comp #line1  0b1) (bv-comp #line2  0b1))   0b0)) ;49 BR
                             stato <= #1 3'b000; $display(";A 51");		//(assert (= @stato    0b000)) ;51 NB
                         end
                         outp <= #1 (line1 | line2); $display(";A 52");		//(assert (= @outp    (bv-or #line1  #line2 ))) ;52 NB
@@ -121,13 +121,13 @@ module b01(clock, line1, line2, reset, outp, overflw, __obs);
                     end
                 3'b111 :
                     begin
-                        $display(";A 54");		//(assert (= #stato    0b111)) ;54 CS
+ $display(";A 54");		//(assert (= #stato    0b111)) ;54 CS
                         if (((line1 == 1'b1) || (line2 == 1'b1))) begin
-                            $display(";A 55");		//(assert (= (bv-or (bv-comp #line1  0b1) (bv-comp #line2  0b1))   0b1)) ;55 BR
+ $display(";A 55");		//(assert (= (bv-or (bv-comp #line1  0b1) (bv-comp #line2  0b1))   0b1)) ;55 BR
                             stato <= #1 3'b011; $display(";A 57");		//(assert (= @stato    0b011)) ;57 NB
                         end
                         else begin
-                            $display(";A 56");		//(assert (= (bv-or (bv-comp #line1  0b1) (bv-comp #line2  0b1))   0b0)) ;56 BR
+ $display(";A 56");		//(assert (= (bv-or (bv-comp #line1  0b1) (bv-comp #line2  0b1))   0b0)) ;56 BR
                             stato <= #1 3'b000; $display(";A 58");		//(assert (= @stato    0b000)) ;58 NB
                         end
                         outp <= #1 (~(line1 | line2)); $display(";A 59");		//(assert (= @outp    (bv-not (bv-or #line1  #line2 )))) ;59 NB

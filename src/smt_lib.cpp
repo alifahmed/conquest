@@ -664,6 +664,17 @@ std::string SMTAssign::pad_and_update(bool is_commit) {
     return new_str;
 }
 
+void SMTAssign::init_assign() {
+    instrument();
+    assert(SMTProcess::curr_proc);
+    SMTProcess::curr_proc->add_assign(this);
+    SMTSigCore* lval_sig = get_lval_sig_core();
+	lval_sig->assignments.push_back(this);
+	if(rval->type != SMT_EXPR_NUMBER){
+		lval_sig->is_state_variable = false;
+	}
+}
+
 std::string SMTAssign::print_cnst() {
     return pad_and_update(is_commit);
 }
@@ -720,8 +731,7 @@ void SMTAssign::instrument() {
 		this->set_covered(0);
         return;
     }
-	fprintf(g_out, "%*c$display(\";A %u\");", get_indent(), ' ', id);
-	fprintf(g_out, "\t\t//%s", str.c_str());
+	fprintf(g_out, " $display(\";A %u\");\t\t//%s", id, str.c_str());
 	conc_flush(g_out);
 	update_signal_dependency(this);
 }
@@ -770,7 +780,7 @@ void SMTAssign::print_coverage(std::ofstream& report) {
 //------------------------SMT Blocking Assign-----------------------------------
 SMTBlockingAssign::SMTBlockingAssign(SMTExpr* lval, SMTExpr* rval) : 
 	SMTAssign(SMT_CLK_CURR, SMT_ASSIGN_BLOCKING, lval, rval, true){
-
+    init_assign();
 }
 
 
@@ -783,7 +793,7 @@ void SMTBlockingAssign::redraw(SMTClkType clk_type) {
 //----------------------SMT Non Blocking Assign---------------------------------
 SMTNonBlockingAssign::SMTNonBlockingAssign(SMTExpr* lval, SMTExpr* rval) :
 	SMTAssign(SMT_CLK_NEXT, SMT_ASSIGN_NON_BLOCKING, lval, rval, false) {
-
+    init_assign();
 }
 
 void SMTNonBlockingAssign::redraw(SMTClkType clk_type) {
@@ -863,8 +873,7 @@ void SMTBranch::instrument() {
 		this->set_covered(0);
         return;
     }
-	fprintf(g_out, "%*c$display(\";A %u\");", get_indent(), ' ', id);
-	fprintf(g_out, "\t\t//%s", str.c_str());
+	fprintf(g_out, " $display(\";A %u\");\t\t//%s", id, str.c_str());
 	conc_flush(g_out);
 }
 
@@ -1370,7 +1379,7 @@ SMTProcess::SMTProcess() {
     process_list.push_back(this);
 	is_edge_triggered = false;
     entry_block = new SMTBasicBlock();
-    exit_block = NULL;
+    exit_block = entry_block;
     top_bb = entry_block;
     is_expanded = false;
     expanding_now = false;
@@ -1401,7 +1410,19 @@ void SMTProcess::add_assign(SMTAssign* assign) {
         sig_assign_list.insert(assign->get_lval_sig_core());
         sig_assign_blocks.insert(top_bb);
     }
+    assign->block = top_bb;
 }
+
+void SMTProcess::update_sensitivity_list(SMTExpr* rval) {
+    //add rval to sensitivity list
+    add_to_rval(sensitivity_list, rval);
+    
+    //add this process to dependency list of signals that its sensitive to
+    for(auto it:sensitivity_list){
+        it->dependent_process.push_back(this);
+    }
+}
+
 
 void SMTProcess::print() {
     SMTBasicBlock::print_all();
