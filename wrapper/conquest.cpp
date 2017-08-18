@@ -9,18 +9,22 @@
 using namespace std;
 
 static void parse_cmd_line(int agrc, char** argv);
-static uint g_unroll_cycle;
-static string g_clock_name;
-static string g_reset_name;
-static uint g_reset_edge;
+static string   g_src_file;
+static uint     g_unroll_cycle;
+static string   g_clock_name;
+static string   g_reset_name;
+static uint     g_reset_edge;
 
 int main(int argc, char** argv){
 	getchar();
     parse_cmd_line(argc, argv);
 	
 	//call Concolic tester
-    
-    
+    string cmd = "iverilog -t conquest -o conquest_dut.v -f " + g_src_file + 
+            " -pclk=" + g_clock_name + " -preset=" + g_reset_name + 
+            " -preset_edge=" + to_string(g_reset_edge) + " -punroll=" + 
+            to_string(g_unroll_cycle);
+    system(cmd.c_str());
 	return 0;
 }
 
@@ -54,12 +58,12 @@ void parse_cmd_line(int argc, char** argv){
     try{
         TCLAP::CmdLine cmd("Command line arguments supported by Conquest", '=', "1.0");
         
-        //Configuration file
-        TCLAP::ValueArg<string> cmd_config_file("f", "config-file", "Location of configuration file", false, "", "string");
-        cmd.add(cmd_config_file);		
+        //Verilog source files
+        TCLAP::ValueArg<string> cmd_src_file("f", "files", "Location of configuration file", true, "", "string");
+        cmd.add(cmd_src_file);		
         
         //Unroll cycles
-        TCLAP::ValueArg<uint> cmd_unroll("u", "unroll", "Number of unrolled cycles", false, 0, "integer");
+        TCLAP::ValueArg<uint> cmd_unroll("u", "unroll", "Number of unrolled cycles", false, 10, "integer");
         cmd.add(cmd_unroll);
         
         //clock signal name
@@ -76,13 +80,14 @@ void parse_cmd_line(int argc, char** argv){
         
         cmd.parse(args);
 		
-		if(cmd_config_file.getValue() != ""){
+		/*if(cmd_config_file.getValue() != ""){
 			//Configuration file given. Append to args
 			parse_config_file(cmd_config_file.getValue(), args);			
 			cmd.parse(args);
-		}
+		}*/
 	
         //assign values
+        g_src_file = cmd_src_file.getValue();
         g_unroll_cycle = cmd_unroll.getValue();
         g_clock_name = cmd_clock.getValue();
         g_reset_name = cmd_reset.getValue();

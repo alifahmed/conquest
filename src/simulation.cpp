@@ -49,7 +49,7 @@ static uint selected_clock;
 static uint selected_idx = 0;
 
 static inline void compile() {
-    string cmd = "iverilog_orig " + string(g_output_file) + " " + \
+    string cmd = "iverilog " + string(g_output_file) + " " + \
                   string(g_tb_file) + " -o conc_run.vvp";
 	system(cmd.c_str());
 }
