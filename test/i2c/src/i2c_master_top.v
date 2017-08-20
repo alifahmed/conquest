@@ -111,7 +111,9 @@ module i2c_master_top(
 	         3'b000 : prer <= #1 {prer[15:8], wb_dat_i};
 	         3'b001 : prer <= #1 {wb_dat_i, prer[7:0]};
 	         3'b010 : ctr         <= #1 wb_dat_i;
-	         3'b011 : txr         <= #1 wb_dat_i;
+	         3'b011 : begin
+	         			txr         <= #1 wb_dat_i;
+	         		  end
 	      endcase
 
 	// generate command register (special case)

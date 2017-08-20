@@ -108,9 +108,9 @@ std::string SMTCommons::print(SMTClkType clk_type) {
 
 
 //----------------------------SMT Expr------------------------------------------
-std::vector<SMTExpr*> g_expr_list;
+std::vector<SMTExpr*>  SMTExpr::all_expr_list;
 SMTExpr::SMTExpr(const SMTExprType _type) : type(_type) {
-	g_expr_list.push_back(this);
+	all_expr_list.push_back(this);
 	is_bool = false;
 	is_inverted = false;
 	yices_term = NULL_TERM;
@@ -132,6 +132,13 @@ SMTExpr* SMTExpr::get_child(uint idx) {
     return NULL;
 }
 
+void SMTExpr::free_all() {
+	while(!all_expr_list.empty()){
+		delete all_expr_list.back();
+		all_expr_list.back() = NULL;
+		all_expr_list.pop_back();
+	}
+}
 
 
 //----------------------------SMT Unspecified-----------------------------------
@@ -623,60 +630,18 @@ SMTAssign::SMTAssign(SMTClkType _clk_type, SMTAssignType _assign_type,
 	yices_term = NULL_TERM;
 	block = NULL;
 	assign_map.push_back(this);
-}
-
-std::string SMTAssign::pad_and_update(bool is_commit) {
-    string orig_str = print(SMT_CLK_CURR);
-    string new_str;
-    new_str.reserve(orig_str.length()*2);
-    
-	size_t start_pos = 0;
-    size_t at_pos;
-	vector<SMTSigCore*> lval_list;
-    while((at_pos = orig_str.find('@', start_pos)) != string::npos){
-        new_str.append(orig_str, start_pos, at_pos - start_pos);
-        at_pos++;
-        size_t name_pos = orig_str.find(' ', at_pos+1);
-        string name = orig_str.substr(at_pos, name_pos - at_pos);
-        SMTSigCore* sig_core = g_name_sig_map[name];
-        assert(sig_core);
-		lval_list.push_back(sig_core);
-        sig_core->update_next_version();
-        new_str += name + '_' + to_string(sig_core->next_version);
-        start_pos = name_pos + 1;
-    }
-    while((at_pos = orig_str.find('#', start_pos)) != string::npos){
-        new_str.append(orig_str, start_pos, at_pos - start_pos);
-        at_pos++;
-        size_t name_pos = orig_str.find(' ', at_pos+1);
-        string name = orig_str.substr(at_pos, name_pos - at_pos);
-        SMTSigCore* sig_core = g_name_sig_map[name];
-        assert(sig_core);
-        new_str += name + '_' + to_string(sig_core->curr_version);
-        start_pos = name_pos + 1;
-    }
-    new_str.append(orig_str, start_pos, 0xFFFFFF);
-	if(is_commit){
-		for(auto it:lval_list){
-			it->commit();
-		}
-	}
-    return new_str;
+	process = SMTProcess::curr_proc;
+	assert(process);
 }
 
 void SMTAssign::init_assign() {
     instrument();
-    assert(SMTProcess::curr_proc);
     SMTProcess::curr_proc->add_assign(this);
     SMTSigCore* lval_sig = get_lval_sig_core();
 	lval_sig->assignments.push_back(this);
 	if(rval->type != SMT_EXPR_NUMBER){
 		lval_sig->is_state_variable = false;
 	}
-}
-
-std::string SMTAssign::print_cnst() {
-    return pad_and_update(is_commit);
 }
 
 term_t SMTAssign::update_term() {
@@ -1077,14 +1042,15 @@ bool SMTNumber::is_equal(SMTNumber* num) {
 }
 
 //---------------------------SMT Signal Core------------------------------------
-core_map_t SMTSigCore::regDir;
-core_map_t SMTSigCore::wireDir;
+std::unordered_map<ivl_signal_t, SMTSigCore*> SMTSigCore::sig_to_core_map;
+vector<SMTSigCore*> SMTSigCore::reg_list;
+vector<SMTSigCore*> SMTSigCore::input_list;
 vector<SMTSigCore*> SMTSigCore::state_variables;
-vector<SMTSigCore*> SMTSigCore::input_port_list;
 SMTSigCore::SMTSigCore(ivl_signal_t sig){
     name = ivl_signal_basename(sig);
     width = ivl_signal_width(sig);
     zeros = smt_zeros(width);
+	sig_to_core_map[sig] = this;
     int msb;
     int lsb;
     get_sig_msb_lsb(sig, &msb, &lsb);
@@ -1093,21 +1059,16 @@ SMTSigCore::SMTSigCore(ivl_signal_t sig){
     }
     assert(width == (msb-lsb+1));
     if(ivl_signal_port(sig) != IVL_SIP_INPUT){
-        type = SMT_SIG_REG;
-        regDir[sig] = this;
+        reg_list.push_back(this);
 		is_dep = false;
 		is_state_variable = true;
     } else{
-        type = SMT_SIG_WIRE;
-        wireDir[sig] = this;
+        input_list.push_back(this);
 		is_dep = true;
 		is_state_variable = false;
-        input_port_list.push_back(this);
     }
 	curr_version = 0;
     next_version = 0;
-    last_defined_version = g_unroll + 1;
-	g_name_sig_map[name] = this;
 	was_in_queue = false;
     //set width type
     bv_type = yices_bv_type(width);
@@ -1115,7 +1076,7 @@ SMTSigCore::SMTSigCore(ivl_signal_t sig){
     //create g_unroll number of terms
     for(uint i = 0; i <= g_unroll; i++){
         term_t new_term = yices_new_uninterpreted_term(bv_type);
-        yices_set_term_name(new_term, (name.c_str() + string("_") + to_string(i)).c_str());
+        yices_set_term_name(new_term, (name + string("_") + to_string(i)).c_str());
         term_stack.push_back(new_term);
     }
 
@@ -1131,7 +1092,7 @@ void SMTSigCore::update_next_version() {
 	
     if(next_version == term_stack.size()){
         term_t new_term = yices_new_uninterpreted_term(bv_type);
-        yices_set_term_name(new_term, (name.c_str() + string("_") + std::to_string(next_version)).c_str());
+        yices_set_term_name(new_term, (name + string("_") + std::to_string(next_version)).c_str());
         term_stack.push_back(new_term);
     }
 }
@@ -1147,141 +1108,58 @@ term_t SMTSigCore::get_term(SMTClkType clk) {
 	return term_stack[version];
 }
 
-void SMTSigCore::print_define(ofstream &strm, uint clock) {
-	strm << "(define " << name << '_' << clock << " ::(bitvector " << width << "))\n";
-}
-
-void SMTSigCore::print_all_defines(ofstream &strm, uint clock) {
-    core_map_t::iterator it;
-    for(it = regDir.begin(); it != regDir.end(); it++){
-        it->second->print_define(strm, clock);
-    }
-    for(it = wireDir.begin(); it != wireDir.end(); it++){
-        it->second->print_define(strm, clock);
-    }
-}
-
 void SMTSigCore::free_all() {
-    core_map_t::iterator it;
-    for(it = regDir.begin(); it != regDir.end(); it++){
-        delete it->second;
-    }
-    regDir.clear();
-    for(it = wireDir.begin(); it != wireDir.end(); it++){
-        delete it->second;
-    }
-    wireDir.clear();
+	for(auto it:reg_list){
+		delete it;
+	}
+	reg_list.clear();
+	for(auto it:input_list){
+		delete it;
+	}
+	input_list.clear();
 }
 
 SMTSigCore* SMTSigCore::get_parent(ivl_signal_t sig) {
-    SMTSigCore* core;
-    if(ivl_signal_port(sig) != IVL_SIP_INPUT){
-        core = regDir[sig];
-    }else{
-        core = wireDir[sig];
-    }
-    assert(core);
-    return core;
+	return sig_to_core_map[sig];
 }
 
 void SMTSigCore::clear_all_versions() {
-    for(auto it:regDir){
-        it.second->curr_version = 0;
-        it.second->next_version = 0;
-        it.second->version_stack.clear();
+    for(auto it:reg_list){
+        it->curr_version = 0;
+        it->next_version = 0;
+		it->version_at_clock.clear();
     }
-    for(auto it:wireDir){
-        it.second->curr_version = 0;
-        it.second->next_version = 0;
-        it.second->version_stack.clear();
+    for(auto it:input_list){
+        it->curr_version = 0;
+        it->next_version = 0;
     }
 }
 
 void SMTSigCore::commit() {
-    version_stack.push_back(curr_version);
     curr_version = next_version;
 }
 
-void SMTSigCore::revert() {
-	next_version = curr_version;
-    curr_version = version_stack.back();
-    version_stack.pop_back();
-}
-
 void SMTSigCore::commit_versions() {
-	for(auto it:regDir){
-		it.second->commit();
-		it.second->version_at_clock.push_back(it.second->curr_version);
+	for(auto it:reg_list){
+		it->commit();
+		it->version_at_clock.push_back(it->curr_version);
 	}
 }
 
-void SMTSigCore::revert_versions() {
-    core_map_t::iterator it;
-    for(it = regDir.begin(); it != regDir.end(); it++){
-        it->second->revert();
-    }
-}
-
-void SMTSigCore::print_reg_init(std::ofstream &out) {
-    core_map_t::iterator it;
-    for(it = regDir.begin(); it != regDir.end(); it++){
-		out << "(assert (= " << it->second->name << "_0 " << it->second->zeros << "))\n";
-    }
-}
-
-void SMTSigCore::print_reg_monitor() {
-    for(auto it:regDir){
-        const char* name = it.second->name.c_str();
-        fprintf(g_out, "    always @(%s) $strobe(\"%s %%d\", %s);\n", name, name, name);
-    }
-}
-
-string uint_to_string(uint num, int width){
-    string str;
-    str.reserve(width+3);
-    str += "0b";
-    for(int i = width-1; i >= 0; i--){
-        str += ((num >> i) & 1) + '0';
-    }
-    return str;
-}
-
-void SMTSigCore::commit_states() {
-    for(auto it:regDir){
-        it.second->states.push_back(uint_to_string(it.second->temp_state, it.second->width));
-    }
-}
-
-void SMTSigCore::print_states(std::ofstream& out, uint clock) {
-    for(auto it:regDir){
-        SMTSigCore* sig = it.second;
-        out << "(assert (= " << sig->name << '_' << sig->version_at_clock[clock-1] << ' ' << sig->states[clock] << "))\n";
-    }
-}
-
-void SMTSigCore::debug_print_state() {
-	printf("------------------------------------------------------------------------------------------\n");
-	SMTSigCore* sig = g_name_sig_map["stato"];
-	assert(sig);
-	for(uint i = 0; i <= g_unroll; i++){
-		printf("%s		%u\n", sig->states[i].c_str(), i);
+void SMTSigCore::restore_versions(uint clock) {
+	for(auto it:reg_list){
+		it->curr_version = it->version_at_clock[clock];
+		it->next_version = it->curr_version;
 	}
-}
-
-void SMTSigCore::clear_states() {
-	for(auto it:regDir){
-		it.second->states.clear();
-		it.second->version_at_clock.clear();
-	}
+	set_input_version(clock);
 }
 
 void SMTSigCore::update_is_dep() {
 	queue<SMTSigCore*> q;
-	for(auto it:wireDir){
-		SMTSigCore* sig = it.second;
-		if(sig->is_dep){
-			sig->was_in_queue = true;
-			q.push(sig);
+	for(auto it:input_list){
+		if(it->is_dep){
+			it->was_in_queue = true;
+			q.push(it);
 		}
 	}
 	while(!q.empty()){
@@ -1298,27 +1176,8 @@ void SMTSigCore::update_is_dep() {
 }
 
 void SMTSigCore::yices_insert_reg_init(context_t* ctx) {
-	for(auto it:regDir){
-		SMTSigCore* sig = it.second;
-		smt_yices_assert(ctx, sig->init_term, NULL);
-	}
-}
-
-void SMTSigCore::free_connected() {
-	uint size;
-	size = term_stack.size();
-    
-	for(uint i=0; i<size; i++){
-		connected_cnst_at_ver[i].clear();
-	}
-}
-
-void SMTSigCore::free_connected_cnst() {
-	for(auto it:regDir){
-		it.second->free_connected();
-	}
-	for(auto it:wireDir){
-		it.second->free_connected();
+	for(auto it:reg_list){
+		smt_yices_assert(ctx, it->init_term, NULL);
 	}
 }
 
@@ -1331,15 +1190,15 @@ void SMTSigCore::print_state_variables(ofstream &out) {
 }
 
 void SMTSigCore::update_state_variables() {
-	for(auto it:regDir){
-		if(it.second->is_state_variable){
-			state_variables.push_back(it.second);
+	for(auto it:reg_list){
+		if(it->is_state_variable){
+			state_variables.push_back(it);
 		}
 	}
 }
 
 void SMTSigCore::set_input_version(uint version) {
-    for(auto it:input_port_list){
+    for(auto it:input_list){
         it->curr_version = version;
     }
 }
@@ -1580,10 +1439,6 @@ void SMTBasicBlock::reset_distances() {
 
 //----------------------------SMT Globals---------------------------------------
 void SMTFreeAll(){
-	while(!g_expr_list.empty()){
-		delete g_expr_list.back();
-		g_expr_list.back() = NULL;
-		g_expr_list.pop_back();
-	}
+	SMTExpr::free_all();
     SMTSigCore::free_all();
 }

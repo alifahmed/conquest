@@ -6,7 +6,7 @@
 #include <stack>
 #include <string>
 #include <sstream>
-#include <map>
+#include <unordered_map>
 #include <fstream>
 #include <set>
 
@@ -66,18 +66,13 @@ typedef enum{
 }constraint_type_t;
 
 struct constraint_t;
-typedef std::vector<constraint_t*> cnst_list_t;
 
 typedef struct constraint_t{
 	constraint_type_t type;
-	std::string constraint;
 	uint clock;
 	SMTAssign* obj;
 	term_t yices_term;
 	term_t yices_term_lval;
-	uint val;
-	std::vector<cnst_list_t*> sig_list;
-	bool is_dumped;
 	uint index;
     uint hash_value;
 }constraint_t;
@@ -95,6 +90,9 @@ public:
 
 //----------------------------SMT Expr------------------------------------------
 class SMTExpr: public SMTCommons{
+private:
+	static std::vector<SMTExpr*> all_expr_list;
+	
 protected:	
 	SMTExpr(const SMTExprType _type);
 		
@@ -111,6 +109,8 @@ public:
 	
 	virtual term_t eval_term(SMTClkType clk) = 0;
 	bool is_term_eval_needed;
+	
+	static void free_all();
 };
 
 
@@ -136,7 +136,6 @@ protected:
 	SMTAssign(SMTClkType clk_type, SMTAssignType assign_type, 
 				SMTExpr* lval, SMTExpr* rval, bool is_commit);
     virtual void redraw(SMTClkType clk_type) override = 0;
-    virtual std::string pad_and_update(bool is_commit);
     virtual void init_assign();
     
 public:
@@ -147,9 +146,9 @@ public:
     const bool is_commit;
 	term_t yices_term;
 	SMTBasicBlock* block;
+	SMTProcess* process;
 	
     virtual void instrument();
-    virtual std::string print_cnst();
 	virtual term_t update_term();
 	
 	bool is_covered();
@@ -332,7 +331,6 @@ public:
 
 
 //----------------------------SMT Number----------------------------------------
-extern const char hex_map[16];
 class SMTNumber: public SMTExpr{
 private:
 	std::string value;
@@ -351,34 +349,23 @@ public:
 
 
 //---------------------------SMT Signal Core------------------------------------
-typedef std::map<ivl_signal_t, SMTSigCore*> core_map_t;
-typedef enum{
-    SMT_SIG_REG,
-    SMT_SIG_WIRE
-}SMTSigType;
-
 class SMTSigCore {
 private:
-    static core_map_t regDir;
-    static core_map_t wireDir;
+	static std::unordered_map<ivl_signal_t, SMTSigCore*> sig_to_core_map;
+    static std::vector<SMTSigCore*> reg_list;
+    static std::vector<SMTSigCore*> input_list;		//same as input list
     char *zeros;
-    std::vector<uint> version_stack;
-    std::vector<std::string> states;
 	std::vector<uint> version_at_clock;
 	std::vector<uint> term_stack;
 	bool was_in_queue;
 	type_t bv_type;
 	term_t init_term;
-	void free_connected();
     
 public:
 	uint curr_version;
     uint next_version;
-    uint last_defined_version;
     std::string name;
     int width;
-    SMTSigType type;
-    uint temp_state;
     bool is_dep;
 	bool is_state_variable;
 	//bool is_signed;
@@ -386,35 +373,23 @@ public:
 	std::vector<SMTAssign*> assignments;
 	std::set<SMTSigCore*> assigned_to;
     std::vector<SMTProcess*> dependent_process;
-	cnst_list_t* connected_cnst_at_ver;
 	static std::vector<SMTSigCore*> state_variables;
-    static std::vector<SMTSigCore*> input_port_list;
 	
 	
     SMTSigCore(ivl_signal_t sig);
     virtual ~SMTSigCore();
     
     void commit();
-    void revert();
-    void print_define(std::ofstream &strm, uint clock);
     void update_next_version();     //increments and prints next version define
 	term_t get_term(SMTClkType clk);
     
     static void free_all();
-    static void print_all_defines(std::ofstream &strm, uint clock);
     static SMTSigCore* get_parent(ivl_signal_t sig);
     static void clear_all_versions();
     static void commit_versions();
-    static void revert_versions();
-	static void print_reg_init(std::ofstream &out);
-    static void print_reg_monitor();
-    static void commit_states();
-    static void print_states(std::ofstream &out, uint clock);
-	static void debug_print_state();
-	static void clear_states();
+	static void restore_versions(uint clock);
 	static void update_is_dep();
 	static void yices_insert_reg_init(context_t * ctx);
-	static void free_connected_cnst();
 	static void print_state_variables(std::ofstream &out);
 	static void update_state_variables();
     static void set_input_version(uint version);

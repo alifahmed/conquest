@@ -41,7 +41,6 @@ static uint sim_num;
 FILE* f_dbg;
 uint total_constraints_before = 0;
 uint total_constraints_after = 0;
-constraint_t* last_cnst = NULL;
 static vector<constraint_t*> dumped_cnsts;
 
 static SMTBranch* selected_branch;
@@ -59,9 +58,6 @@ static constraint_t* create_clock(uint clock){
 	cnst->type = CNST_CLK;
 	cnst->clock = clock;
 	cnst->obj = NULL;
-	cnst->constraint = "\n;------------------------------------------------CLK " \
-            + to_string(clock) + "-----------------------------------------------\n";
-	cnst->val = clock;
     cnst->hash_value = 0;
     return cnst;
 }
@@ -78,26 +74,19 @@ static constraint_t* create_constraint(uint clock, SMTAssign* assign){
 	constraint_t* cnst = new constraint_t;
 	cnst->clock = clock;
 	cnst->obj = assign;
-	cnst->val = assign->id;
-	cnst->is_dumped = false;
 	cnst->index = constraints_stack.size();
-	last_cnst = cnst;
     cnst->yices_term = assign->update_term();
     cnst->yices_term_lval = assign->lval->yices_term;
     if(cnst->yices_term <= 0){
         yices_print_error(stdout);
         error("Term evaluation failed at assign id: %u", assign->id);
     }
-	last_cnst = NULL;
     
 	if(assign->assign_type == SMT_ASSIGN_BRANCH){
 		cnst->type = CNST_BRANCH;
 		SMTBranch* br = dynamic_cast<SMTBranch*>(assign);
 		assert(br);
         update_path_hash_map(cnst);
-        if(!br->is_covered()){
-            //printf("[COVERED NEW] %s", br->print(SMT_CLK_CURR).c_str());
-        }
     	br->set_covered_clk(sim_num, clock);
 	} else{
         cnst->type = CNST_ASSIGN;
@@ -208,67 +197,6 @@ static void dump_yices_constraints(uint top_idx) {
 	}
 }
 
-static void dump_yices_ud(constraint_t* cnst){
-	for(auto it:cnst->sig_list){
-		cnst_list_t* cnst_list = it;
-		const uint size = cnst_list->size();
-		for(uint i=0; i<size; i++){
-			constraint_t* next_cnst = cnst_list->at(i);
-			if(!next_cnst->is_dumped && (next_cnst->index < constraints_stack.size())){
-				next_cnst->is_dumped = true;
-				dumped_cnsts.push_back(next_cnst);
-				smt_yices_assert(yices_context, next_cnst->yices_term, cnst->obj);
-				dump_yices_ud(next_cnst);
-			}
-		}
-	}
-}
-
-static void dump_file_ud(constraint_t* cnst, ofstream &f_cons){
-	for(auto it:cnst->sig_list){
-		cnst_list_t* cnst_list = it;
-		const uint size = cnst_list->size();
-		for(uint i=0; i<size; i++){
-			constraint_t* next_cnst = cnst_list->at(i);
-			if(!next_cnst->is_dumped && (next_cnst->index < constraints_stack.size())){
-				next_cnst->is_dumped = true;
-				dumped_cnsts.push_back(next_cnst);
-				f_cons << next_cnst->constraint;
-				f_cons.flush();
-				dump_file_ud(next_cnst, f_cons);
-			}
-		}
-	}
-}
-
-static inline void dump_constraints_check(ofstream &f_cons, uint top_idx) {
-	for(uint i=0; i<=top_idx; i++){
-		f_cons << constraints_stack[i]->constraint;
-	}
-}
-
-static inline void dump_constraints(ofstream &f_cons, uint top_idx) {
-    for(uint i=0; i<=top_idx; i++){
-        f_cons << constraints_stack[i]->constraint;
-    }
-}
-
-static inline bool check_sat(ifstream &f_in, const string &sim_cnst){
-	string cmd = "yices --logic=QF_BV " + sim_cnst + " > model.log";
-	system(cmd.c_str());
-	f_in.open("model.log");
-	string sat;
-    getline(f_in, sat);
-    if(sat == "sat"){
-        return true;
-    } else if(sat == "unsat"){
-        return false;
-    } else{
-        error("Syntax error in constraints.ys");
-        return false;
-    }
-}
-
 static bool check_yices_status(){
 	smt_status_t status = yices_check_context(yices_context, NULL);
 	if(status == STATUS_SAT){
@@ -348,41 +276,66 @@ static bool find_next_cfg(){
 	//sort by distance
 	sort(branches.begin(), branches.end(), compare_dist);
 	for(auto it:branches){
-		//if(enable_yices_api){
-			//reset context
-			yices_reset_context(yices_context);
-			
-			//insert initial assertion to zero for registers
-			SMTSigCore::yices_insert_reg_init(yices_context);
-			
-			uint i = 0;
-			while(constraints_stack[i] != it->cnst){
-				constraint_t* cnst = constraints_stack[i];
-				if(cnst->type != CNST_CLK){
-					smt_yices_assert(yices_context, cnst->yices_term, cnst->obj);
-				}
-				i++;
+		uint clock = it->cnst->clock;
+		//reset context
+		yices_reset_context(yices_context);
+
+		//insert initial assertion to zero for registers
+		SMTSigCore::yices_insert_reg_init(yices_context);
+
+		/*uint i = 0;
+		while(constraints_stack[i] != it->cnst){
+			constraint_t* cnst = constraints_stack[i];
+			if(cnst->type != CNST_CLK){
+				smt_yices_assert(yices_context, cnst->yices_term, cnst->obj);
 			}
-			
-			term_t yices_term = yices_eq(it->cnst->yices_term_lval, it->br->rval->eval_term(SMT_CLK_CURR));
-			
-			//add mutated branch
-			smt_yices_assert(yices_context, yices_term, it->br);
-			uint clock = it->cnst->clock;
-			call_to_solver++;
-			if(solve_constraints(clock)){
-				selected_branch = it->br;
-				selected_clock = clock;
-				selected_idx = constraints_stack.size();
-                selected_branch->k_permit_covered++;
-				selected_branch->block->distance++;
-				if(!enable_error_check){
-					it->br->set_covered_clk(sim_num+1, clock);
-				}
-				printf("[FOUND %d] %s", clock, it->br->print(SMT_CLK_CURR).c_str());
-				return true;
+			i++;
+		}
+
+		term_t yices_term = yices_eq(it->cnst->yices_term_lval, it->br->rval->eval_term(SMT_CLK_CURR));
+
+		//add mutated branch
+		smt_yices_assert(yices_context, yices_term, it->br);*/
+		
+		constraint_t** cnst = constraints_stack.data();
+		while((*cnst)->clock != clock){
+			if((*cnst)->type != CNST_CLK){
+				smt_yices_assert(yices_context, (*cnst)->yices_term, (*cnst)->obj);
 			}
-		//}
+			cnst++;
+		}
+		assert((*cnst)->type == CNST_CLK);
+		cnst++;
+		
+		//restore version
+		SMTSigCore::restore_versions(clock);
+		const SMTProcess* target_process = it->cnst->obj->process;
+		while(*cnst != it->cnst){
+			const SMTProcess* process = (*cnst)->obj->process;
+			if(!process->is_edge_triggered || (process == target_process)){
+				term_t term = (*cnst)->obj->update_term();
+				smt_yices_assert(yices_context, term, (*cnst)->obj);
+			}
+			cnst++;
+		}
+
+		//add mutated branch
+		smt_yices_assert(yices_context, it->br->update_term(), it->br);
+		
+
+		call_to_solver++;
+		if(solve_constraints(clock)){
+			selected_branch = it->br;
+			selected_clock = clock;
+			selected_idx = constraints_stack.size();
+			selected_branch->k_permit_covered++;
+			selected_branch->block->distance++;
+			if(!enable_error_check){
+				it->br->set_covered_clk(sim_num+1, clock);
+			}
+			printf("[FOUND %d] %s", clock, it->br->print(SMT_CLK_CURR).c_str());
+			return true;
+		}
 	}
 	
 	return false;
@@ -423,7 +376,6 @@ static bool concolic_iteration(uint sim_num) {
     
     //reset variable versions to zero
     SMTSigCore::clear_all_versions();
-    SMTSigCore::clear_states();
     
     //builds stack and also updates coverage
     build_stack();

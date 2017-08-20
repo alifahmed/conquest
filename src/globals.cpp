@@ -27,7 +27,3 @@ const char*     g_clock_sig_name;
 const char*     g_reset_sig_name;
 const char*     g_reset_edge_active;
 uint			g_branch_id = 0xDEADBEEF;
-
-
-std::unordered_map<std::string, SMTSigCore*> g_name_sig_map;
-std::ofstream g_define_out;
