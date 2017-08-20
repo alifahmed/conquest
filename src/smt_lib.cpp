@@ -96,17 +96,6 @@ void smt_yices_pop(){
 	}
 }
 
-//----------------------------SMT Commons---------------------------------------
-std::string SMTCommons::print(SMTClkType clk_type) {
-	if(!is_init){
-		is_init = true;
-		bv_str.str("");
-		redraw(clk_type);
-	}
-	return bv_str.str();
-}
-
-
 //----------------------------SMT Expr------------------------------------------
 std::vector<SMTExpr*>  SMTExpr::all_expr_list;
 SMTExpr::SMTExpr(const SMTExprType _type) : type(_type) {
@@ -145,8 +134,8 @@ void SMTExpr::free_all() {
 SMTUnspecified::SMTUnspecified() : SMTExpr(SMT_EXPR_UNSPECIFIED){
 }
 
-void SMTUnspecified::redraw(SMTClkType clk_type) {
-	bv_str << "_UNSPECIFIED_";
+void SMTUnspecified::print(std::stringstream& ss) {
+	ss << "_UNSPECIFIED_";
     error("Unspecified");
 }
 
@@ -162,27 +151,27 @@ SMTConcat::SMTConcat() : SMTExpr(SMT_EXPR_CONCAT){
 	repeat = 1;
 }
 
-void SMTConcat::redraw(SMTClkType clk_type) {
+void SMTConcat::print(std::stringstream &ss) {
 	const uint count = exprList.size();
 	if(repeat != 1){
-		bv_str << "(bv-repeat ";
+		ss << "(bv-repeat ";
 	}
 	if(count > 1){
-		bv_str << "(bv-concat";
+		ss << "(bv-concat";
 		for(uint i=0; i<count; i++){
 			if(exprList[i] == NULL){
 				error("Concatenation failed");
 			}
-			bv_str << " " << exprList[i]->print(clk_type);
+			ss << " ";
+			exprList[i]->print(ss);
 		}
-		bv_str << ")";
+		ss << ")";
 	}
 	else{
-		//info("SMTConcat object with %u elements", count);
-		bv_str << exprList[0]->print(clk_type);
+		exprList[0]->print(ss);
 	}
 	if(repeat != 1){
-		bv_str << " " << repeat << ")";
+		ss << " " << repeat << ")";
 	}
 }
 
@@ -212,17 +201,17 @@ SMTCust::SMTCust(std::string _operand) : SMTExpr(SMT_EXPR_CUSTOM){
     operand = _operand;
 }
 
-void SMTCust::redraw(SMTClkType clk_type) {
+void SMTCust::print(std::stringstream& ss) {
     if(exprList.size()){
-        bv_str << "(" << operand;
-        vector<SMTExpr*>::iterator it;
-        for(it = exprList.begin(); it != exprList.end(); it++){
-            bv_str << " " << (*it)->print(clk_type);
+        ss << "(" << operand;
+        for(auto it:exprList){
+            ss << " ";
+			it->print(ss);
         }
-        bv_str << ")";
+        ss << ")";
     }
     else{
-        bv_str << operand;
+        ss << operand;
     }
 }
 
@@ -312,27 +301,6 @@ void SMTUnary::set_opcode(char ivl_code) {
 	}
 }
 
-/*void SMTUnary::set_opcode(SMTUnaryOpcode opcode){
-    switch(opcode){
-        case SMT_RE_NAND:
-            opcode = SMT_RE_AND;
-            is_inverted = true;
-            break;
-        case SMT_RE_NOR:
-            opcode = SMT_RE_OR;
-            is_inverted = true;
-            break;
-        case SMT_RE_XNOR:
-            opcode = SMT_RE_XOR;
-            is_inverted = true;
-            break;
-        case SMT_BV_NOT:
-            opcode = SMT_BUFF;
-            is_inverted = true;
-            break;
-    }
-}*/
-
 void SMTUnary::set_opcode(const ivl_expr_t expr) {
 	const char ivl_code = ivl_expr_opcode(expr);
 	set_opcode(ivl_code);
@@ -341,16 +309,18 @@ void SMTUnary::set_opcode(const ivl_expr_t expr) {
 	}
 }
 
-void SMTUnary::redraw(SMTClkType clk_type) {
+void SMTUnary::print(std::stringstream& ss) {
 	assert(exprList.size() == 1);
 
 	//print
 	if(is_inverted){
-		bv_str << "(bv-not ";
+		ss << "(bv-not ";
 	}
-	bv_str << "(" << opcode << " " << exprList[0]->print(clk_type) << ")";
+	ss << "(" << opcode << " ";
+	exprList[0]->print(ss);
+	ss << ")";
 	if(is_inverted){
-		bv_str << ")";
+		ss << ")";
 	}
 }
 
@@ -501,14 +471,18 @@ void SMTBinary::set_opcode_from_expr(const ivl_expr_t expr) {
 	}
 }
 
-void SMTBinary::redraw(SMTClkType clk_type) {
+void SMTBinary::print(std::stringstream& ss) {
 	assert(exprList.size() == 2);
 		
-	if(is_inverted){ bv_str << "(bv-not "; }
-	if(is_bool){ bv_str << "(bool-to-bv "; }
-	bv_str << "(" << opcode << " " << exprList[0]->print(clk_type) << " " << exprList[1]->print(clk_type) << ")";
-	if(is_bool){ bv_str << ")"; }
-	if(is_inverted){ bv_str << ")"; }
+	if(is_inverted){ ss << "(bv-not "; }
+	if(is_bool){ ss << "(bool-to-bv "; }
+	ss << "(" << opcode << " ";
+	exprList[0]->print(ss);
+	ss << " ";
+	exprList[1]->print(ss);
+	ss << ")";
+	if(is_bool){ ss << ")"; }
+	if(is_inverted){ ss << ")"; }
 }
 
 term_t SMTBinary::eval_term(SMTClkType clk) {
@@ -577,15 +551,16 @@ string SMTLogic::get_opcode() {
     return NULL;
 }
 
-void SMTLogic::redraw(SMTClkType clk_type) {
+void SMTLogic::print(std::stringstream& ss) {
 	//info("SMTLogic used. Implement invert inheritance to improve perf");
 	assert(exprList.size() == 2);
-	bv_str << "(" << get_opcode();
+	ss << "(" << get_opcode();
 	vector<SMTExpr*>::iterator it;
-	for(it = exprList.begin(); it != exprList.end(); it++){
-		bv_str << " " << (*it)->print(clk_type);
+	for(auto it:exprList){
+		ss << " ";
+		it->print(ss);
 	}
-	bv_str << ")";
+	ss << ")";
 }
 
 term_t SMTLogic::eval_term(SMTClkType clk) {
@@ -601,12 +576,16 @@ term_t SMTLogic::eval_term(SMTClkType clk) {
 SMTTernary::SMTTernary() : SMTExpr(SMT_EXPR_TERNARY) {
 }
 
-void SMTTernary::redraw(SMTClkType clk_type) {
+void SMTTernary::print(std::stringstream& ss) {
 	assert(exprList.size() == 3);
     
-	bv_str << "(ite (= " << exprList[0]-> print(clk_type) << " 0b1) "    \
-            << exprList[1]->print(clk_type) << " "                      \
-            << exprList[2]->print(clk_type) << ")";
+	ss << "(ite (= ";
+	exprList[0]-> print(ss);
+	ss << " 0b1) ";
+	exprList[1]->print(ss);
+	ss << " ";
+    exprList[2]->print(ss);
+	ss << ")";
 }
 
 term_t SMTTernary::eval_term(SMTClkType clk) {
@@ -632,10 +611,12 @@ SMTAssign::SMTAssign(SMTClkType _clk_type, SMTAssignType _assign_type,
 	assign_map.push_back(this);
 	process = SMTProcess::curr_proc;
 	assert(process);
+	is_first_time = true;
 }
 
 void SMTAssign::init_assign() {
     instrument();
+	partial_assign_check();
     SMTProcess::curr_proc->add_assign(this);
     SMTSigCore* lval_sig = get_lval_sig_core();
 	lval_sig->assignments.push_back(this);
@@ -657,6 +638,18 @@ term_t SMTAssign::update_term() {
 
 bool SMTAssign::is_covered() {
 	return covered_any_clock;
+}
+
+std::string SMTAssign::print() {
+	if(is_first_time){
+		is_first_time = false;
+		ss << "(assert (= ";
+		lval->print(ss);
+		ss << "   ";
+		rval->print(ss);
+		ss << ")) ;" << id << "\n";
+	}
+	return ss.str();
 }
 
 void SMTAssign::set_covered(uint sim_num) {
@@ -691,7 +684,7 @@ uint SMTAssign::get_assign_count() {
 }
 
 void SMTAssign::instrument() {
-	const string &str = print(clk_type);
+	const string &str = print();
     if(skip_assign(str)){
 		this->set_covered(0);
         return;
@@ -728,7 +721,7 @@ void SMTAssign::print_coverage(std::ofstream& report) {
                     report << setw(12) << assign->covered_in_sim << " \n";
 				}
 				else{
-					printf("[UNC BRANCH] %s", assign->print(SMT_CLK_CURR).c_str());
+					printf("[UNC BRANCH] %s", assign->print().c_str());
                     report << setw(12) << assign->id << " ";
                     report << setw(12) << "UNC" << " \n";
 				}
@@ -748,25 +741,11 @@ SMTBlockingAssign::SMTBlockingAssign(SMTExpr* lval, SMTExpr* rval) :
     init_assign();
 }
 
-
-void SMTBlockingAssign::redraw(SMTClkType clk_type) {
-    bv_str << "(assert (= " << lval->print(SMT_CLK_NEXT);
-	bv_str << "   " << rval->print(SMT_CLK_CURR) << ")) ;" << id << " BL\n";
-    partial_assign_check();
-}
-
 //----------------------SMT Non Blocking Assign---------------------------------
 SMTNonBlockingAssign::SMTNonBlockingAssign(SMTExpr* lval, SMTExpr* rval) :
 	SMTAssign(SMT_CLK_NEXT, SMT_ASSIGN_NON_BLOCKING, lval, rval, false) {
     init_assign();
 }
-
-void SMTNonBlockingAssign::redraw(SMTClkType clk_type) {
-    bv_str << "(assert (= " << lval->print(SMT_CLK_NEXT);
-	bv_str << "   " << rval->print(SMT_CLK_CURR) << ")) ;" << id << " NB\n";
-    partial_assign_check();
-}
-
 
 //-----------------------------SMT Branch---------------------------------------
 uint SMTBranch::total_branch_count;
@@ -788,17 +767,6 @@ SMTBranch::SMTBranch(SMTBranchNode* _parent_node, SMTBranchType type,
 	all_branches_list.push_back(this);
 	last_selected_clock = 0x8FFFFFFF;
 	is_dep = true;
-}
-
-void SMTBranch::redraw(SMTClkType clk_type) {
-    string ty;
-    if(type == SMT_BRANCH_CASE){
-        ty = " CS\n";
-    } else if(type == SMT_BRANCH_CONDIT){
-        ty = " BR\n";
-    }
-    bv_str << "(assert (= " << lval->print(SMT_CLK_CURR);
-	bv_str << "   " << rval->print(SMT_CLK_CURR) << ")) ;" << id << ty;
 }
 
 bool SMTBranch::is_covered_clk(uint clock) {
@@ -835,7 +803,7 @@ void SMTBranch::update_distance() {
 }
 
 void SMTBranch::instrument() {
-    const string &str = print(SMT_CLK_CURR);
+    const string &str = print();
 	total_branch_count++;
     if(skip_assign(str)){
 		covered_branch_count++;
@@ -1017,8 +985,8 @@ SMTNumber::SMTNumber(const char* bits, int bit_width, bool is_signed) : SMTExpr(
 	}
 }
 
-void SMTNumber::redraw(SMTClkType clk_type) {
-	bv_str << "0b" << value;
+void SMTNumber::print(std::stringstream& ss) {
+	ss << "0b" << value;
 }
 
 void SMTNumber::emit_verilog_value() {
@@ -1213,17 +1181,12 @@ SMTSignal::SMTSignal(ivl_signal_t sig) : SMTExpr(SMT_EXPR_SIGNAL) {
     get_sig_msb_lsb(sig, &msb, &lsb);
 }
 
-void SMTSignal::redraw(SMTClkType clk_type) {
-    char marker = '@';
-    if(clk_type == SMT_CLK_CURR){
-        marker = '#';
-    }
-    
+void SMTSignal::print(std::stringstream& ss) {
 	if((msb - lsb) == (parent->width - 1)){
-		bv_str << marker << parent->name << ' ';
+		ss << parent->name << ' ';
 	}
 	else{	//part select
-		bv_str << "(bv-extract " << msb << " " << lsb << " " << marker << parent->name << " )";
+		ss << "(bv-extract " << msb << " " << lsb << " " << parent->name << " )";
 	}
 }
 
@@ -1382,7 +1345,7 @@ SMTBasicBlock::SMTBasicBlock() : id(id_counter) {
 
 void SMTBasicBlock::print_assigns(ofstream &out) {
     for(auto it:assign_list){
-        out << it->print(SMT_CLK_CURR);
+        out << it->print();
     }
 }
 

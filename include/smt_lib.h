@@ -77,19 +77,8 @@ typedef struct constraint_t{
     uint hash_value;
 }constraint_t;
 
-class SMTCommons{
-public:	
-	std::stringstream bv_str;
-	bool skip = false;
-	bool is_init = false;
-
-	virtual std::string print(SMTClkType clk_type);		//print statement with placeholder only
-	virtual void redraw(SMTClkType clk_type) = 0;
-};
-
-
 //----------------------------SMT Expr------------------------------------------
-class SMTExpr: public SMTCommons{
+class SMTExpr{
 private:
 	static std::vector<SMTExpr*> all_expr_list;
 	
@@ -102,13 +91,13 @@ public:
 	bool is_inverted;	//inverted if true
 	std::vector<SMTExpr*> exprList;
 	term_t yices_term;
+	bool is_term_eval_needed;
 	
 	virtual ~SMTExpr();
 	virtual void add(SMTExpr *expr);
     virtual SMTExpr* get_child(uint idx);
-	
 	virtual term_t eval_term(SMTClkType clk) = 0;
-	bool is_term_eval_needed;
+	virtual void print(std::stringstream &ss) = 0;
 	
 	static void free_all();
 };
@@ -118,24 +107,26 @@ public:
 class SMTUnspecified: public SMTExpr{
 public:
 	SMTUnspecified();
-	void redraw(SMTClkType clk_type) override;
+	
+	void print(std::stringstream& ss) override;
 	term_t eval_term(SMTClkType clk) override;
 };
 
 
 //----------------------------SMT Assign----------------------------------------
-class SMTAssign: public SMTCommons{
+class SMTAssign{
 private:
 	static std::vector<SMTAssign*> assign_map;
+	bool is_first_time;
 	
 protected:
     const SMTClkType clk_type;
 	bool covered_any_clock;
     uint covered_in_sim;
+	std::stringstream ss;
 	
 	SMTAssign(SMTClkType clk_type, SMTAssignType assign_type, 
 				SMTExpr* lval, SMTExpr* rval, bool is_commit);
-    virtual void redraw(SMTClkType clk_type) override = 0;
     virtual void init_assign();
     
 public:
@@ -150,11 +141,11 @@ public:
 	
     virtual void instrument();
 	virtual term_t update_term();
-	
-	bool is_covered();
-	void set_covered(uint sim_num);
-    void partial_assign_check();
-    SMTSigCore* get_lval_sig_core();
+	virtual bool is_covered();
+	virtual void set_covered(uint sim_num);
+    virtual void partial_assign_check();
+    virtual SMTSigCore* get_lval_sig_core();
+	virtual std::string print();
 	
 	static SMTAssign* get_assign(uint id);
 	static uint get_assign_count();
@@ -164,9 +155,6 @@ public:
 
 //------------------------SMT Blocking Assign-----------------------------------
 class SMTBlockingAssign: public SMTAssign{
-private:
-    void redraw(SMTClkType clk_type) override;
-	
 public:
 	SMTBlockingAssign(SMTExpr* lval, SMTExpr* rval);
 };
@@ -174,9 +162,6 @@ public:
 
 //----------------------SMT Non Blocking Assign---------------------------------
 class SMTNonBlockingAssign: public SMTAssign{
-private:
-    void redraw(SMTClkType clk_type) override;
-    
 public:
 	SMTNonBlockingAssign(SMTExpr* lval, SMTExpr* rval);
 };
@@ -191,7 +176,6 @@ private:
 	SMTBranch(SMTBranchNode* parent_node, SMTBranchType type, SMTExpr* lval, 
 			SMTExpr* rval);
 	static SMTBranch* _create_condit_branch(SMTBranchNode* parent, const char* num_expr);
-    void redraw(SMTClkType clk_type) override;
 	//bool check_is_dep_expr(SMTExpr* expr);
 	bool saved_coverage;
     static uint saved_total_branch;
@@ -216,8 +200,10 @@ public:
     void clear_covered_clk(uint clock);
 	void clear_flag();
     void update_distance();
-	
+	term_t update_term() override;
 	void instrument() override;
+
+	
 	static SMTBranch* create_true_branch(SMTBranchNode* parent);
 	static SMTBranch* create_false_branch(SMTBranchNode* parent);
 	static SMTBranch* create_case_branch(SMTBranchNode* parent, SMTExpr* case_expr);
@@ -228,7 +214,6 @@ public:
 	static void save_coverage();
 	static void restore_coverage();
 	static void update_is_dep();
-	term_t update_term() override;
 	static void update_fsm();
 };
 
@@ -255,7 +240,7 @@ class SMTConcat : public SMTExpr{
 public:
 	uint repeat;
 	SMTConcat();
-	void redraw(SMTClkType clk_type) override;
+	void print(std::stringstream& ss) override;
 	term_t eval_term(SMTClkType clk) override;
 };
 
@@ -266,7 +251,7 @@ private:
     
 public:
     SMTCust(std::string operand);
-    void redraw(SMTClkType clk_type) override;
+	void print(std::stringstream& ss) override;
 	term_t eval_term(SMTClkType clk) override;
 };
 
@@ -284,8 +269,7 @@ public:
     
     void set_opcode(const ivl_expr_t expr);
 	void set_opcode(char ivl_code);
-    //void set_opcode(SMTUnaryOpcode opcode);
-	void redraw(SMTClkType clk_type) override;
+	void print(std::stringstream& ss) override;
 	term_t eval_term(SMTClkType clk) override;
 };
 
@@ -299,7 +283,7 @@ private:
 public:
 	bool is_signed;
 	SMTBinary();
-	void redraw(SMTClkType clk_type) override;
+	void print(std::stringstream& ss) override;
 	void set_opcode_from_expr(const ivl_expr_t expr);
 	void set_opcode(char ivl_code);
 	term_t eval_term(SMTClkType clk) override;
@@ -315,7 +299,7 @@ private:
 	
 public:
 	SMTLogic();
-	void redraw(SMTClkType clk_type) override;
+	void print(std::stringstream& ss) override;
 	void set_opcode(char ivl_code, bool is_inverted);
 	term_t eval_term(SMTClkType clk) override;
 };
@@ -325,7 +309,7 @@ public:
 class SMTTernary : public SMTExpr{	
 public:
 	SMTTernary();
-	void redraw(SMTClkType clk_type) override;
+	void print(std::stringstream& ss) override;
 	term_t eval_term(SMTClkType clk) override;
 };
 
@@ -341,7 +325,7 @@ public:
 	uint width;
 	
 	SMTNumber(const char* bits, int bit_width, bool is_signed);
-	void redraw(SMTClkType clk_type);
+	void print(std::stringstream& ss) override;
 	void emit_verilog_value();
 	term_t eval_term(SMTClkType clk) override;
 	bool is_equal(SMTNumber* num);
@@ -406,8 +390,7 @@ public:
 	
     SMTSignal();	
     SMTSignal(ivl_signal_t sig);
-    
-	void redraw(SMTClkType clk_type) override;
+    void print(std::stringstream& ss) override;
 	term_t eval_term(SMTClkType clk) override;
 };
 

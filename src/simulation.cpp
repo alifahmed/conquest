@@ -333,7 +333,7 @@ static bool find_next_cfg(){
 			if(!enable_error_check){
 				it->br->set_covered_clk(sim_num+1, clock);
 			}
-			printf("[FOUND %d] %s", clock, it->br->print(SMT_CLK_CURR).c_str());
+			printf("[FOUND %d] %s", clock, it->br->print().c_str());
 			return true;
 		}
 	}
@@ -360,8 +360,6 @@ static void check_satisfiability(){
         error("Simulation not satisfiable");
     }
 }
-
-ofstream iter_out("report_iter.log");
 
 static bool concolic_iteration(uint sim_num) {
 	if(enable_yices_debug){
@@ -394,8 +392,6 @@ static bool concolic_iteration(uint sim_num) {
 		return false;
 	}
     
-	iter_out << SMTBranch::covered_branch_count << endl;
-
 	if(enable_error_check){
 		//check satisfiability
 		check_satisfiability();
@@ -501,7 +497,6 @@ void start_concolic() {
 void end_concolic(){
     clock_t end_time = clock();
 	fflush(stdout);
-    iter_out.close();
 	if(enable_yices_debug){
 		fclose(f_dbg);
 	}
