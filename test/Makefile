@@ -15,7 +15,7 @@ all:
 	@mkdir -p $(CONC_TEST_DIR)
 	@$(IVERILOG_BIN)/iverilog_dev -f files.f -o $(OBJ_INST) -t conquest \
 		-ptb=conquest_tb.v -pclk=$(CLK_NAME) -preset=$(RESET_NAME) -preset_edge=$(RESET_EDGE) \
-		-punroll=$(UNROLL_CYC)
+		-punroll=$(UNROLL_CYC) -pbid=$(TARGET)
 	@rm -rf tmp_alif_concolic_debug.txt
 	
 else
@@ -24,7 +24,7 @@ all: $(OBJ_FLAT)
 	@mkdir -p $(CONC_TEST_DIR)
 	@$(IVERILOG_BIN)/iverilog_dev $(OBJ_FLAT) -o $(OBJ_INST) -t conquest \
 		-ptb=conquest_tb.v -pclk=$(CLK_NAME) -preset=$(RESET_NAME) -preset_edge=$(RESET_EDGE) \
-		-punroll=$(UNROLL_CYC)
+		-punroll=$(UNROLL_CYC) -pbid=$(TARGET)
 	@rm -rf tmp_alif_concolic_debug.txt
 
 $(OBJ_FLAT): $(OBJ_SRC)

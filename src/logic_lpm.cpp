@@ -7,15 +7,6 @@
 
 using namespace std;
 
-/*
- * Data type used to signify if a $signed or $unsigned should be emitted.
- */
-typedef enum lpm_sign_e {
-	NO_SIGN = 0,
-	NEED_SIGNED = 1,
-	NEED_UNSIGNED = 2
-} lpm_sign_t;
-
 static ivl_signal_t nexus_is_signal(ivl_scope_t scope, ivl_nexus_t nex,
 		int*base, unsigned*array_word);
 
@@ -1070,13 +1061,14 @@ static void emit_bufz(ivl_scope_t scope, ivl_net_logic_t nlogic) {
 	SMTProcess::curr_proc = new SMTProcess();
 	fprintf(g_out, "always @(*) begin\n");
 	g_ind += g_ind_incr;
+	fprintf(g_out, "%*c", g_ind, ' ');
 	SMTExpr* lval = emit_name_of_nexus(scope, ivl_logic_pin(nlogic, 0), 0);
 	fprintf(g_out, " = ");
 	SMTExpr* rval = emit_nexus_as_ca(scope, ivl_logic_pin(nlogic, 1), 0, 0);
 	fprintf(g_out, ";");
 	SMTAssign* smt_assign = new SMTBlockingAssign(lval, rval);
 	g_ind -= g_ind_incr;
-	fprintf(g_out, "%*cend\n", g_ind, ' ');
+	fprintf(g_out, "%*cend\n\n", g_ind, ' ');
     
     SMTProcess::curr_proc->update_sensitivity_list(smt_assign->rval);
     SMTProcess::curr_proc = NULL;
@@ -1132,11 +1124,19 @@ void emit_logic(ivl_scope_t scope, ivl_net_logic_t nlogic) {
 		fprintf(g_out, ";");
 		SMTAssign* smt_assign = new SMTBlockingAssign(lval, rval);
 		g_ind -= g_ind_incr;
-		fprintf(g_out, "%*cend\n", g_ind, ' ');
+		fprintf(g_out, "%*cend\n\n", g_ind, ' ');
 		
         SMTProcess::curr_proc->update_sensitivity_list(smt_assign->rval);
         SMTProcess::curr_proc = NULL;   
 		return;
+	}
+	//error("Check gate generation");
+	if(ivl_logic_type(nlogic) == IVL_LO_BUFZ){
+		emit_bufz(scope, nlogic);
+		return;
+	}
+	else{
+		error("Check gate generation");
 	}
 	switch (ivl_logic_type(nlogic)) {
 		case IVL_LO_AND:
@@ -1282,6 +1282,7 @@ void emit_signal_net_const_as_ca(ivl_scope_t scope, ivl_signal_t sig) {
         SMTProcess::curr_proc = new SMTProcess();
 		fprintf(g_out, "%*calways @(*) begin\n", g_ind, ' ');
 		g_ind += g_ind_incr;
+		fprintf(g_out, "%*c", g_ind, ' ');
 		emit_id(ivl_signal_basename(sig));
 		SMTExpr* lval = new SMTSignal(sig);
 		fprintf(g_out, " = ");
@@ -1289,7 +1290,7 @@ void emit_signal_net_const_as_ca(ivl_scope_t scope, ivl_signal_t sig) {
 		fprintf(g_out, ";");
 		new SMTBlockingAssign(lval, rval);
 		g_ind -= g_ind_incr;
-		fprintf(g_out, "%*cend\n", g_ind, ' ');
+		fprintf(g_out, "%*cend\n\n", g_ind, ' ');
 		
         SMTProcess::curr_proc = NULL;
         
@@ -1301,27 +1302,6 @@ void emit_signal_net_const_as_ca(ivl_scope_t scope, ivl_signal_t sig) {
 	/* We must find the constant in the nexus. */
 	assert(0);
 
-}
-
-static void dump_drive(ivl_drive_t drive) {
-	switch (drive) {
-		case IVL_DR_HiZ: fprintf(stderr, "highz");
-			break;
-		case IVL_DR_SMALL: fprintf(stderr, "small");
-			break;
-		case IVL_DR_MEDIUM: fprintf(stderr, "medium");
-			break;
-		case IVL_DR_WEAK: fprintf(stderr, "weak");
-			break;
-		case IVL_DR_LARGE: fprintf(stderr, "large");
-			break;
-		case IVL_DR_PULL: fprintf(stderr, "pull");
-			break;
-		case IVL_DR_STRONG: fprintf(stderr, "strong");
-			break;
-		case IVL_DR_SUPPLY: fprintf(stderr, "supply");
-			break;
-	}
 }
 
 /*
@@ -1339,11 +1319,6 @@ void dump_nexus_information(ivl_scope_t scope, ivl_nexus_t nex) {
 		ivl_net_const_t net_const = ivl_nexus_ptr_con(nex_ptr);
 		ivl_net_logic_t nlogic = ivl_nexus_ptr_log(nex_ptr);
 		ivl_signal_t sig = ivl_nexus_ptr_sig(nex_ptr);
-		fprintf(stderr, "  %u (", idx);
-		dump_drive(ivl_nexus_ptr_drive1(nex_ptr));
-		fprintf(stderr, "1 ,");
-		dump_drive(ivl_nexus_ptr_drive0(nex_ptr));
-		fprintf(stderr, "0) ");
 		if (lpm) {
 			ivl_scope_t lpm_scope = ivl_lpm_scope(lpm);
 			assert(!net_const);

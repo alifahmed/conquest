@@ -20,11 +20,7 @@ void emit_event(ivl_scope_t scope, ivl_statement_t stmt) {
             have_level_trig = true;
 			if (first) first = 0;
 			else fprintf(g_out, " or ");
-			smt_expr = dynamic_cast<SMTSignal*>(emit_nexus_as_ca(scope, ivl_event_any(event, idx), 0, 0));
-			assert(smt_expr);
-			SMTProcess::curr_proc->sensitivity_list.insert(smt_expr->parent);
-			SMTProcess::curr_proc->is_edge_triggered = false;
-            smt_expr->parent->dependent_process.push_back(SMTProcess::curr_proc);
+			SMTProcess::curr_proc->add_to_sensitivity(emit_nexus_as_ca(scope, ivl_event_any(event, idx), 0, 0));
 		}
 
 		/* Check for positive edge events. */

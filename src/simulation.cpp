@@ -25,7 +25,7 @@ const search_algo_t search_algo = SEARCH_ALGO_CFG_DIRECTED;
 const bool		enable_unsolvable_branch_elimination = true;
 const bool		enable_yices_debug = false;
 const bool		enable_fsm_cfg_hybrid = true;
-
+const bool		enable_all_target = false;
 
 
 static SMTBranch* target_branch;
@@ -184,6 +184,7 @@ static void set_mem_log_name(uint sim_num) {
 }
 
 static void sim() {
+	static bool is_first_time = true;
 	if(enable_sim_copy){
 		string cmd = "cp data.mem " + string(mem_file_name);
 		system(cmd.c_str());
@@ -191,6 +192,10 @@ static void sim() {
 		system(cmd.c_str());
 	} else{
 		system("vvp conc_run.vvp > sim.log");
+	}
+	if(is_first_time){
+		is_first_time = false;
+		copy_file("sim.log", "first_sim.log");
 	}
 }
 
@@ -424,7 +429,7 @@ static bool concolic_iteration(uint sim_num) {
     build_stack();
 	if(target_branch->is_covered() && search_algo == SEARCH_ALGO_CFG_DIRECTED){
 		free_stack();
-		printf("[TARGET COVERED %u]\n", target_branch->id);
+		printf("Branch %u covered in %u iterations\n", target_branch->id, sim_num);
 		return false;
 	}
 	if(enable_yices_debug){
@@ -462,49 +467,82 @@ void start_concolic() {
     freopen("/dev/null", "w", stderr);
 	init();
 	SMTBranch::save_coverage();
-	if(search_algo == SEARCH_ALGO_CFG_DIRECTED){
-		const uint count = SMTAssign::get_assign_count();
-		ofstream report("report_cov.log");
-		for(uint i=0; i<count; i++){
-			SMTAssign* assign = SMTAssign::get_assign(i);
-			if(assign->assign_type == SMT_ASSIGN_BRANCH){
-                copy_file(g_data_mem_raw, g_data_mem);
-				target_branch = dynamic_cast<SMTBranch*>(assign);
-				assert(target_branch);
-				target_branch->k_permit_covered = 0;
-				SMTBasicBlock::reset_distances();
-				SMTBranch::clear_coverage(0);
-				SMTBranch::restore_coverage();
-				path_hash_map.clear();
-				target_branch->update_distance();
-				sim_num = 0;
-				selected_branch = NULL;
-				while (concolic_iteration(sim_num)) {
-					sim_num++;
-					if(sim_num >= 2000){
-						break;
-					}
+	if(!enable_all_target){
+		SMTAssign* assign = SMTAssign::get_assign(g_branch_id);
+		if(assign->assign_type == SMT_ASSIGN_BRANCH){
+			copy_file(g_data_mem_raw, g_data_mem);
+			target_branch = dynamic_cast<SMTBranch*>(assign);
+			assert(target_branch);
+			target_branch->k_permit_covered = 0;
+			SMTBasicBlock::reset_distances();
+			SMTBranch::clear_coverage(0);
+			SMTBranch::restore_coverage();
+			path_hash_map.clear();
+			target_branch->update_distance();
+			ofstream out("cfg_info.txt");
+			SMTBasicBlock::print_all(out);
+			SMTSigCore::print_state_variables(out);
+			out.close();
+			sim_num = 0;
+			selected_branch = NULL;
+			while (concolic_iteration(sim_num)) {
+				sim_num++;
+				if(sim_num >= 2000){
+					break;
 				}
-				if(target_branch->is_covered() == false){
-					sim_num = 2000;
-				}
-				report << setw(12) << assign->id << " ";
-                report << setw(12) << sim_num << " \n";
+			}
+			if(target_branch->is_covered() == false){
+				printf("Target not covered\n");
 			}
 		}
-		report.close();
-        yices_free_context(yices_context);
-        yices_exit();
-		SMTFreeAll();
-		exit(0);
-	}
-	else{
-		sim_num = 0;
-		start_time = clock();
-		while (concolic_iteration(sim_num)) {
-			sim_num++;
+		else{
+			printf("Selected id is not of a branch...");
 		}
-		end_concolic();
+	} else{
+		if(search_algo == SEARCH_ALGO_CFG_DIRECTED){
+			const uint count = SMTAssign::get_assign_count();
+			ofstream report("report_cov.log");
+			for(uint i=0; i<count; i++){
+				SMTAssign* assign = SMTAssign::get_assign(i);
+				if(assign->assign_type == SMT_ASSIGN_BRANCH){
+					copy_file(g_data_mem_raw, g_data_mem);
+					target_branch = dynamic_cast<SMTBranch*>(assign);
+					assert(target_branch);
+					target_branch->k_permit_covered = 0;
+					SMTBasicBlock::reset_distances();
+					SMTBranch::clear_coverage(0);
+					SMTBranch::restore_coverage();
+					path_hash_map.clear();
+					target_branch->update_distance();
+					sim_num = 0;
+					selected_branch = NULL;
+					while (concolic_iteration(sim_num)) {
+						sim_num++;
+						if(sim_num >= 2000){
+							break;
+						}
+					}
+					if(target_branch->is_covered() == false){
+						sim_num = 2000;
+					}
+					report << setw(12) << assign->id << " ";
+					report << setw(12) << sim_num << " \n";
+				}
+			}
+			report.close();
+			yices_free_context(yices_context);
+			yices_exit();
+			SMTFreeAll();
+			exit(0);
+		}
+		else{
+			sim_num = 0;
+			start_time = clock();
+			while (concolic_iteration(sim_num)) {
+				sim_num++;
+			}
+			end_concolic();
+		}
 	}
 }
 

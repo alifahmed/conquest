@@ -1,0 +1,1155 @@
+/*
+[1] weight: 0 distance: 268435455
+(assert (= @scl_pad_o    0b0)) ;0 BL
+
+[2] weight: 0 distance: 268435455
+(assert (= @sda_pad_o    0b0)) ;1 BL
+
+[3] weight: 0 distance: 268435455
+(assert (= @sta    (bv-extract 7 7 #cr ))) ;2 BL
+
+[4] weight: 0 distance: 268435455
+(assert (= @sto    (bv-extract 6 6 #cr ))) ;3 BL
+
+[5] weight: 0 distance: 268435455
+(assert (= @rd    (bv-extract 5 5 #cr ))) ;4 BL
+
+[6] weight: 0 distance: 268435455
+(assert (= @wr    (bv-extract 4 4 #cr ))) ;5 BL
+
+[7] weight: 0 distance: 268435455
+(assert (= @ack    (bv-extract 3 3 #cr ))) ;6 BL
+
+[8] weight: 0 distance: 268435455
+(assert (= @iack    (bv-extract 0 0 #cr ))) ;7 BL
+
+[9] weight: 0 distance: 268435455
+(assert (= @wb_wacc    (bv-and (bv-and #wb_cyc_i  #wb_stb_i ) #wb_we_i ))) ;8 BL
+
+[10] weight: 0 distance: 268435455
+(assert (= @i2c_busy    #byte_controller_bit_controller_busy )) ;9 BL
+
+[11] weight: 0 distance: 268435455
+(assert (= @scl_padoen_o    #byte_controller_bit_controller_scl_oen )) ;10 BL
+
+[12] weight: 0 distance: 268435455
+(assert (= @sda_padoen_o    #byte_controller_bit_controller_sda_oen )) ;11 BL
+
+[13] weight: 0 distance: 268435455
+(assert (= @byte_controller_i2c_busy    #byte_controller_bit_controller_busy )) ;12 BL
+
+[14] weight: 0 distance: 268435455
+(assert (= @byte_controller_i2c_al    #byte_controller_bit_controller_al )) ;13 BL
+
+[15] weight: 0 distance: 268435455
+(assert (= @byte_controller_dout    #byte_controller_sr )) ;14 BL
+
+[16] weight: 0 distance: 268435455
+(assert (= @wb_ack_o    (bv-and (bv-and #wb_cyc_i  #wb_stb_i ) (bv-not #wb_ack_o )))) ;15 NB
+
+[17] weight: 1 distance: 268435455
+[S] 19 20 21 22 23 24 25 26
+[P] 18
+
+[18] weight: 0 distance: 268435455
+[P] 19 20 21 22 23 24 25 26
+
+[19] weight: 0 distance: 268435455
+(assert (= #wb_adr_i    0b000)) ;16 CS
+(assert (= @wb_dat_o    (bv-extract 7 0 #prer ))) ;17 NB
+[S] 18
+[P] 17
+
+[20] weight: 0 distance: 268435455
+(assert (= #wb_adr_i    0b001)) ;18 CS
+(assert (= @wb_dat_o    (bv-extract 15 8 #prer ))) ;19 NB
+[S] 18
+[P] 17
+
+[21] weight: 0 distance: 268435455
+(assert (= #wb_adr_i    0b010)) ;20 CS
+(assert (= @wb_dat_o    #ctr )) ;21 NB
+[S] 18
+[P] 17
+
+[22] weight: 0 distance: 268435455
+(assert (= #wb_adr_i    0b011)) ;22 CS
+(assert (= @wb_dat_o    #byte_controller_dout )) ;23 NB
+[S] 18
+[P] 17
+
+[23] weight: 0 distance: 268435455
+(assert (= #wb_adr_i    0b100)) ;24 CS
+(assert (= @wb_dat_o    (bv-concat #rxack  #i2c_busy  #al  0b000 #tip  #irq_flag ))) ;25 NB
+[S] 18
+[P] 17
+
+[24] weight: 0 distance: 268435455
+(assert (= #wb_adr_i    0b101)) ;26 CS
+(assert (= @wb_dat_o    #txr )) ;27 NB
+[S] 18
+[P] 17
+
+[25] weight: 0 distance: 268435455
+(assert (= #wb_adr_i    0b110)) ;28 CS
+(assert (= @wb_dat_o    #cr )) ;29 NB
+[S] 18
+[P] 17
+
+[26] weight: 0 distance: 268435455
+(assert (= #wb_adr_i    0b111)) ;30 CS
+(assert (= @wb_dat_o    0b00000000)) ;31 NB
+[S] 18
+[P] 17
+
+[27] weight: 1 distance: 268435455
+[S] 28 29
+[P] 30
+
+[28] weight: 0 distance: 268435455
+(assert (= (bv-not (bv-redor #rst_i ))   0b1)) ;32 BR
+(assert (= @prer    0b1111111111111111)) ;34 NB
+(assert (= @ctr    0b00000000)) ;35 NB
+(assert (= @txr    0b00000000)) ;36 NB
+[S] 30
+[P] 27
+
+[29] weight: 1 distance: 268435455
+(assert (= (bv-not (bv-redor #rst_i ))   0b0)) ;33 BR
+[S] 31 32
+[P] 27
+
+[30] weight: 0 distance: 268435455
+[P] 28 33
+
+[31] weight: 1 distance: 268435455
+(assert (= #wb_wacc    0b1)) ;37 BR
+[S] 35 36 37 38
+[P] 29
+
+[32] weight: 0 distance: 268435455
+(assert (= #wb_wacc    0b0)) ;38 BR
+[S] 33
+[P] 29
+
+[33] weight: 0 distance: 268435455
+[S] 30
+[P] 34 32
+
+[34] weight: 0 distance: 268435455
+[S] 33
+[P] 35 36 37 38
+
+[35] weight: 0 distance: 268435455
+(assert (= #wb_adr_i    0b000)) ;39 CS
+(assert (= @prer    (bv-concat (bv-extract 15 8 #prer ) #wb_dat_i ))) ;40 NB
+[S] 34
+[P] 31
+
+[36] weight: 0 distance: 268435455
+(assert (= #wb_adr_i    0b001)) ;41 CS
+(assert (= @prer    (bv-concat #wb_dat_i  (bv-extract 7 0 #prer )))) ;42 NB
+[S] 34
+[P] 31
+
+[37] weight: 0 distance: 268435455
+(assert (= #wb_adr_i    0b010)) ;43 CS
+(assert (= @ctr    #wb_dat_i )) ;44 NB
+[S] 34
+[P] 31
+
+[38] weight: 0 distance: 268435455
+(assert (= #wb_adr_i    0b011)) ;45 CS
+(assert (= @txr    #wb_dat_i )) ;46 NB
+[S] 34
+[P] 31
+
+[39] weight: 1 distance: 3
+[S] 40 41
+[P] 42
+
+[40] weight: 0 distance: 3
+(assert (= (bv-not #rst_i )   0b1)) ;47 BR
+(assert (= @cr    0b00000000)) ;49 NB
+[S] 42
+[P] 39
+
+[41] weight: 1 distance: 2
+(assert (= (bv-not #rst_i )   0b0)) ;48 BR
+[S] 43 44
+[P] 39
+
+[42] weight: 0 distance: 3
+[P] 40 45
+
+[43] weight: 1 distance: 1
+(assert (= #wb_wacc    0b1)) ;50 BR
+[S] 46 47
+[P] 41
+
+[44] weight: 1 distance: 4
+(assert (= #wb_wacc    0b0)) ;51 BR
+[S] 49 50
+[P] 41
+
+[45] weight: 0 distance: 3
+[S] 42
+[P] 48 51
+
+[46] weight: 0 distance: 0
+(assert (= (bv-and (bv-extract 7 7 #ctr ) (bv-comp #wb_adr_i  0b100))   0b1)) ;52 BR
+(assert (= @cr    #wb_dat_i )) ;54 NB
+[S] 48
+[P] 43
+
+[47] weight: 0 distance: 3
+(assert (= (bv-and (bv-extract 7 7 #ctr ) (bv-comp #wb_adr_i  0b100))   0b0)) ;53 BR
+[S] 48
+[P] 43
+
+[48] weight: 0 distance: 3
+[S] 45
+[P] 46 47
+
+[49] weight: 0 distance: 3
+(assert (= (bv-or #byte_controller_cmd_ack  #byte_controller_i2c_al )   0b1)) ;55 BR
+(assert (= @cr    (bv-concat 0b0000 (bv-extract 3 0 #cr )))) ;57 NB
+[S] 51
+[P] 44
+
+[50] weight: 0 distance: 3
+(assert (= (bv-or #byte_controller_cmd_ack  #byte_controller_i2c_al )   0b0)) ;56 BR
+[S] 51
+[P] 44
+
+[51] weight: 0 distance: 3
+(assert (= @cr    (bv-concat (bv-extract 7 3 #cr ) 0b000))) ;58 NB
+[S] 45
+[P] 49 50
+
+[52] weight: 1 distance: 268435455
+[S] 53 54
+[P] 55
+
+[53] weight: 0 distance: 268435455
+(assert (= (bv-not (bv-redor #rst_i ))   0b1)) ;59 BR
+(assert (= @al    0b0)) ;61 NB
+(assert (= @rxack    0b0)) ;62 NB
+(assert (= @tip    0b0)) ;63 NB
+(assert (= @irq_flag    0b0)) ;64 NB
+[S] 55
+[P] 52
+
+[54] weight: 0 distance: 268435455
+(assert (= (bv-not (bv-redor #rst_i ))   0b0)) ;60 BR
+(assert (= @al    (bv-or #byte_controller_i2c_al  (bv-and #al  (bv-not #sta ))))) ;65 NB
+(assert (= @rxack    #byte_controller_ack_out )) ;66 NB
+(assert (= @tip    (bv-or #rd  #wr ))) ;67 NB
+(assert (= @irq_flag    (bv-and (bv-or (bv-or #byte_controller_cmd_ack  #byte_controller_i2c_al ) #irq_flag ) (bv-not #iack )))) ;68 NB
+[S] 55
+[P] 52
+
+[55] weight: 0 distance: 268435455
+[P] 53 54
+
+[56] weight: 1 distance: 268435455
+[S] 57 58
+[P] 59
+
+[57] weight: 0 distance: 268435455
+(assert (= (bv-not (bv-redor #rst_i ))   0b1)) ;69 BR
+(assert (= @wb_inta_o    0b0)) ;71 NB
+[S] 59
+[P] 56
+
+[58] weight: 0 distance: 268435455
+(assert (= (bv-not (bv-redor #rst_i ))   0b0)) ;70 BR
+(assert (= @wb_inta_o    (bv-and #irq_flag  (bv-extract 6 6 #ctr )))) ;72 NB
+[S] 59
+[P] 56
+
+[59] weight: 0 distance: 268435455
+[P] 57 58
+
+[60] weight: 1 distance: 268435455
+[S] 61 62
+[P] 63
+
+[61] weight: 0 distance: 268435455
+(assert (= (bv-not #rst_i )   0b1)) ;73 BR
+(assert (= @byte_controller_bit_controller_dscl_oen    0b0)) ;75 NB
+[S] 63
+[P] 60
+
+[62] weight: 0 distance: 268435455
+(assert (= (bv-not #rst_i )   0b0)) ;74 BR
+(assert (= @byte_controller_bit_controller_dscl_oen    #byte_controller_bit_controller_scl_oen )) ;76 NB
+[S] 63
+[P] 60
+
+[63] weight: 0 distance: 268435455
+[P] 61 62
+
+[64] weight: 1 distance: 268435455
+[S] 66 65
+[P] 67
+
+[65] weight: 0 distance: 268435455
+(assert (= (bv-not #rst_i )   0b1)) ;77 BR
+(assert (= @byte_controller_bit_controller_cnt    0b0000000000000000)) ;79 NB
+(assert (= @byte_controller_bit_controller_clk_en    0b1)) ;80 NB
+[S] 67
+[P] 64
+
+[66] weight: 1 distance: 268435455
+(assert (= (bv-not #rst_i )   0b0)) ;78 BR
+[S] 68 69
+[P] 64
+
+[67] weight: 0 distance: 268435455
+[P] 65 70
+
+[68] weight: 1 distance: 268435455
+(assert (= (bv-or (bv-not (bv-redor #byte_controller_bit_controller_cnt )) (bv-not (bv-extract 7 7 #ctr )))   0b1)) ;81 BR
+[S] 71 72
+[P] 66
+
+[69] weight: 0 distance: 268435455
+(assert (= (bv-or (bv-not (bv-redor #byte_controller_bit_controller_cnt )) (bv-not (bv-extract 7 7 #ctr )))   0b0)) ;82 BR
+(assert (= @byte_controller_bit_controller_cnt    (bv-sub #byte_controller_bit_controller_cnt  0b0000000000000001))) ;89 NB
+(assert (= @byte_controller_bit_controller_clk_en    0b0)) ;90 NB
+[S] 70
+[P] 66
+
+[70] weight: 0 distance: 268435455
+[S] 67
+[P] 69 73
+
+[71] weight: 0 distance: 268435455
+(assert (= (bv-not (bv-and #byte_controller_bit_controller_dscl_oen  (bv-not (bv-redor #byte_controller_bit_controller_sSCL ))))   0b1)) ;83 BR
+(assert (= @byte_controller_bit_controller_cnt    #prer )) ;85 NB
+(assert (= @byte_controller_bit_controller_clk_en    0b1)) ;86 NB
+[S] 73
+[P] 68
+
+[72] weight: 0 distance: 268435455
+(assert (= (bv-not (bv-and #byte_controller_bit_controller_dscl_oen  (bv-not (bv-redor #byte_controller_bit_controller_sSCL ))))   0b0)) ;84 BR
+(assert (= @byte_controller_bit_controller_cnt    #byte_controller_bit_controller_cnt )) ;87 NB
+(assert (= @byte_controller_bit_controller_clk_en    0b0)) ;88 NB
+[S] 73
+[P] 68
+
+[73] weight: 0 distance: 268435455
+[S] 70
+[P] 71 72
+
+[74] weight: 1 distance: 268435455
+[S] 75 76
+[P] 77
+
+[75] weight: 0 distance: 268435455
+(assert (= (bv-not #rst_i )   0b1)) ;91 BR
+(assert (= @byte_controller_bit_controller_sSCL    0b1)) ;93 NB
+(assert (= @byte_controller_bit_controller_sSDB    0b1)) ;94 NB
+(assert (= @byte_controller_bit_controller_dSCL    0b1)) ;95 NB
+(assert (= @byte_controller_bit_controller_dSDA    0b1)) ;96 NB
+[S] 77
+[P] 74
+
+[76] weight: 0 distance: 268435455
+(assert (= (bv-not #rst_i )   0b0)) ;92 BR
+(assert (= @byte_controller_bit_controller_sSCL    #scl_pad_i )) ;97 NB
+(assert (= @byte_controller_bit_controller_sSDB    #sda_pad_i )) ;98 NB
+(assert (= @byte_controller_bit_controller_dSCL    #byte_controller_bit_controller_sSCL )) ;99 NB
+(assert (= @byte_controller_bit_controller_dSDA    #byte_controller_bit_controller_sSDB )) ;100 NB
+[S] 77
+[P] 74
+
+[77] weight: 0 distance: 268435455
+[P] 75 76
+
+[78] weight: 1 distance: 268435455
+[S] 79 80
+[P] 81
+
+[79] weight: 0 distance: 268435455
+(assert (= (bv-not #rst_i )   0b1)) ;101 BR
+(assert (= @byte_controller_bit_controller_sta_condition    0b0)) ;103 NB
+(assert (= @byte_controller_bit_controller_sto_condition    0b0)) ;104 NB
+[S] 81
+[P] 78
+
+[80] weight: 0 distance: 268435455
+(assert (= (bv-not #rst_i )   0b0)) ;102 BR
+(assert (= @byte_controller_bit_controller_sta_condition    (bv-and (bv-and (bv-not #byte_controller_bit_controller_sSDB ) #byte_controller_bit_controller_dSDA ) #byte_controller_bit_controller_sSCL ))) ;105 NB
+(assert (= @byte_controller_bit_controller_sto_condition    (bv-and (bv-and #byte_controller_bit_controller_sSDB  (bv-not #byte_controller_bit_controller_dSDA )) #byte_controller_bit_controller_sSCL ))) ;106 NB
+[S] 81
+[P] 78
+
+[81] weight: 0 distance: 268435455
+[P] 79 80
+
+[82] weight: 1 distance: 268435455
+[S] 83 84
+[P] 85
+
+[83] weight: 0 distance: 268435455
+(assert (= (bv-not (bv-redor #rst_i ))   0b1)) ;107 BR
+(assert (= @byte_controller_bit_controller_busy    0b0)) ;109 NB
+[S] 85
+[P] 82
+
+[84] weight: 0 distance: 268435455
+(assert (= (bv-not (bv-redor #rst_i ))   0b0)) ;108 BR
+(assert (= @byte_controller_bit_controller_busy    (bv-and (bv-or #byte_controller_bit_controller_sta_condition  #byte_controller_bit_controller_busy ) (bv-not #byte_controller_bit_controller_sto_condition )))) ;110 NB
+[S] 85
+[P] 82
+
+[85] weight: 0 distance: 268435455
+[P] 83 84
+
+[86] weight: 1 distance: 268435455
+[S] 87 88
+[P] 89
+
+[87] weight: 0 distance: 268435455
+(assert (= (bv-not #rst_i )   0b1)) ;111 BR
+(assert (= @byte_controller_bit_controller_cmd_stop    0b0)) ;113 NB
+[S] 89
+[P] 86
+
+[88] weight: 1 distance: 268435455
+(assert (= (bv-not #rst_i )   0b0)) ;112 BR
+[S] 90 91
+[P] 86
+
+[89] weight: 0 distance: 268435455
+[P] 87 92
+
+[90] weight: 0 distance: 268435455
+(assert (= #byte_controller_bit_controller_clk_en    0b1)) ;114 BR
+(assert (= @byte_controller_bit_controller_cmd_stop    (bv-comp #byte_controller_core_cmd  0b0010))) ;116 NB
+[S] 92
+[P] 65 71
+
+[91] weight: 0 distance: 268435455
+(assert (= #byte_controller_bit_controller_clk_en    0b0)) ;115 BR
+[S] 92
+[P] 69 72
+
+[92] weight: 0 distance: 268435455
+[S] 89
+[P] 90 91
+
+[93] weight: 1 distance: 268435455
+[S] 94 95
+[P] 96
+
+[94] weight: 0 distance: 268435455
+(assert (= (bv-not #rst_i )   0b1)) ;117 BR
+(assert (= @byte_controller_bit_controller_al    0b0)) ;119 NB
+[S] 96
+[P] 93
+
+[95] weight: 0 distance: 268435455
+(assert (= (bv-not #rst_i )   0b0)) ;118 BR
+(assert (= @byte_controller_bit_controller_al    (bv-or (bv-and (bv-and #byte_controller_bit_controller_sda_chk  (bv-not #byte_controller_bit_controller_sSDB )) #byte_controller_bit_controller_sda_oen ) (bv-and (bv-and (bv-redor #byte_controller_bit_controller_c_state ) #byte_controller_bit_controller_sto_condition ) (bv-not #byte_controller_bit_controller_cmd_stop ))))) ;120 NB
+[S] 96
+[P] 93
+
+[96] weight: 0 distance: 268435455
+[P] 94 95
+
+[97] weight: 1 distance: 268435455
+[S] 98 99
+[P] 100
+
+[98] weight: 0 distance: 268435455
+(assert (= (bv-not #rst_i )   0b1)) ;121 BR
+(assert (= @byte_controller_bit_controller_dout    0b0)) ;123 NB
+[S] 100
+[P] 97
+
+[99] weight: 1 distance: 268435455
+(assert (= (bv-not #rst_i )   0b0)) ;122 BR
+[S] 101 102
+[P] 97
+
+[100] weight: 0 distance: 268435455
+[P] 98 103
+
+[101] weight: 0 distance: 268435455
+(assert (= (bv-and #byte_controller_bit_controller_sSCL  (bv-not #byte_controller_bit_controller_dSCL ))   0b1)) ;124 BR
+(assert (= @byte_controller_bit_controller_dout    #byte_controller_bit_controller_sSDB )) ;126 NB
+[S] 103
+[P] 99
+
+[102] weight: 0 distance: 268435455
+(assert (= (bv-and #byte_controller_bit_controller_sSCL  (bv-not #byte_controller_bit_controller_dSCL ))   0b0)) ;125 BR
+[S] 103
+[P] 99
+
+[103] weight: 0 distance: 268435455
+[S] 100
+[P] 101 102
+
+[104] weight: 1 distance: 268435455
+[S] 105 106
+[P] 107
+
+[105] weight: 0 distance: 268435455
+(assert (= (bv-not (bv-redor #rst_i ))   0b1)) ;127 BR
+(assert (= @byte_controller_bit_controller_c_state    0b00000000000000000)) ;129 NB
+(assert (= @byte_controller_bit_controller_cmd_ack    0b0)) ;130 NB
+(assert (= @byte_controller_bit_controller_scl_oen    0b1)) ;131 NB
+(assert (= @byte_controller_bit_controller_sda_oen    0b1)) ;132 NB
+(assert (= @byte_controller_bit_controller_sda_chk    0b0)) ;133 NB
+[S] 107
+[P] 104
+
+[106] weight: 1 distance: 268435455
+(assert (= (bv-not (bv-redor #rst_i ))   0b0)) ;128 BR
+[S] 108 109
+[P] 104
+
+[107] weight: 0 distance: 268435455
+[P] 105 110
+
+[108] weight: 0 distance: 268435455
+(assert (= #byte_controller_bit_controller_al    0b1)) ;134 BR
+(assert (= @byte_controller_bit_controller_c_state    0b00000000000000000)) ;136 NB
+(assert (= @byte_controller_bit_controller_cmd_ack    0b0)) ;137 NB
+(assert (= @byte_controller_bit_controller_scl_oen    0b1)) ;138 NB
+(assert (= @byte_controller_bit_controller_sda_oen    0b1)) ;139 NB
+(assert (= @byte_controller_bit_controller_sda_chk    0b0)) ;140 NB
+[S] 110
+[P] 106
+
+[109] weight: 1 distance: 268435455
+(assert (= #byte_controller_bit_controller_al    0b0)) ;135 BR
+(assert (= @byte_controller_bit_controller_cmd_ack    0b0)) ;141 NB
+[S] 111 112
+[P] 106
+
+[110] weight: 0 distance: 268435455
+[S] 107
+[P] 108 113
+
+[111] weight: 1 distance: 268435455
+(assert (= #byte_controller_bit_controller_clk_en    0b1)) ;142 BR
+[S] 122 115 123 124 125 126 127 136 128 137 129 130 131 132 133 134 135 138
+[P] 65 71
+
+[112] weight: 0 distance: 268435455
+(assert (= #byte_controller_bit_controller_clk_en    0b0)) ;143 BR
+[S] 113
+[P] 69 72
+
+[113] weight: 0 distance: 268435455
+[S] 110
+[P] 112 114
+
+[114] weight: 0 distance: 268435455
+[S] 113
+[P] 122 116 123 124 125 126 127 136 128 137 129 130 131 132 133 134 135 138
+
+[115] weight: 1 distance: 268435455
+(assert (= #byte_controller_bit_controller_c_state    0b00000000000000000)) ;144 CS
+[S] 117 118 119 120 121
+[P] 105 108 121 126 130 134 138
+
+[116] weight: 0 distance: 268435455
+(assert (= @byte_controller_bit_controller_scl_oen    #byte_controller_bit_controller_scl_oen )) ;155 NB
+(assert (= @byte_controller_bit_controller_sda_oen    #byte_controller_bit_controller_sda_oen )) ;156 NB
+(assert (= @byte_controller_bit_controller_sda_chk    0b0)) ;157 NB
+[S] 114
+[P] 117 118 119 120 121
+
+[117] weight: 0 distance: 268435455
+(assert (= #byte_controller_core_cmd    0b0001)) ;145 CS
+(assert (= @byte_controller_bit_controller_c_state    0b00000000000000001)) ;146 NB
+[S] 116
+[P] 171
+
+[118] weight: 0 distance: 268435455
+(assert (= #byte_controller_core_cmd    0b0010)) ;147 CS
+(assert (= @byte_controller_bit_controller_c_state    0b00000000000100000)) ;148 NB
+[S] 116
+[P] 178 205
+
+[119] weight: 0 distance: 268435455
+(assert (= #byte_controller_core_cmd    0b0100)) ;149 CS
+(assert (= @byte_controller_bit_controller_c_state    0b00010000000000000)) ;150 NB
+[S] 116
+[P] 177 185 192 198
+
+[120] weight: 0 distance: 268435455
+(assert (= #byte_controller_core_cmd    0b1000)) ;151 CS
+(assert (= @byte_controller_bit_controller_c_state    0b00000001000000000)) ;152 NB
+[S] 116
+[P] 174 184 191 199
+
+[121] weight: 0 distance: 268435455
+(assert (= (and (/= #byte_controller_core_cmd  0b0001) (/= #byte_controller_core_cmd  0b0010) (/= #byte_controller_core_cmd  0b0100) (/= #byte_controller_core_cmd  0b1000))   true)) ;153 CS
+(assert (= @byte_controller_bit_controller_c_state    0b00000000000000000)) ;154 NB
+[S] 116
+[P] 115
+
+[122] weight: 0 distance: 268435455
+(assert (= #byte_controller_bit_controller_c_state    0b00000000000000001)) ;158 CS
+(assert (= @byte_controller_bit_controller_c_state    0b00000000000000010)) ;159 NB
+(assert (= @byte_controller_bit_controller_scl_oen    #byte_controller_bit_controller_scl_oen )) ;160 NB
+(assert (= @byte_controller_bit_controller_sda_oen    0b1)) ;161 NB
+(assert (= @byte_controller_bit_controller_sda_chk    0b0)) ;162 NB
+[S] 114
+[P] 117
+
+[123] weight: 0 distance: 268435455
+(assert (= #byte_controller_bit_controller_c_state    0b00000000000000010)) ;163 CS
+(assert (= @byte_controller_bit_controller_c_state    0b00000000000000100)) ;164 NB
+(assert (= @byte_controller_bit_controller_scl_oen    0b1)) ;165 NB
+(assert (= @byte_controller_bit_controller_sda_oen    0b1)) ;166 NB
+(assert (= @byte_controller_bit_controller_sda_chk    0b0)) ;167 NB
+[S] 114
+[P] 122
+
+[124] weight: 0 distance: 268435455
+(assert (= #byte_controller_bit_controller_c_state    0b00000000000000100)) ;168 CS
+(assert (= @byte_controller_bit_controller_c_state    0b00000000000001000)) ;169 NB
+(assert (= @byte_controller_bit_controller_scl_oen    0b1)) ;170 NB
+(assert (= @byte_controller_bit_controller_sda_oen    0b0)) ;171 NB
+(assert (= @byte_controller_bit_controller_sda_chk    0b0)) ;172 NB
+[S] 114
+[P] 123
+
+[125] weight: 0 distance: 268435455
+(assert (= #byte_controller_bit_controller_c_state    0b00000000000001000)) ;173 CS
+(assert (= @byte_controller_bit_controller_c_state    0b00000000000010000)) ;174 NB
+(assert (= @byte_controller_bit_controller_scl_oen    0b1)) ;175 NB
+(assert (= @byte_controller_bit_controller_sda_oen    0b0)) ;176 NB
+(assert (= @byte_controller_bit_controller_sda_chk    0b0)) ;177 NB
+[S] 114
+[P] 124
+
+[126] weight: 0 distance: 268435455
+(assert (= #byte_controller_bit_controller_c_state    0b00000000000010000)) ;178 CS
+(assert (= @byte_controller_bit_controller_c_state    0b00000000000000000)) ;179 NB
+(assert (= @byte_controller_bit_controller_cmd_ack    0b1)) ;180 NB
+(assert (= @byte_controller_bit_controller_scl_oen    0b0)) ;181 NB
+(assert (= @byte_controller_bit_controller_sda_oen    0b0)) ;182 NB
+(assert (= @byte_controller_bit_controller_sda_chk    0b0)) ;183 NB
+[S] 114
+[P] 125
+
+[127] weight: 0 distance: 268435455
+(assert (= #byte_controller_bit_controller_c_state    0b00000000000100000)) ;184 CS
+(assert (= @byte_controller_bit_controller_c_state    0b00000000001000000)) ;185 NB
+(assert (= @byte_controller_bit_controller_scl_oen    0b0)) ;186 NB
+(assert (= @byte_controller_bit_controller_sda_oen    0b0)) ;187 NB
+(assert (= @byte_controller_bit_controller_sda_chk    0b0)) ;188 NB
+[S] 114
+[P] 118
+
+[128] weight: 0 distance: 268435455
+(assert (= #byte_controller_bit_controller_c_state    0b00000000001000000)) ;189 CS
+(assert (= @byte_controller_bit_controller_c_state    0b00000000010000000)) ;190 NB
+(assert (= @byte_controller_bit_controller_scl_oen    0b1)) ;191 NB
+(assert (= @byte_controller_bit_controller_sda_oen    0b0)) ;192 NB
+(assert (= @byte_controller_bit_controller_sda_chk    0b0)) ;193 NB
+[S] 114
+[P] 127
+
+[129] weight: 0 distance: 268435455
+(assert (= #byte_controller_bit_controller_c_state    0b00000000010000000)) ;194 CS
+(assert (= @byte_controller_bit_controller_c_state    0b00000000100000000)) ;195 NB
+(assert (= @byte_controller_bit_controller_scl_oen    0b1)) ;196 NB
+(assert (= @byte_controller_bit_controller_sda_oen    0b0)) ;197 NB
+(assert (= @byte_controller_bit_controller_sda_chk    0b0)) ;198 NB
+[S] 114
+[P] 128
+
+[130] weight: 0 distance: 268435455
+(assert (= #byte_controller_bit_controller_c_state    0b00000000100000000)) ;199 CS
+(assert (= @byte_controller_bit_controller_c_state    0b00000000000000000)) ;200 NB
+(assert (= @byte_controller_bit_controller_cmd_ack    0b1)) ;201 NB
+(assert (= @byte_controller_bit_controller_scl_oen    0b1)) ;202 NB
+(assert (= @byte_controller_bit_controller_sda_oen    0b1)) ;203 NB
+(assert (= @byte_controller_bit_controller_sda_chk    0b0)) ;204 NB
+[S] 114
+[P] 129
+
+[131] weight: 0 distance: 268435455
+(assert (= #byte_controller_bit_controller_c_state    0b00000001000000000)) ;205 CS
+(assert (= @byte_controller_bit_controller_c_state    0b00000010000000000)) ;206 NB
+(assert (= @byte_controller_bit_controller_scl_oen    0b0)) ;207 NB
+(assert (= @byte_controller_bit_controller_sda_oen    0b1)) ;208 NB
+(assert (= @byte_controller_bit_controller_sda_chk    0b0)) ;209 NB
+[S] 114
+[P] 120
+
+[132] weight: 0 distance: 268435455
+(assert (= #byte_controller_bit_controller_c_state    0b00000010000000000)) ;210 CS
+(assert (= @byte_controller_bit_controller_c_state    0b00000100000000000)) ;211 NB
+(assert (= @byte_controller_bit_controller_scl_oen    0b1)) ;212 NB
+(assert (= @byte_controller_bit_controller_sda_oen    0b1)) ;213 NB
+(assert (= @byte_controller_bit_controller_sda_chk    0b0)) ;214 NB
+[S] 114
+[P] 131
+
+[133] weight: 0 distance: 268435455
+(assert (= #byte_controller_bit_controller_c_state    0b00000100000000000)) ;215 CS
+(assert (= @byte_controller_bit_controller_c_state    0b00001000000000000)) ;216 NB
+(assert (= @byte_controller_bit_controller_scl_oen    0b1)) ;217 NB
+(assert (= @byte_controller_bit_controller_sda_oen    0b1)) ;218 NB
+(assert (= @byte_controller_bit_controller_sda_chk    0b0)) ;219 NB
+[S] 114
+[P] 132
+
+[134] weight: 0 distance: 268435455
+(assert (= #byte_controller_bit_controller_c_state    0b00001000000000000)) ;220 CS
+(assert (= @byte_controller_bit_controller_c_state    0b00000000000000000)) ;221 NB
+(assert (= @byte_controller_bit_controller_cmd_ack    0b1)) ;222 NB
+(assert (= @byte_controller_bit_controller_scl_oen    0b0)) ;223 NB
+(assert (= @byte_controller_bit_controller_sda_oen    0b1)) ;224 NB
+(assert (= @byte_controller_bit_controller_sda_chk    0b0)) ;225 NB
+[S] 114
+[P] 133
+
+[135] weight: 0 distance: 268435455
+(assert (= #byte_controller_bit_controller_c_state    0b00010000000000000)) ;226 CS
+(assert (= @byte_controller_bit_controller_c_state    0b00100000000000000)) ;227 NB
+(assert (= @byte_controller_bit_controller_scl_oen    0b0)) ;228 NB
+(assert (= @byte_controller_bit_controller_sda_oen    #byte_controller_core_txd )) ;229 NB
+(assert (= @byte_controller_bit_controller_sda_chk    0b0)) ;230 NB
+[S] 114
+[P] 119
+
+[136] weight: 0 distance: 268435455
+(assert (= #byte_controller_bit_controller_c_state    0b00100000000000000)) ;231 CS
+(assert (= @byte_controller_bit_controller_c_state    0b01000000000000000)) ;232 NB
+(assert (= @byte_controller_bit_controller_scl_oen    0b1)) ;233 NB
+(assert (= @byte_controller_bit_controller_sda_oen    #byte_controller_core_txd )) ;234 NB
+(assert (= @byte_controller_bit_controller_sda_chk    0b1)) ;235 NB
+[S] 114
+[P] 135
+
+[137] weight: 0 distance: 268435455
+(assert (= #byte_controller_bit_controller_c_state    0b01000000000000000)) ;236 CS
+(assert (= @byte_controller_bit_controller_c_state    0b10000000000000000)) ;237 NB
+(assert (= @byte_controller_bit_controller_scl_oen    0b1)) ;238 NB
+(assert (= @byte_controller_bit_controller_sda_oen    #byte_controller_core_txd )) ;239 NB
+(assert (= @byte_controller_bit_controller_sda_chk    0b1)) ;240 NB
+[S] 114
+[P] 136
+
+[138] weight: 0 distance: 268435455
+(assert (= #byte_controller_bit_controller_c_state    0b10000000000000000)) ;241 CS
+(assert (= @byte_controller_bit_controller_c_state    0b00000000000000000)) ;242 NB
+(assert (= @byte_controller_bit_controller_cmd_ack    0b1)) ;243 NB
+(assert (= @byte_controller_bit_controller_scl_oen    0b0)) ;244 NB
+(assert (= @byte_controller_bit_controller_sda_oen    #byte_controller_core_txd )) ;245 NB
+(assert (= @byte_controller_bit_controller_sda_chk    0b0)) ;246 NB
+[S] 114
+[P] 137
+
+[139] weight: 1 distance: 268435455
+[S] 140 141
+[P] 142
+
+[140] weight: 0 distance: 268435455
+(assert (= (bv-not (bv-redor #rst_i ))   0b1)) ;247 BR
+(assert (= @byte_controller_sr    0b00000000)) ;249 NB
+[S] 142
+[P] 139
+
+[141] weight: 1 distance: 268435455
+(assert (= (bv-not (bv-redor #rst_i ))   0b0)) ;248 BR
+[S] 143 144
+[P] 139
+
+[142] weight: 0 distance: 268435455
+[P] 140 145
+
+[143] weight: 0 distance: 268435455
+(assert (= #byte_controller_ld    0b1)) ;250 BR
+(assert (= @byte_controller_sr    #txr )) ;252 NB
+[S] 145
+[P] 173 186
+
+[144] weight: 1 distance: 268435455
+(assert (= #byte_controller_ld    0b0)) ;251 BR
+[S] 146 147
+[P] 160 163 164
+
+[145] weight: 0 distance: 268435455
+[S] 142
+[P] 143 148
+
+[146] weight: 0 distance: 268435455
+(assert (= #byte_controller_shift    0b1)) ;253 BR
+(assert (= @byte_controller_sr    (bv-concat (bv-extract 6 0 #byte_controller_sr ) #byte_controller_bit_controller_dout ))) ;255 NB
+[S] 148
+[P] 192 200
+
+[147] weight: 0 distance: 268435455
+(assert (= #byte_controller_shift    0b0)) ;254 BR
+[S] 148
+[P] 160 163 164
+
+[148] weight: 0 distance: 268435455
+[S] 145
+[P] 146 147
+
+[149] weight: 1 distance: 268435455
+[S] 150 151
+[P] 152
+
+[150] weight: 0 distance: 268435455
+(assert (= (bv-not (bv-redor #rst_i ))   0b1)) ;256 BR
+(assert (= @byte_controller_dcnt    0b000)) ;258 NB
+[S] 152
+[P] 149
+
+[151] weight: 1 distance: 268435455
+(assert (= (bv-not (bv-redor #rst_i ))   0b0)) ;257 BR
+[S] 153 154
+[P] 149
+
+[152] weight: 0 distance: 268435455
+[P] 150 155
+
+[153] weight: 0 distance: 268435455
+(assert (= #byte_controller_ld    0b1)) ;259 BR
+(assert (= @byte_controller_dcnt    0b111)) ;261 NB
+[S] 155
+[P] 173 186
+
+[154] weight: 1 distance: 268435455
+(assert (= #byte_controller_ld    0b0)) ;260 BR
+[S] 156 157
+[P] 160 163 164
+
+[155] weight: 0 distance: 268435455
+[S] 152
+[P] 153 158
+
+[156] weight: 0 distance: 268435455
+(assert (= #byte_controller_shift    0b1)) ;262 BR
+(assert (= @byte_controller_dcnt    (bv-sub #byte_controller_dcnt  0b001))) ;264 NB
+[S] 158
+[P] 192 200
+
+[157] weight: 0 distance: 268435455
+(assert (= #byte_controller_shift    0b0)) ;263 BR
+[S] 158
+[P] 160 163 164
+
+[158] weight: 0 distance: 268435455
+[S] 155
+[P] 156 157
+
+[159] weight: 1 distance: 268435455
+[S] 160 161
+[P] 162
+
+[160] weight: 0 distance: 268435455
+(assert (= (bv-not (bv-redor #rst_i ))   0b1)) ;265 BR
+(assert (= @byte_controller_core_cmd    0b0000)) ;267 NB
+(assert (= @byte_controller_core_txd    0b0)) ;268 NB
+(assert (= @byte_controller_shift    0b0)) ;269 NB
+(assert (= @byte_controller_ld    0b0)) ;270 NB
+(assert (= @byte_controller_cmd_ack    0b0)) ;271 NB
+(assert (= @byte_controller_c_state    0b00000)) ;272 NB
+(assert (= @byte_controller_ack_out    0b0)) ;273 NB
+[S] 162
+[P] 159
+
+[161] weight: 1 distance: 268435455
+(assert (= (bv-not (bv-redor #rst_i ))   0b0)) ;266 BR
+[S] 163 164
+[P] 159
+
+[162] weight: 0 distance: 268435455
+[P] 160 165
+
+[163] weight: 0 distance: 268435455
+(assert (= #byte_controller_bit_controller_al    0b1)) ;274 BR
+(assert (= @byte_controller_core_cmd    0b0000)) ;276 NB
+(assert (= @byte_controller_core_txd    0b0)) ;277 NB
+(assert (= @byte_controller_shift    0b0)) ;278 NB
+(assert (= @byte_controller_ld    0b0)) ;279 NB
+(assert (= @byte_controller_cmd_ack    0b0)) ;280 NB
+(assert (= @byte_controller_c_state    0b00000)) ;281 NB
+(assert (= @byte_controller_ack_out    0b0)) ;282 NB
+[S] 165
+[P] 161
+
+[164] weight: 1 distance: 268435455
+(assert (= #byte_controller_bit_controller_al    0b0)) ;275 BR
+(assert (= @byte_controller_core_txd    (bv-extract 7 7 #byte_controller_sr ))) ;283 NB
+(assert (= @byte_controller_shift    0b0)) ;284 NB
+(assert (= @byte_controller_ld    0b0)) ;285 NB
+(assert (= @byte_controller_cmd_ack    0b0)) ;286 NB
+[S] 167 180 187 194 201 208
+[P] 161
+
+[165] weight: 0 distance: 268435455
+[S] 162
+[P] 163 166
+
+[166] weight: 0 distance: 268435455
+[S] 165
+[P] 211 170 183 190 197 204
+
+[167] weight: 1 distance: 268435455
+(assert (= #byte_controller_c_state    0b00000)) ;287 CS
+[S] 168 169
+[P] 209 160 163 206
+
+[168] weight: 1 distance: 268435455
+(assert (= (bv-and (bv-or (bv-or #rd  #wr ) #sto ) (bv-not #byte_controller_cmd_ack ))   0b1)) ;288 BR
+[S] 171 172
+[P] 167
+
+[169] weight: 0 distance: 268435455
+(assert (= (bv-and (bv-or (bv-or #rd  #wr ) #sto ) (bv-not #byte_controller_cmd_ack ))   0b0)) ;289 BR
+[S] 170
+[P] 167
+
+[170] weight: 0 distance: 268435455
+[S] 166
+[P] 169 173
+
+[171] weight: 0 distance: 268435455
+(assert (= #sta    0b1)) ;290 BR
+(assert (= @byte_controller_c_state    0b00001)) ;292 NB
+(assert (= @byte_controller_core_cmd    0b0001)) ;293 NB
+[S] 173
+[P] 168
+
+[172] weight: 1 distance: 268435455
+(assert (= #sta    0b0)) ;291 BR
+[S] 174 175
+[P] 168
+
+[173] weight: 0 distance: 268435455
+(assert (= @byte_controller_ld    0b1)) ;304 NB
+[S] 170
+[P] 171 176
+
+[174] weight: 0 distance: 268435455
+(assert (= #rd    0b1)) ;294 BR
+(assert (= @byte_controller_c_state    0b00010)) ;296 NB
+(assert (= @byte_controller_core_cmd    0b1000)) ;297 NB
+[S] 176
+[P] 172
+
+[175] weight: 1 distance: 268435455
+(assert (= #rd    0b0)) ;295 BR
+[S] 177 178
+[P] 172
+
+[176] weight: 0 distance: 268435455
+[S] 173
+[P] 174 179
+
+[177] weight: 0 distance: 268435455
+(assert (= #wr    0b1)) ;298 BR
+(assert (= @byte_controller_c_state    0b00100)) ;300 NB
+(assert (= @byte_controller_core_cmd    0b0100)) ;301 NB
+[S] 179
+[P] 175
+
+[178] weight: 0 distance: 268435455
+(assert (= #wr    0b0)) ;299 BR
+(assert (= @byte_controller_c_state    0b10000)) ;302 NB
+(assert (= @byte_controller_core_cmd    0b0010)) ;303 NB
+[S] 179
+[P] 175
+
+[179] weight: 0 distance: 268435455
+[S] 176
+[P] 177 178
+
+[180] weight: 1 distance: 268435455
+(assert (= #byte_controller_c_state    0b00001)) ;305 CS
+[S] 181 182
+[P] 171
+
+[181] weight: 1 distance: 268435455
+(assert (= #byte_controller_bit_controller_cmd_ack    0b1)) ;306 BR
+[S] 184 185
+[P] 126 130 134 138
+
+[182] weight: 0 distance: 268435455
+(assert (= #byte_controller_bit_controller_cmd_ack    0b0)) ;307 BR
+[S] 183
+[P] 105 108 109
+
+[183] weight: 0 distance: 268435455
+[S] 166
+[P] 182 186
+
+[184] weight: 0 distance: 268435455
+(assert (= #rd    0b1)) ;308 BR
+(assert (= @byte_controller_c_state    0b00010)) ;310 NB
+(assert (= @byte_controller_core_cmd    0b1000)) ;311 NB
+[S] 186
+[P] 181
+
+[185] weight: 0 distance: 268435455
+(assert (= #rd    0b0)) ;309 BR
+(assert (= @byte_controller_c_state    0b00100)) ;312 NB
+(assert (= @byte_controller_core_cmd    0b0100)) ;313 NB
+[S] 186
+[P] 181
+
+[186] weight: 0 distance: 268435455
+(assert (= @byte_controller_ld    0b1)) ;314 NB
+[S] 183
+[P] 184 185
+
+[187] weight: 1 distance: 268435455
+(assert (= #byte_controller_c_state    0b00100)) ;315 CS
+[S] 188 189
+[P] 177 185 192
+
+[188] weight: 1 distance: 268435455
+(assert (= #byte_controller_bit_controller_cmd_ack    0b1)) ;316 BR
+[S] 191 192
+[P] 126 130 134 138
+
+[189] weight: 0 distance: 268435455
+(assert (= #byte_controller_bit_controller_cmd_ack    0b0)) ;317 BR
+[S] 190
+[P] 105 108 109
+
+[190] weight: 0 distance: 268435455
+[S] 166
+[P] 189 193
+
+[191] weight: 0 distance: 268435455
+(assert (= (bv-not (bv-redor #byte_controller_dcnt ))   0b1)) ;318 BR
+(assert (= @byte_controller_c_state    0b01000)) ;320 NB
+(assert (= @byte_controller_core_cmd    0b1000)) ;321 NB
+[S] 193
+[P] 188
+
+[192] weight: 0 distance: 268435455
+(assert (= (bv-not (bv-redor #byte_controller_dcnt ))   0b0)) ;319 BR
+(assert (= @byte_controller_c_state    0b00100)) ;322 NB
+(assert (= @byte_controller_core_cmd    0b0100)) ;323 NB
+(assert (= @byte_controller_shift    0b1)) ;324 NB
+[S] 193
+[P] 188
+
+[193] weight: 0 distance: 268435455
+[S] 190
+[P] 191 192
+
+[194] weight: 1 distance: 268435455
+(assert (= #byte_controller_c_state    0b00010)) ;325 CS
+[S] 195 196
+[P] 174 184 199
+
+[195] weight: 1 distance: 268435455
+(assert (= #byte_controller_bit_controller_cmd_ack    0b1)) ;326 BR
+[S] 198 199
+[P] 126 130 134 138
+
+[196] weight: 0 distance: 268435455
+(assert (= #byte_controller_bit_controller_cmd_ack    0b0)) ;327 BR
+[S] 197
+[P] 105 108 109
+
+[197] weight: 0 distance: 268435455
+[S] 166
+[P] 196 200
+
+[198] weight: 0 distance: 268435455
+(assert (= (bv-not (bv-redor #byte_controller_dcnt ))   0b1)) ;328 BR
+(assert (= @byte_controller_c_state    0b01000)) ;330 NB
+(assert (= @byte_controller_core_cmd    0b0100)) ;331 NB
+[S] 200
+[P] 195
+
+[199] weight: 0 distance: 268435455
+(assert (= (bv-not (bv-redor #byte_controller_dcnt ))   0b0)) ;329 BR
+(assert (= @byte_controller_c_state    0b00010)) ;332 NB
+(assert (= @byte_controller_core_cmd    0b1000)) ;333 NB
+[S] 200
+[P] 195
+
+[200] weight: 0 distance: 268435455
+(assert (= @byte_controller_shift    0b1)) ;334 NB
+(assert (= @byte_controller_core_txd    #ack )) ;335 NB
+[S] 197
+[P] 198 199
+
+[201] weight: 1 distance: 268435455
+(assert (= #byte_controller_c_state    0b01000)) ;336 CS
+[S] 202 203
+[P] 191 198
+
+[202] weight: 1 distance: 268435455
+(assert (= #byte_controller_bit_controller_cmd_ack    0b1)) ;337 BR
+[S] 205 206
+[P] 126 130 134 138
+
+[203] weight: 0 distance: 268435455
+(assert (= #byte_controller_bit_controller_cmd_ack    0b0)) ;338 BR
+(assert (= @byte_controller_core_txd    #ack )) ;348 NB
+[S] 204
+[P] 105 108 109
+
+[204] weight: 0 distance: 268435455
+[S] 166
+[P] 203 207
+
+[205] weight: 0 distance: 268435455
+(assert (= #sto    0b1)) ;339 BR
+(assert (= @byte_controller_c_state    0b10000)) ;341 NB
+(assert (= @byte_controller_core_cmd    0b0010)) ;342 NB
+[S] 207
+[P] 202
+
+[206] weight: 0 distance: 268435455
+(assert (= #sto    0b0)) ;340 BR
+(assert (= @byte_controller_c_state    0b00000)) ;343 NB
+(assert (= @byte_controller_core_cmd    0b0000)) ;344 NB
+(assert (= @byte_controller_cmd_ack    0b1)) ;345 NB
+[S] 207
+[P] 202
+
+[207] weight: 0 distance: 268435455
+(assert (= @byte_controller_ack_out    #byte_controller_bit_controller_dout )) ;346 NB
+(assert (= @byte_controller_core_txd    0b1)) ;347 NB
+[S] 204
+[P] 205 206
+
+[208] weight: 1 distance: 268435455
+(assert (= #byte_controller_c_state    0b10000)) ;349 CS
+[S] 209 210
+[P] 178 205
+
+[209] weight: 0 distance: 268435455
+(assert (= #byte_controller_bit_controller_cmd_ack    0b1)) ;350 BR
+(assert (= @byte_controller_c_state    0b00000)) ;352 NB
+(assert (= @byte_controller_core_cmd    0b0000)) ;353 NB
+(assert (= @byte_controller_cmd_ack    0b1)) ;354 NB
+[S] 211
+[P] 126 130 134 138
+
+[210] weight: 0 distance: 268435455
+(assert (= #byte_controller_bit_controller_cmd_ack    0b0)) ;351 BR
+[S] 211
+[P] 105 108 109
+
+[211] weight: 0 distance: 268435455
+[S] 166
+[P] 209 210
+
+*/
+
+//state variables: byte_controller_bit_controller_c_state byte_controller_bit_controller_clk_en byte_controller_bit_controller_cmd_ack byte_controller_bit_controller_scl_o byte_controller_bit_controller_sda_chk byte_controller_bit_controller_sda_o byte_controller_c_state byte_controller_cmd_ack byte_controller_core_cmd byte_controller_ld byte_controller_shift scl_pad_o sda_pad_o
+

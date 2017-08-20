@@ -416,6 +416,7 @@ public:
 	static void yices_insert_reg_init(context_t * ctx);
 	static void free_connected_cnst();
 	static void print_state_variables(std::ofstream &out);
+	static void update_state_variables();
     static void set_input_version(uint version);
 };
 
@@ -453,6 +454,7 @@ public:
     SMTBasicBlock* top_bb;
 	static SMTProcess* curr_proc;
     void add_assign(SMTAssign* assign);
+	void add_to_sensitivity(SMTExpr* expr);
     
     //Update sensitivity and dependency list for always @* blocks
     void update_sensitivity_list(SMTExpr* rval);

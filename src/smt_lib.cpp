@@ -1323,17 +1323,19 @@ void SMTSigCore::free_connected_cnst() {
 }
 
 void SMTSigCore::print_state_variables(ofstream &out) {
-	//first update state variables
-	for(auto it:regDir){
-		if(it.second->is_state_variable){
-			state_variables.push_back(it.second);
-		}
-	}
 	out << "//state variables:";
 	for(auto it:state_variables){
         out << ' ' << it->name;
 	}
     out << "\n\n";
+}
+
+void SMTSigCore::update_state_variables() {
+	for(auto it:regDir){
+		if(it.second->is_state_variable){
+			state_variables.push_back(it.second);
+		}
+	}
 }
 
 void SMTSigCore::set_input_version(uint version) {
@@ -1415,6 +1417,19 @@ void SMTProcess::add_assign(SMTAssign* assign) {
         sig_assign_blocks.insert(top_bb);
     }
     assign->block = top_bb;
+}
+
+void SMTProcess::add_to_sensitivity(SMTExpr* expr) {
+	SMTSignal* sig = dynamic_cast<SMTSignal*>(expr);
+	if(sig){
+		sensitivity_list.insert(sig->parent);
+		sig->parent->dependent_process.push_back(this);
+	}
+	else{
+		for(auto it:expr->exprList){
+			add_to_sensitivity(it);
+		}
+	}
 }
 
 void SMTProcess::update_sensitivity_list(SMTExpr* rval) {

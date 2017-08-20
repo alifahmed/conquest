@@ -1,10 +1,9 @@
-//state variables: ackout cc_mux enable_count state uscite
-
 /*
-[1] weight: 1 distance: 268435455
+[1] weight: 1 distance: 5
 [S] 2 3
+[P] 4
 
-[2] weight: 0 distance: 268435455
+[2] weight: 0 distance: 4
 (assert (= (bv-comp #reset  0b1)   0b1)) ;0 BR
 (assert (= @state    0b000)) ;2 NB
 (assert (= @cc_mux    0b00)) ;3 NB
@@ -19,7 +18,7 @@
 [S] 5 6
 [P] 1
 
-[4] weight: 0 distance: 268435455
+[4] weight: 0 distance: 5
 [P] 2 8
 
 [5] weight: 0 distance: 268435455
@@ -40,24 +39,24 @@
 [S] 9 10 14 30 18 22 26
 [P] 5 6
 
-[8] weight: 0 distance: 268435455
+[8] weight: 0 distance: 5
 [S] 4
 [P] 9 13 17 21 25 29 33
 
-[9] weight: 0 distance: 268435455
+[9] weight: 0 distance: 4
 (assert (= #state    0b000)) ;13 CS
 (assert (= @cc_mux    0b01)) ;14 NB
 (assert (= @uscite    0b01)) ;15 NB
 (assert (= @state    0b001)) ;16 NB
 [S] 8
-[P] 7
+[P] 2
 
-[10] weight: 1 distance: 268435455
+[10] weight: 1 distance: 4
 (assert (= #state    0b001)) ;17 CS
 [S] 11 12
-[P] 7
+[P] 9 16 24 32
 
-[11] weight: 0 distance: 268435455
+[11] weight: 0 distance: 5
 (assert (= (bv-comp #eql  0b1)   0b1)) ;18 BR
 (assert (= @uscite    0b00)) ;20 NB
 (assert (= @cc_mux    0b11)) ;21 NB
@@ -65,7 +64,7 @@
 [S] 13
 [P] 10
 
-[12] weight: 0 distance: 268435455
+[12] weight: 0 distance: 3
 (assert (= (bv-comp #eql  0b1)   0b0)) ;19 BR
 (assert (= @uscite    0b01)) ;23 NB
 (assert (= @cc_mux    0b10)) ;24 NB
@@ -73,16 +72,16 @@
 [S] 13
 [P] 10
 
-[13] weight: 0 distance: 268435455
+[13] weight: 0 distance: 5
 [S] 8
 [P] 11 12
 
-[14] weight: 1 distance: 268435455
+[14] weight: 1 distance: 3
 (assert (= #state    0b101)) ;26 CS
 [S] 15 16
-[P] 7
+[P] 12
 
-[15] weight: 0 distance: 268435455
+[15] weight: 0 distance: 2
 (assert (= (bv-comp #eql  0b1)   0b1)) ;27 BR
 (assert (= @uscite    0b00)) ;29 NB
 (assert (= @cc_mux    0b11)) ;30 NB
@@ -90,7 +89,7 @@
 [S] 17
 [P] 14
 
-[16] weight: 0 distance: 268435455
+[16] weight: 0 distance: 4
 (assert (= (bv-comp #eql  0b1)   0b0)) ;28 BR
 (assert (= @uscite    0b01)) ;32 NB
 (assert (= @cc_mux    0b01)) ;33 NB
@@ -98,16 +97,16 @@
 [S] 17
 [P] 14
 
-[17] weight: 0 distance: 268435455
+[17] weight: 0 distance: 5
 [S] 8
 [P] 15 16
 
-[18] weight: 1 distance: 268435455
+[18] weight: 1 distance: 6
 (assert (= #state    0b010)) ;35 CS
 [S] 19 20
-[P] 7
+[P] 11 19
 
-[19] weight: 0 distance: 268435455
+[19] weight: 0 distance: 5
 (assert (= (bv-comp #eql  0b1)   0b1)) ;36 BR
 (assert (= @uscite    0b00)) ;38 NB
 (assert (= @cc_mux    0b11)) ;39 NB
@@ -115,7 +114,7 @@
 [S] 21
 [P] 18
 
-[20] weight: 0 distance: 268435455
+[20] weight: 0 distance: 5
 (assert (= (bv-comp #eql  0b1)   0b0)) ;37 BR
 (assert (= @uscite    0b01)) ;41 NB
 (assert (= @ackout    0b1)) ;42 NB
@@ -125,16 +124,16 @@
 [S] 21
 [P] 18
 
-[21] weight: 0 distance: 268435455
+[21] weight: 0 distance: 5
 [S] 8
 [P] 19 20
 
-[22] weight: 1 distance: 268435455
+[22] weight: 1 distance: 5
 (assert (= #state    0b011)) ;46 CS
 [S] 23 24
-[P] 7
+[P] 23 20
 
-[23] weight: 0 distance: 268435455
+[23] weight: 0 distance: 5
 (assert (= (bv-comp #eql  0b1)   0b1)) ;47 BR
 (assert (= @uscite    0b01)) ;49 NB
 (assert (= @cc_mux    0b01)) ;50 NB
@@ -142,7 +141,7 @@
 [S] 25
 [P] 22
 
-[24] weight: 0 distance: 268435455
+[24] weight: 0 distance: 4
 (assert (= (bv-comp #eql  0b1)   0b0)) ;48 BR
 (assert (= @uscite    0b01)) ;52 NB
 (assert (= @cc_mux    0b01)) ;53 NB
@@ -150,16 +149,16 @@
 [S] 25
 [P] 22
 
-[25] weight: 0 distance: 268435455
+[25] weight: 0 distance: 5
 [S] 8
 [P] 23 24
 
-[26] weight: 1 distance: 268435455
+[26] weight: 1 distance: 2
 (assert (= #state    0b100)) ;55 CS
 [S] 27 28
-[P] 7
+[P] 15 27
 
-[27] weight: 0 distance: 268435455
+[27] weight: 0 distance: 2
 (assert (= (bv-comp #eql  0b1)   0b1)) ;56 BR
 (assert (= @uscite    0b00)) ;58 NB
 (assert (= @cc_mux    0b11)) ;59 NB
@@ -167,7 +166,7 @@
 [S] 29
 [P] 26
 
-[28] weight: 0 distance: 268435455
+[28] weight: 0 distance: 1
 (assert (= (bv-comp #eql  0b1)   0b0)) ;57 BR
 (assert (= @uscite    0b11)) ;61 NB
 (assert (= @cc_mux    0b10)) ;62 NB
@@ -175,16 +174,16 @@
 [S] 29
 [P] 26
 
-[29] weight: 0 distance: 268435455
+[29] weight: 0 distance: 5
 [S] 8
 [P] 27 28
 
-[30] weight: 1 distance: 268435455
+[30] weight: 1 distance: 1
 (assert (= #state    0b110)) ;64 CS
 [S] 31 32
-[P] 7
+[P] 28 31
 
-[31] weight: 0 distance: 268435455
+[31] weight: 0 distance: 0
 (assert (= (bv-comp #eql  0b1)   0b1)) ;65 BR
 (assert (= @uscite    0b11)) ;67 NB
 (assert (= @cc_mux    0b10)) ;68 NB
@@ -192,7 +191,7 @@
 [S] 33
 [P] 30
 
-[32] weight: 0 distance: 268435455
+[32] weight: 0 distance: 4
 (assert (= (bv-comp #eql  0b1)   0b0)) ;66 BR
 (assert (= @uscite    0b01)) ;70 NB
 (assert (= @cc_mux    0b01)) ;71 NB
@@ -200,9 +199,11 @@
 [S] 33
 [P] 30
 
-[33] weight: 0 distance: 268435455
+[33] weight: 0 distance: 5
 [S] 8
 [P] 31 32
 
 */
+
+//state variables: ackout cc_mux enable_count state uscite
 

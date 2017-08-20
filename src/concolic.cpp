@@ -82,10 +82,7 @@ void post_processing(ivl_design_t design){
     fclose(g_out);
     g_out = NULL;
     
-    ofstream out("cfg_info.txt");
-	SMTSigCore::print_state_variables(out);
-    SMTBasicBlock::print_all(out);
-    out.close();
+	SMTSigCore::update_state_variables();
     
     //Make all SMTProcess circular
     SMTProcess::make_circular();
@@ -116,6 +113,11 @@ void extract_parameters(ivl_design_t design){
     if(g_reset_edge_active == NULL){
         error("Reset edge not given");
     }
+	
+	const char* bid = ivl_design_flag(design, "bid");
+	if((bid != NULL) && strcmp(bid, "")){
+		g_branch_id = atoi(bid);
+	}
 }
 
 void generate_tb(ivl_scope_t root){
