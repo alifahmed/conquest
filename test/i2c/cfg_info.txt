@@ -134,7 +134,7 @@
 
 [33] weight: 0 distance: 268435455
 [S] 30
-[P] 32 34
+[P] 34 32
 
 [34] weight: 0 distance: 268435455
 [S] 33

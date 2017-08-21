@@ -765,7 +765,6 @@ SMTBranch::SMTBranch(SMTBranchNode* _parent_node, SMTBranchType type,
 	covered_any_clock = false;
 	k_permit_covered = 0;
 	all_branches_list.push_back(this);
-	last_selected_clock = 0x8FFFFFFF;
 	is_dep = true;
 }
 
@@ -792,10 +791,6 @@ void SMTBranch::set_covered_clk(uint sim_num, uint clock) {
 
 void SMTBranch::clear_covered_clk(uint clock) {
     coverage[clock] = false;
-}
-
-void SMTBranch::clear_flag() {
-	parent_node->clear_flag();
 }
 
 void SMTBranch::update_distance() {
@@ -850,12 +845,6 @@ SMTBranch* SMTBranch::create_default_branch(SMTBranchNode* parent) {
     }
     
 	return new SMTBranch(parent, SMT_BRANCH_CASE, smt_and, new SMTCust("true"));
-}
-
-void SMTBranch::clear_last_selected_clocks() {
-	for(auto it:all_branches_list){
-		it->last_selected_clock = 0x8FFFFFFF;
-	}
 }
 
 void SMTBranch::clear_k_permit() {
@@ -941,11 +930,6 @@ void SMTBranch::update_fsm() {
 
 //-------------------------SMT Branch Node--------------------------------------
 SMTBranchNode::SMTBranchNode() {
-    curr_check_idx = 0;
-}
-
-void SMTBranchNode::clear_flag() {
-	curr_check_idx = 0;
 }
 
 //-------------------------SMT Branch Case--------------------------------------
@@ -1050,6 +1034,7 @@ SMTSigCore::SMTSigCore(ivl_signal_t sig){
 
     //create zero term
     init_term = yices_eq(term_stack[0], yices_bvconst_zero(width));
+	version_at_clock.resize(g_unroll + 2);
 }
 
 SMTSigCore::~SMTSigCore() {
@@ -1095,7 +1080,6 @@ void SMTSigCore::clear_all_versions() {
     for(auto it:reg_list){
         it->curr_version = 0;
         it->next_version = 0;
-		it->version_at_clock.clear();
     }
     for(auto it:input_list){
         it->curr_version = 0;
@@ -1107,10 +1091,10 @@ void SMTSigCore::commit() {
     curr_version = next_version;
 }
 
-void SMTSigCore::commit_versions() {
+void SMTSigCore::commit_versions(uint clock) {
 	for(auto it:reg_list){
 		it->commit();
-		it->version_at_clock.push_back(it->curr_version);
+		it->version_at_clock[clock] = it->curr_version;
 	}
 }
 

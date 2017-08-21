@@ -39,13 +39,9 @@ static char mem_file_name[64];
 static uint hash_table[1024*16];
 static uint sim_num;
 FILE* f_dbg;
-uint total_constraints_before = 0;
-uint total_constraints_after = 0;
-static vector<constraint_t*> dumped_cnsts;
 
 static SMTBranch* selected_branch;
 static uint selected_clock;
-static uint selected_idx = 0;
 
 static inline void compile() {
     string cmd = "iverilog " + string(g_output_file) + " " + \
@@ -59,6 +55,8 @@ static constraint_t* create_clock(uint clock){
 	cnst->clock = clock;
 	cnst->obj = NULL;
     cnst->hash_value = 0;
+	cnst->index = 0;
+	cnst->yices_term = -1;
     return cnst;
 }
 
@@ -76,7 +74,6 @@ static constraint_t* create_constraint(uint clock, SMTAssign* assign){
 	cnst->obj = assign;
 	cnst->index = constraints_stack.size();
     cnst->yices_term = assign->update_term();
-    cnst->yices_term_lval = assign->lval->yices_term;
     if(cnst->yices_term <= 0){
         yices_print_error(stdout);
         error("Term evaluation failed at assign id: %u", assign->id);
@@ -116,13 +113,12 @@ static void build_stack() {
 			if(clock == g_unroll + 1)	break;
 			constraints_stack.push_back(create_clock(clock));
             SMTSigCore::set_input_version(clock);
-            SMTSigCore::commit_versions();
+            SMTSigCore::commit_versions(clock);
 		}
 		else if (strcmp(tag, ";A") == 0){
 			SMTAssign* assign = SMTAssign::get_assign(val);
 			constraints_stack.push_back(create_constraint(clock, assign));
 		}
-		total_constraints_after++;
 	}
 
 	fclose(f_test);
@@ -238,6 +234,11 @@ bool compare_dist(br_cnst_t* a, br_cnst_t* b){
 	return a->br->block->distance < b->br->block->distance;
 }
 
+static void update_path_taken(br_cnst_t* alt_path){
+    uint alt_path_hash = alt_path->cnst->hash_value + hash_table[alt_path->br->id % 16384]*alt_path->cnst->index;
+	path_hash_map.insert(alt_path_hash);
+}
+
 static bool is_path_taken(br_cnst_t* alt_path){
     uint alt_path_hash = alt_path->cnst->hash_value + hash_table[alt_path->br->id % 16384]*alt_path->cnst->index;
     return path_hash_map.find(alt_path_hash) != path_hash_map.end();
@@ -327,9 +328,10 @@ static bool find_next_cfg(){
 		if(solve_constraints(clock)){
 			selected_branch = it->br;
 			selected_clock = clock;
-			selected_idx = constraints_stack.size();
 			selected_branch->k_permit_covered++;
 			selected_branch->block->distance++;
+			//insert hash value even if potentially incorrect
+			update_path_taken(it);
 			if(!enable_error_check){
 				it->br->set_covered_clk(sim_num+1, clock);
 			}
@@ -414,18 +416,12 @@ static bool concolic_iteration(uint sim_num) {
 void start_concolic() {
     freopen("/dev/null", "w", stderr);
 	init();
-	SMTBranch::save_coverage();
 	if(!enable_all_target){
 		SMTAssign* assign = SMTAssign::get_assign(g_branch_id);
 		if(assign->assign_type == SMT_ASSIGN_BRANCH){
 			copy_file(g_data_mem_raw, g_data_mem);
 			target_branch = dynamic_cast<SMTBranch*>(assign);
 			assert(target_branch);
-			target_branch->k_permit_covered = 0;
-			SMTBasicBlock::reset_distances();
-			SMTBranch::clear_coverage(0);
-			SMTBranch::restore_coverage();
-			path_hash_map.clear();
 			target_branch->update_distance();
 			ofstream out("cfg_info.txt");
 			SMTBasicBlock::print_all(out);
@@ -447,6 +443,7 @@ void start_concolic() {
 			printf("Selected id is not of a branch...");
 		}
 	} else{
+		SMTBranch::save_coverage();
 		if(search_algo == SEARCH_ALGO_CFG_DIRECTED){
 			const uint count = SMTAssign::get_assign_count();
 			ofstream report("report_cov.log");
@@ -517,8 +514,6 @@ void end_concolic(){
 	printf("[TIME] %.2lf sec\n", (end_time - start_time)/double(CLOCKS_PER_SEC));
     printf("[ITER] %u\n", sim_num);
     printf("[SOLVER CALL] %u\n", call_to_solver);
-	printf("[CNST BEFORE] %u\n", total_constraints_before);
-	printf("[CNST AFTER] %u\n", total_constraints_after);
 	
     yices_free_context(yices_context);
     yices_exit();

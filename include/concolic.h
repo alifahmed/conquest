@@ -60,7 +60,6 @@ extern void emit_string(const char *string);
 extern void SMTFreeAll();
 extern uint get_indent(void);
 extern void end_concolic();
-extern void create_context(std::vector<uint> &cntx);
 
 /*
  * Find the enclosing module scope.

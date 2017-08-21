@@ -1,9 +1,9 @@
 /*
-[1] weight: 1 distance: 4
+[1] weight: 1 distance: 5
 [S] 2 3
 [P] 4
 
-[2] weight: 0 distance: 3
+[2] weight: 0 distance: 4
 (assert (= (bv-comp reset  0b1)   0b1)) ;0
 (assert (= state    0b000)) ;2
 (assert (= cc_mux    0b00)) ;3
@@ -18,7 +18,7 @@
 [S] 5 6
 [P] 1
 
-[4] weight: 0 distance: 4
+[4] weight: 0 distance: 5
 [P] 2 8
 
 [5] weight: 0 distance: 268435455
@@ -39,11 +39,11 @@
 [S] 9 10 14 30 18 22 26
 [P] 5 6
 
-[8] weight: 0 distance: 4
+[8] weight: 0 distance: 5
 [S] 4
 [P] 9 13 17 21 25 29 33
 
-[9] weight: 0 distance: 3
+[9] weight: 0 distance: 4
 (assert (= state    0b000)) ;13
 (assert (= cc_mux    0b01)) ;14
 (assert (= uscite    0b01)) ;15
@@ -51,12 +51,12 @@
 [S] 8
 [P] 2
 
-[10] weight: 1 distance: 3
+[10] weight: 1 distance: 4
 (assert (= state    0b001)) ;17
 [S] 11 12
 [P] 9 16 24 32
 
-[11] weight: 0 distance: 4
+[11] weight: 0 distance: 5
 (assert (= (bv-comp eql  0b1)   0b1)) ;18
 (assert (= uscite    0b00)) ;20
 (assert (= cc_mux    0b11)) ;21
@@ -64,7 +64,7 @@
 [S] 13
 [P] 10
 
-[12] weight: 0 distance: 2
+[12] weight: 0 distance: 3
 (assert (= (bv-comp eql  0b1)   0b0)) ;19
 (assert (= uscite    0b01)) ;23
 (assert (= cc_mux    0b10)) ;24
@@ -72,16 +72,16 @@
 [S] 13
 [P] 10
 
-[13] weight: 0 distance: 4
+[13] weight: 0 distance: 5
 [S] 8
 [P] 11 12
 
-[14] weight: 1 distance: 2
+[14] weight: 1 distance: 3
 (assert (= state    0b101)) ;26
 [S] 15 16
 [P] 12
 
-[15] weight: 0 distance: 1
+[15] weight: 0 distance: 2
 (assert (= (bv-comp eql  0b1)   0b1)) ;27
 (assert (= uscite    0b00)) ;29
 (assert (= cc_mux    0b11)) ;30
@@ -89,7 +89,7 @@
 [S] 17
 [P] 14
 
-[16] weight: 0 distance: 3
+[16] weight: 0 distance: 4
 (assert (= (bv-comp eql  0b1)   0b0)) ;28
 (assert (= uscite    0b01)) ;32
 (assert (= cc_mux    0b01)) ;33
@@ -97,16 +97,16 @@
 [S] 17
 [P] 14
 
-[17] weight: 0 distance: 4
+[17] weight: 0 distance: 5
 [S] 8
 [P] 15 16
 
-[18] weight: 1 distance: 5
+[18] weight: 1 distance: 6
 (assert (= state    0b010)) ;35
 [S] 19 20
 [P] 11 19
 
-[19] weight: 0 distance: 4
+[19] weight: 0 distance: 5
 (assert (= (bv-comp eql  0b1)   0b1)) ;36
 (assert (= uscite    0b00)) ;38
 (assert (= cc_mux    0b11)) ;39
@@ -114,7 +114,7 @@
 [S] 21
 [P] 18
 
-[20] weight: 0 distance: 4
+[20] weight: 0 distance: 5
 (assert (= (bv-comp eql  0b1)   0b0)) ;37
 (assert (= uscite    0b01)) ;41
 (assert (= ackout    0b1)) ;42
@@ -124,16 +124,16 @@
 [S] 21
 [P] 18
 
-[21] weight: 0 distance: 4
+[21] weight: 0 distance: 5
 [S] 8
 [P] 19 20
 
-[22] weight: 1 distance: 4
+[22] weight: 1 distance: 5
 (assert (= state    0b011)) ;46
 [S] 23 24
 [P] 23 20
 
-[23] weight: 0 distance: 4
+[23] weight: 0 distance: 5
 (assert (= (bv-comp eql  0b1)   0b1)) ;47
 (assert (= uscite    0b01)) ;49
 (assert (= cc_mux    0b01)) ;50
@@ -141,7 +141,7 @@
 [S] 25
 [P] 22
 
-[24] weight: 0 distance: 3
+[24] weight: 0 distance: 4
 (assert (= (bv-comp eql  0b1)   0b0)) ;48
 (assert (= uscite    0b01)) ;52
 (assert (= cc_mux    0b01)) ;53
@@ -149,16 +149,16 @@
 [S] 25
 [P] 22
 
-[25] weight: 0 distance: 4
+[25] weight: 0 distance: 5
 [S] 8
 [P] 23 24
 
-[26] weight: 1 distance: 1
+[26] weight: 1 distance: 2
 (assert (= state    0b100)) ;55
 [S] 27 28
 [P] 15 27
 
-[27] weight: 0 distance: 1
+[27] weight: 0 distance: 2
 (assert (= (bv-comp eql  0b1)   0b1)) ;56
 (assert (= uscite    0b00)) ;58
 (assert (= cc_mux    0b11)) ;59
@@ -166,7 +166,7 @@
 [S] 29
 [P] 26
 
-[28] weight: 0 distance: 0
+[28] weight: 0 distance: 1
 (assert (= (bv-comp eql  0b1)   0b0)) ;57
 (assert (= uscite    0b11)) ;61
 (assert (= cc_mux    0b10)) ;62
@@ -174,16 +174,16 @@
 [S] 29
 [P] 26
 
-[29] weight: 0 distance: 4
+[29] weight: 0 distance: 5
 [S] 8
 [P] 27 28
 
-[30] weight: 1 distance: 0
+[30] weight: 1 distance: 1
 (assert (= state    0b110)) ;64
 [S] 31 32
 [P] 28 31
 
-[31] weight: 0 distance: 0
+[31] weight: 0 distance: 1
 (assert (= (bv-comp eql  0b1)   0b1)) ;65
 (assert (= uscite    0b11)) ;67
 (assert (= cc_mux    0b10)) ;68
@@ -191,7 +191,7 @@
 [S] 33
 [P] 30
 
-[32] weight: 0 distance: 3
+[32] weight: 0 distance: 0
 (assert (= (bv-comp eql  0b1)   0b0)) ;66
 (assert (= uscite    0b01)) ;70
 (assert (= cc_mux    0b01)) ;71
@@ -199,7 +199,7 @@
 [S] 33
 [P] 30
 
-[33] weight: 0 distance: 4
+[33] weight: 0 distance: 5
 [S] 8
 [P] 31 32
 

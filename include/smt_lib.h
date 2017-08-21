@@ -72,7 +72,6 @@ typedef struct constraint_t{
 	uint clock;
 	SMTAssign* obj;
 	term_t yices_term;
-	term_t yices_term_lval;
 	uint index;
     uint hash_value;
 }constraint_t;
@@ -189,16 +188,13 @@ public:
 	SMTBranchNode*  parent_node;
     std::set<SMTBranch*> prev_branches;
 	uint k_permit_covered;
-	uint last_selected_clock;
 	bool is_dep;
-	//SMTBasicBlock* block;
 	
 	virtual ~SMTBranch();
 	
 	bool is_covered_clk(uint clock);
 	void set_covered_clk(uint sim_num, uint clock);
     void clear_covered_clk(uint clock);
-	void clear_flag();
     void update_distance();
 	term_t update_term() override;
 	void instrument() override;
@@ -208,7 +204,6 @@ public:
 	static SMTBranch* create_false_branch(SMTBranchNode* parent);
 	static SMTBranch* create_case_branch(SMTBranchNode* parent, SMTExpr* case_expr);
 	static SMTBranch* create_default_branch(SMTBranchNode* parent);
-	static void clear_last_selected_clocks();
 	static void clear_k_permit();
     static void clear_coverage(uint min_clock);
 	static void save_coverage();
@@ -220,18 +215,11 @@ public:
 
 //-------------------------SMT Branch Node--------------------------------------
 class SMTBranchNode{
-private:
-	uint curr_check_idx;
-	
 public:
     SMTBranchNode();
     std::vector<SMTBranch*> branch_list;
     SMTExpr* cond;
     uint cond_width;
-    constraint_t* mult_last_node;
-    uint mult_last_id = 0xFFFFFFFF;
-    
-	void clear_flag();
 };
 
 
@@ -370,7 +358,7 @@ public:
     static void free_all();
     static SMTSigCore* get_parent(ivl_signal_t sig);
     static void clear_all_versions();
-    static void commit_versions();
+    static void commit_versions(uint clock);
 	static void restore_versions(uint clock);
 	static void update_is_dep();
 	static void yices_insert_reg_init(context_t * ctx);
