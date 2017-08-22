@@ -438,4 +438,5 @@ private:
     void print_assigns(std::ofstream &out);
     static uint id_counter;
     static std::vector<SMTBasicBlock*> block_list;
+	const static uint initial_distance = 10;
 };

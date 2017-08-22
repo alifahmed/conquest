@@ -1317,7 +1317,7 @@ SMTBasicBlock::SMTBasicBlock() : id(id_counter) {
     id_counter++;
     block_list.push_back(this);
 	weight = 0;
-	distance = 0xFFFFFFF;
+	distance = initial_distance;
 }
 
 /*SMTBasicBlock::SMTBasicBlock(SMTBasicBlock& obj) : id(id_counter) {
@@ -1380,7 +1380,7 @@ void SMTBasicBlock::print_all(ofstream &out) {
 
 void SMTBasicBlock::reset_distances() {
     for(auto it:block_list){
-        it->distance = 0xFFFFFFF;
+        it->distance = initial_distance;
     }
 }
 

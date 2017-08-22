@@ -328,14 +328,14 @@ static bool find_next_cfg(){
 		if(solve_constraints(clock)){
 			selected_branch = it->br;
 			selected_clock = clock;
-			selected_branch->k_permit_covered++;
-			selected_branch->block->distance++;
 			//insert hash value even if potentially incorrect
 			update_path_taken(it);
 			if(!enable_error_check){
 				it->br->set_covered_clk(sim_num+1, clock);
 			}
-			printf("[FOUND %d] %s", clock, it->br->print().c_str());
+			printf("[FOUND %u--%u] %s", clock, selected_branch->block->distance, it->br->print().c_str());
+			selected_branch->k_permit_covered++;
+			selected_branch->block->distance++;
 			return true;
 		}
 	}
