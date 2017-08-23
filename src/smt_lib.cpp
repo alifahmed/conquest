@@ -952,45 +952,67 @@ SMTNumber::SMTNumber(const char* bits, int bit_width, bool is_signed) : SMTExpr(
     this->is_signed = is_signed;
     assert(bit_width);
 	width = bit_width;
-	
+	value_hex = "";
+    
 	const int nbits = bit_width - 1;
 	//print in binary
-	value = "";
-	value.reserve(width+1);
+	value_bin = "";
+	value_bin.reserve(width+1);
 	for(int i = nbits; i>=0; i--){
 		if((bits[i] != '0') && (bits[i] != '1')){
-			value += '0';
+			value_bin += '0';
             has_undef = true;
             //info("Number expression has x or z or ?");
 		}
 		else{
-			value += bits[i];
+			value_bin += bits[i];
 		}
 	}
+    
+    if(!(width & 3)){
+        uint sum = 0;
+        for(uint i=0; i<width; i++){
+            uint offset = 3 - (i & 3);
+            sum += (value_bin[i] - '0') << offset;
+            if(offset == 0){
+                value_hex += hex_map[sum];
+                sum = 0;
+            }
+        }
+    }
 }
 
 void SMTNumber::print(std::stringstream& ss) {
-	ss << "0b" << value;
+	if(width & 3){
+        ss << "0b" << value_bin;
+    }
+    else{
+        ss << "0h" << value_hex;
+    }
 }
 
 void SMTNumber::emit_verilog_value() {
+    const char* str = value_hex.c_str();
+    if(width & 3){
+        str = value_bin.c_str();
+    }
     if(!is_signed){
-        fprintf(g_out, "%u\'b%s", width, value.c_str());
+        fprintf(g_out, "%u\'b%s", width, str);
     } else{
-        fprintf(g_out, "%u\'sb%s", width, value.c_str());
+        fprintf(g_out, "%u\'sb%s", width, str);
     }
 }
 
 term_t SMTNumber::eval_term(SMTClkType clk) {
 	if(is_term_eval_needed){
-		yices_term = yices_parse_bvbin(value.c_str());
+		yices_term = yices_parse_bvbin(value_bin.c_str());
 		is_term_eval_needed = false;
 	}
 	return yices_term;
 }
 
 bool SMTNumber::is_equal(SMTNumber* num) {
-	return (value == num->value);
+	return (value_bin == num->value_bin);
 }
 
 //---------------------------SMT Signal Core------------------------------------

@@ -305,7 +305,8 @@ public:
 //----------------------------SMT Number----------------------------------------
 class SMTNumber: public SMTExpr{
 private:
-	std::string value;
+	std::string value_bin;
+    std::string value_hex;
 	bool is_signed;
 	
 public:
