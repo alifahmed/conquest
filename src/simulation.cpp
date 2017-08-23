@@ -22,7 +22,6 @@ const bool		enable_error_check = true;
 const bool		enable_obs_padding = true;
 const bool		enable_sim_copy = false;
 const search_algo_t search_algo = SEARCH_ALGO_CFG_DIRECTED;
-const bool		enable_unsolvable_branch_elimination = true;
 const bool		enable_yices_debug = false;
 const bool		enable_fsm_cfg_hybrid = true;
 const bool		enable_all_target = false;
@@ -147,10 +146,6 @@ static void init() {
     yices_context = yices_new_context(config);
     yices_free_config(config);
 	compile();
-	if(enable_unsolvable_branch_elimination){
-		SMTSigCore::update_is_dep();
-		SMTBranch::update_is_dep();
-	}
 	if(enable_fsm_cfg_hybrid && (search_algo == SEARCH_ALGO_CFG_DIRECTED)){
 		SMTBranch::update_fsm();
 	}

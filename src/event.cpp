@@ -20,7 +20,7 @@ void emit_event(ivl_scope_t scope, ivl_statement_t stmt) {
             have_level_trig = true;
 			if (first) first = 0;
 			else fprintf(g_out, " or ");
-			SMTProcess::curr_proc->add_to_sensitivity(emit_nexus_as_ca(scope, ivl_event_any(event, idx), 0, 0));
+			emit_nexus_as_ca(scope, ivl_event_any(event, idx), 0, 0);
 		}
 
 		/* Check for positive edge events. */
@@ -32,9 +32,7 @@ void emit_event(ivl_scope_t scope, ivl_statement_t stmt) {
 			fprintf(g_out, "posedge ");
 			smt_expr = dynamic_cast<SMTSignal*>(emit_nexus_as_ca(scope, ivl_event_pos(event, idx), 0, 0));
 			assert(smt_expr);
-			SMTProcess::curr_proc->sensitivity_list.insert(smt_expr->parent);
 			SMTProcess::curr_proc->is_edge_triggered = true;
-            smt_expr->parent->dependent_process.push_back(SMTProcess::curr_proc);
 		}
 
 		/* Check for negative edge events. */
@@ -46,9 +44,7 @@ void emit_event(ivl_scope_t scope, ivl_statement_t stmt) {
 			fprintf(g_out, "negedge ");
 			smt_expr = dynamic_cast<SMTSignal*>(emit_nexus_as_ca(scope, ivl_event_neg(event, idx), 0, 0));
 			assert(smt_expr);
-			SMTProcess::curr_proc->sensitivity_list.insert(smt_expr->parent);
 			SMTProcess::curr_proc->is_edge_triggered = true;
-            smt_expr->parent->dependent_process.push_back(SMTProcess::curr_proc);
 		}
 
 		/* We have a named event if there were no edge or level events. */

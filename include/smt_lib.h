@@ -341,13 +341,8 @@ public:
     int width;
     bool is_dep;
 	bool is_state_variable;
-	//bool is_signed;
 	
 	std::vector<SMTAssign*> assignments;
-	std::set<SMTSigCore*> assigned_to;
-    std::vector<SMTProcess*> dependent_process;
-	static std::vector<SMTSigCore*> state_variables;
-	
 	
     SMTSigCore(ivl_signal_t sig);
     virtual ~SMTSigCore();
@@ -361,10 +356,8 @@ public:
     static void clear_all_versions();
     static void commit_versions(uint clock);
 	static void restore_versions(uint clock);
-	static void update_is_dep();
 	static void yices_insert_reg_init(context_t * ctx);
 	static void print_state_variables(std::ofstream &out);
-	static void update_state_variables();
     static void set_input_version(uint version);
 };
 
@@ -392,7 +385,6 @@ public:
     virtual ~SMTProcess();
     
     bool is_edge_triggered;
-    std::set<SMTSigCore*> sensitivity_list;
     std::set<SMTSigCore*> sig_assign_list;
     std::set<SMTBasicBlock*> sig_assign_blocks;
     
@@ -401,10 +393,6 @@ public:
     SMTBasicBlock* top_bb;
 	static SMTProcess* curr_proc;
     void add_assign(SMTAssign* assign);
-	void add_to_sensitivity(SMTExpr* expr);
-    
-    //Update sensitivity and dependency list for always @* blocks
-    void update_sensitivity_list(SMTExpr* rval);
     
     void expand();
     static void combine_processes();

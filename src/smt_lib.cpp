@@ -56,20 +56,6 @@ void add_to_rval(set<SMTSigCore*> &assign_set, SMTExpr* expr){
 	}
 }
 
-static void update_signal_dependency(SMTAssign* assign){
-	SMTSignal* lval = dynamic_cast<SMTSignal*>(assign->lval);
-	assert(lval);
-	
-	set<SMTSigCore*> right;
-	add_to_rval(right, assign->rval);
-	
-	for(auto it_r:right){
-		if(it_r != lval->parent){
-			it_r->assigned_to.insert(lval->parent);
-		}
-	}
-}
-
 void smt_yices_assert(context_t *ctx, term_t term, SMTAssign* assign){
 	yices_assert_formula(ctx, term);
 	if(enable_yices_debug){
@@ -691,7 +677,6 @@ void SMTAssign::instrument() {
     }
 	fprintf(g_out, " $display(\";A %u\");\t\t//%s", id, str.c_str());
 	conc_flush(g_out);
-	update_signal_dependency(this);
 }
 
 void SMTAssign::print_coverage(std::ofstream& report) {
@@ -1019,7 +1004,6 @@ bool SMTNumber::is_equal(SMTNumber* num) {
 std::unordered_map<ivl_signal_t, SMTSigCore*> SMTSigCore::sig_to_core_map;
 vector<SMTSigCore*> SMTSigCore::reg_list;
 vector<SMTSigCore*> SMTSigCore::input_list;
-vector<SMTSigCore*> SMTSigCore::state_variables;
 SMTSigCore::SMTSigCore(ivl_signal_t sig){
     name = ivl_signal_basename(sig);
     width = ivl_signal_width(sig);
@@ -1128,27 +1112,6 @@ void SMTSigCore::restore_versions(uint clock) {
 	set_input_version(clock);
 }
 
-void SMTSigCore::update_is_dep() {
-	queue<SMTSigCore*> q;
-	for(auto it:input_list){
-		if(it->is_dep){
-			it->was_in_queue = true;
-			q.push(it);
-		}
-	}
-	while(!q.empty()){
-		SMTSigCore* sig = q.front();
-		q.pop();
-		for(auto it:sig->assigned_to){
-			if(it->was_in_queue == false){
-				it->is_dep = true;
-				it->was_in_queue = true;
-				q.push(it);
-			}
-		}
-	}
-}
-
 void SMTSigCore::yices_insert_reg_init(context_t* ctx) {
 	for(auto it:reg_list){
 		smt_yices_assert(ctx, it->init_term, NULL);
@@ -1157,18 +1120,12 @@ void SMTSigCore::yices_insert_reg_init(context_t* ctx) {
 
 void SMTSigCore::print_state_variables(ofstream &out) {
 	out << "//state variables:";
-	for(auto it:state_variables){
-        out << ' ' << it->name;
-	}
-    out << "\n\n";
-}
-
-void SMTSigCore::update_state_variables() {
 	for(auto it:reg_list){
 		if(it->is_state_variable){
-			state_variables.push_back(it);
+			out << ' ' << it->name;
 		}
 	}
+    out << "\n\n";
 }
 
 void SMTSigCore::set_input_version(uint version) {
@@ -1245,29 +1202,6 @@ void SMTProcess::add_assign(SMTAssign* assign) {
         sig_assign_blocks.insert(top_bb);
     }
     assign->block = top_bb;
-}
-
-void SMTProcess::add_to_sensitivity(SMTExpr* expr) {
-	SMTSignal* sig = dynamic_cast<SMTSignal*>(expr);
-	if(sig){
-		sensitivity_list.insert(sig->parent);
-		sig->parent->dependent_process.push_back(this);
-	}
-	else{
-		for(auto it:expr->exprList){
-			add_to_sensitivity(it);
-		}
-	}
-}
-
-void SMTProcess::update_sensitivity_list(SMTExpr* rval) {
-    //add rval to sensitivity list
-    add_to_rval(sensitivity_list, rval);
-    
-    //add this process to dependency list of signals that its sensitive to
-    for(auto it:sensitivity_list){
-        it->dependent_process.push_back(this);
-    }
 }
 
 //static void merge(SMTBasicBlock* block, uint pos, SMTProcess* proc){

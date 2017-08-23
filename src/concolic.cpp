@@ -82,8 +82,6 @@ void post_processing(ivl_design_t design){
     fclose(g_out);
     g_out = NULL;
     
-	SMTSigCore::update_state_variables();
-    
     //Make all SMTProcess circular
     SMTProcess::make_circular();
 }

@@ -1044,11 +1044,10 @@ void emit_lpm(ivl_scope_t scope, ivl_lpm_t lpm) {
     fprintf(g_out, " = ");
 	SMTExpr* rval = emit_lpm_as_ca(scope, lpm, 0);
 	fprintf(g_out, ";");
-	SMTAssign* smt_assign = new SMTBlockingAssign(lval, rval);
+	new SMTBlockingAssign(lval, rval);
 	g_ind -= g_ind_incr;
 	fprintf(g_out, "%*cend\n\n", g_ind, ' ');
 	
-    SMTProcess::curr_proc->update_sensitivity_list(smt_assign->rval);
     SMTProcess::curr_proc = NULL;
 }
 
@@ -1066,11 +1065,10 @@ static void emit_bufz(ivl_scope_t scope, ivl_net_logic_t nlogic) {
 	fprintf(g_out, " = ");
 	SMTExpr* rval = emit_nexus_as_ca(scope, ivl_logic_pin(nlogic, 1), 0, 0);
 	fprintf(g_out, ";");
-	SMTAssign* smt_assign = new SMTBlockingAssign(lval, rval);
+	new SMTBlockingAssign(lval, rval);
 	g_ind -= g_ind_incr;
 	fprintf(g_out, "%*cend\n\n", g_ind, ' ');
     
-    SMTProcess::curr_proc->update_sensitivity_list(smt_assign->rval);
     SMTProcess::curr_proc = NULL;
 }
 
@@ -1122,11 +1120,10 @@ void emit_logic(ivl_scope_t scope, ivl_net_logic_t nlogic) {
 		fprintf(g_out, " = ");
 		SMTExpr* rval = emit_logic_as_ca(scope, nlogic);
 		fprintf(g_out, ";");
-		SMTAssign* smt_assign = new SMTBlockingAssign(lval, rval);
+		new SMTBlockingAssign(lval, rval);
 		g_ind -= g_ind_incr;
 		fprintf(g_out, "%*cend\n\n", g_ind, ' ');
 		
-        SMTProcess::curr_proc->update_sensitivity_list(smt_assign->rval);
         SMTProcess::curr_proc = NULL;   
 		return;
 	}
