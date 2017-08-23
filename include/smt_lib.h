@@ -88,7 +88,7 @@ public:
 	const SMTExprType type;
 	bool is_bool;		//bool or bitvector
 	bool is_inverted;	//inverted if true
-	std::vector<SMTExpr*> exprList;
+	std::vector<SMTExpr*> expr_list;
 	term_t yices_term;
 	bool is_term_eval_needed;
 	
@@ -140,6 +140,7 @@ public:
 	
     virtual void instrument();
 	virtual term_t update_term();
+	virtual term_t get_current_term();
 	virtual bool is_covered();
 	virtual void set_covered(uint sim_num);
     virtual void partial_assign_check();
@@ -186,7 +187,6 @@ public:
 	const SMTBranchType type;
     const uint list_idx;    //index in parent's branch list
 	SMTBranchNode*  parent_node;
-    std::set<SMTBranch*> prev_branches;
 	uint k_permit_covered;
 	bool is_dep;
 	
@@ -196,6 +196,7 @@ public:
 	void set_covered_clk(uint sim_num, uint clock);
     void clear_covered_clk(uint clock);
     void update_distance();
+	void update_edge();
 	term_t update_term() override;
 	void instrument() override;
 
@@ -208,8 +209,8 @@ public:
     static void clear_coverage(uint min_clock);
 	static void save_coverage();
 	static void restore_coverage();
-	static void update_is_dep();
 	static void update_fsm();
+	static void get_state_variables(std::set<SMTSigCore*> &sigs, SMTExpr* expr);
 };
 
 
@@ -385,8 +386,6 @@ public:
     virtual ~SMTProcess();
     
     bool is_edge_triggered;
-    std::set<SMTSigCore*> sig_assign_list;
-    std::set<SMTBasicBlock*> sig_assign_blocks;
     
     SMTBasicBlock* entry_block;
     SMTBasicBlock* exit_block;
@@ -416,9 +415,11 @@ public:
     std::set<SMTBasicBlock*> predecessors;
 	uint weight;
 	uint distance;
+	bool is_edge_updated;
     
     void print(std::ofstream &out);
     void update_distance();
+	void update_edge();
     
     static void print_all(std::ofstream &out);
 	static void reset_distances();
@@ -427,5 +428,5 @@ private:
     void print_assigns(std::ofstream &out);
     static uint id_counter;
     static std::vector<SMTBasicBlock*> block_list;
-	const static uint initial_distance = 10;
+	const static uint initial_distance = 0xFFFFFFF;
 };

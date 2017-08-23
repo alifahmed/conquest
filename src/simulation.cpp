@@ -13,17 +13,11 @@
 
 using namespace std;
 
-typedef enum{
-	SEARCH_ALGO_CFG_DIRECTED
-}search_algo_t;
-
 //configuration
 const bool		enable_error_check = true;
 const bool		enable_obs_padding = true;
 const bool		enable_sim_copy = false;
-const search_algo_t search_algo = SEARCH_ALGO_CFG_DIRECTED;
 const bool		enable_yices_debug = false;
-const bool		enable_fsm_cfg_hybrid = true;
 const bool		enable_all_target = false;
 
 
@@ -146,9 +140,6 @@ static void init() {
     yices_context = yices_new_context(config);
     yices_free_config(config);
 	compile();
-	if(enable_fsm_cfg_hybrid && (search_algo == SEARCH_ALGO_CFG_DIRECTED)){
-		SMTBranch::update_fsm();
-	}
 }
 
 static void set_sim_log_name(uint sim_num) {
@@ -224,7 +215,7 @@ typedef struct{
 
 bool compare_dist(br_cnst_t* a, br_cnst_t* b){
     if(a->br->block->distance == b->br->block->distance){
-        return a->br->k_permit_covered < b->br->k_permit_covered;
+        return a->cnst->clock < b->cnst->clock;
     }
 	return a->br->block->distance < b->br->block->distance;
 }
@@ -244,8 +235,12 @@ static bool find_next_cfg(){
 	vector<br_cnst_t*> branches;
 	
 	//create branches
-	for(uint i=0; i < size; i++){
-		constraint_t* cnst = constraints_stack[i];
+	uint idx = 0;
+	while(constraints_stack[idx]->clock < 2){
+		idx++;
+	}
+	for(; idx < size; idx++){
+		constraint_t* cnst = constraints_stack[idx];
 		if(cnst->type == CNST_BRANCH){
 			SMTBranch* br = dynamic_cast<SMTBranch*>(cnst->obj);
 			assert(br);
@@ -374,7 +369,7 @@ static bool concolic_iteration(uint sim_num) {
     
     //builds stack and also updates coverage
     build_stack();
-	if(target_branch->is_covered() && search_algo == SEARCH_ALGO_CFG_DIRECTED){
+	if(target_branch->is_covered()){
 		free_stack();
 		printf("Branch %u covered in %u iterations\n", target_branch->id, sim_num);
 		return false;
@@ -439,50 +434,40 @@ void start_concolic() {
 		}
 	} else{
 		SMTBranch::save_coverage();
-		if(search_algo == SEARCH_ALGO_CFG_DIRECTED){
-			const uint count = SMTAssign::get_assign_count();
-			ofstream report("report_cov.log");
-			for(uint i=0; i<count; i++){
-				SMTAssign* assign = SMTAssign::get_assign(i);
-				if(assign->assign_type == SMT_ASSIGN_BRANCH){
-					copy_file(g_data_mem_raw, g_data_mem);
-					target_branch = dynamic_cast<SMTBranch*>(assign);
-					assert(target_branch);
-					target_branch->k_permit_covered = 0;
-					SMTBasicBlock::reset_distances();
-					SMTBranch::clear_coverage(0);
-					SMTBranch::restore_coverage();
-					path_hash_map.clear();
-					target_branch->update_distance();
-					sim_num = 0;
-					selected_branch = NULL;
-					while (concolic_iteration(sim_num)) {
-						sim_num++;
-						if(sim_num >= 2000){
-							break;
-						}
+		const uint count = SMTAssign::get_assign_count();
+		ofstream report("report_cov.log");
+		for(uint i=0; i<count; i++){
+			SMTAssign* assign = SMTAssign::get_assign(i);
+			if(assign->assign_type == SMT_ASSIGN_BRANCH){
+				copy_file(g_data_mem_raw, g_data_mem);
+				target_branch = dynamic_cast<SMTBranch*>(assign);
+				assert(target_branch);
+				target_branch->k_permit_covered = 0;
+				SMTBasicBlock::reset_distances();
+				SMTBranch::clear_coverage(0);
+				SMTBranch::restore_coverage();
+				path_hash_map.clear();
+				target_branch->update_distance();
+				sim_num = 0;
+				selected_branch = NULL;
+				while (concolic_iteration(sim_num)) {
+					sim_num++;
+					if(sim_num >= 2000){
+						break;
 					}
-					if(target_branch->is_covered() == false){
-						sim_num = 2000;
-					}
-					report << setw(12) << assign->id << " ";
-					report << setw(12) << sim_num << " \n";
 				}
+				if(target_branch->is_covered() == false){
+					sim_num = 2000;
+				}
+				report << setw(12) << assign->id << " ";
+				report << setw(12) << sim_num << " \n";
 			}
-			report.close();
-			yices_free_context(yices_context);
-			yices_exit();
-			SMTFreeAll();
-			exit(0);
 		}
-		else{
-			sim_num = 0;
-			start_time = clock();
-			while (concolic_iteration(sim_num)) {
-				sim_num++;
-			}
-			end_concolic();
-		}
+		report.close();
+		yices_free_context(yices_context);
+		yices_exit();
+		SMTFreeAll();
+		exit(0);
 	}
 }
 

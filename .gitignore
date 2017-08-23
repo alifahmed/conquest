@@ -2,4 +2,7 @@ nbproject/
 *~
 *.o
 conquest
+*cfg_info.txt
+*conquest_dut.v
+*conc_run.vvp
 

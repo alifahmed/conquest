@@ -35,7 +35,7 @@ static bool check_assign_dependency(SMTExpr* expr){
 		}
 	}
 	else{
-		for(auto it:(expr->exprList)){
+		for(auto it:(expr->expr_list)){
 			if(check_assign_dependency(it)){
 				return true;
 			}
@@ -50,7 +50,7 @@ void add_to_rval(set<SMTSigCore*> &assign_set, SMTExpr* expr){
 		assign_set.insert(sig->parent);
 	}
 	else{
-		for(auto it:(expr->exprList)){
+		for(auto it:(expr->expr_list)){
 			add_to_rval(assign_set, it);
 		}
 	}
@@ -97,12 +97,12 @@ SMTExpr::~SMTExpr() {
 }
 
 void SMTExpr::add(SMTExpr* expr) {
-	exprList.push_back(expr);
+	expr_list.push_back(expr);
 }
 
 SMTExpr* SMTExpr::get_child(uint idx) {
-    if(idx < exprList.size()){
-        return exprList[idx];
+    if(idx < expr_list.size()){
+        return expr_list[idx];
     }
     return NULL;
 }
@@ -138,23 +138,23 @@ SMTConcat::SMTConcat() : SMTExpr(SMT_EXPR_CONCAT){
 }
 
 void SMTConcat::print(std::stringstream &ss) {
-	const uint count = exprList.size();
+	const uint count = expr_list.size();
 	if(repeat != 1){
 		ss << "(bv-repeat ";
 	}
 	if(count > 1){
 		ss << "(bv-concat";
 		for(uint i=0; i<count; i++){
-			if(exprList[i] == NULL){
+			if(expr_list[i] == NULL){
 				error("Concatenation failed");
 			}
 			ss << " ";
-			exprList[i]->print(ss);
+			expr_list[i]->print(ss);
 		}
 		ss << ")";
 	}
 	else{
-		exprList[0]->print(ss);
+		expr_list[0]->print(ss);
 	}
 	if(repeat != 1){
 		ss << " " << repeat << ")";
@@ -164,11 +164,11 @@ void SMTConcat::print(std::stringstream &ss) {
 term_t SMTConcat::eval_term(SMTClkType clk) {
 	if(is_term_eval_needed){
 		is_term_eval_needed = false;
-		const uint size = exprList.size();
+		const uint size = expr_list.size();
 		term_t* arr = new term_t[size];
 		for(uint i = 0; i < size; i++){
-			arr[i] = exprList[i]->eval_term(clk);
-			if(exprList[i]->is_term_eval_needed){
+			arr[i] = expr_list[i]->eval_term(clk);
+			if(expr_list[i]->is_term_eval_needed){
 				is_term_eval_needed = true;
 			}
 		}
@@ -188,9 +188,9 @@ SMTCust::SMTCust(std::string _operand) : SMTExpr(SMT_EXPR_CUSTOM){
 }
 
 void SMTCust::print(std::stringstream& ss) {
-    if(exprList.size()){
+    if(expr_list.size()){
         ss << "(" << operand;
-        for(auto it:exprList){
+        for(auto it:expr_list){
             ss << " ";
 			it->print(ss);
         }
@@ -205,11 +205,11 @@ term_t SMTCust::eval_term(SMTClkType clk) {
 	if(is_term_eval_needed){
 		if(operand == "and"){
 			is_term_eval_needed = false;
-			const uint size = exprList.size();
+			const uint size = expr_list.size();
 			term_t* arr = new term_t[size];
 			for(uint i = 0; i < size; i++){
-				arr[i] = exprList[i]->eval_term(clk);
-				if(exprList[i]->is_term_eval_needed){
+				arr[i] = expr_list[i]->eval_term(clk);
+				if(expr_list[i]->is_term_eval_needed){
 					is_term_eval_needed = true;
 				}
 			}
@@ -217,8 +217,8 @@ term_t SMTCust::eval_term(SMTClkType clk) {
 			delete [] arr;
 		}
 		else if(operand == "/="){
-			yices_term = yices_neq(exprList[0]->eval_term(clk), exprList[1]->eval_term(clk));
-			is_term_eval_needed = exprList[0]->is_term_eval_needed | exprList[1]->is_term_eval_needed;
+			yices_term = yices_neq(expr_list[0]->eval_term(clk), expr_list[1]->eval_term(clk));
+			is_term_eval_needed = expr_list[0]->is_term_eval_needed | expr_list[1]->is_term_eval_needed;
 		}
 		else if(operand == "true"){
 			is_term_eval_needed = false;
@@ -296,14 +296,14 @@ void SMTUnary::set_opcode(const ivl_expr_t expr) {
 }
 
 void SMTUnary::print(std::stringstream& ss) {
-	assert(exprList.size() == 1);
+	assert(expr_list.size() == 1);
 
 	//print
 	if(is_inverted){
 		ss << "(bv-not ";
 	}
 	ss << "(" << opcode << " ";
-	exprList[0]->print(ss);
+	expr_list[0]->print(ss);
 	ss << ")";
 	if(is_inverted){
 		ss << ")";
@@ -312,8 +312,8 @@ void SMTUnary::print(std::stringstream& ss) {
 
 term_t SMTUnary::eval_term(SMTClkType clk) {
 	if(is_term_eval_needed){
-		yices_term = func(exprList[0]->eval_term(clk));
-		is_term_eval_needed = exprList[0]->is_term_eval_needed;
+		yices_term = func(expr_list[0]->eval_term(clk));
+		is_term_eval_needed = expr_list[0]->is_term_eval_needed;
 		if(is_inverted){
 			yices_term = yices_bvnot(yices_term);
 		}
@@ -458,14 +458,14 @@ void SMTBinary::set_opcode_from_expr(const ivl_expr_t expr) {
 }
 
 void SMTBinary::print(std::stringstream& ss) {
-	assert(exprList.size() == 2);
+	assert(expr_list.size() == 2);
 		
 	if(is_inverted){ ss << "(bv-not "; }
 	if(is_bool){ ss << "(bool-to-bv "; }
 	ss << "(" << opcode << " ";
-	exprList[0]->print(ss);
+	expr_list[0]->print(ss);
 	ss << " ";
-	exprList[1]->print(ss);
+	expr_list[1]->print(ss);
 	ss << ")";
 	if(is_bool){ ss << ")"; }
 	if(is_inverted){ ss << ")"; }
@@ -473,7 +473,7 @@ void SMTBinary::print(std::stringstream& ss) {
 
 term_t SMTBinary::eval_term(SMTClkType clk) {
 	if(is_term_eval_needed){
-		yices_term = func(exprList[0]->eval_term(clk), exprList[1]->eval_term(clk));
+		yices_term = func(expr_list[0]->eval_term(clk), expr_list[1]->eval_term(clk));
 		if(is_bool){
 			term_t p[1];
 			p[0] = yices_term;
@@ -482,7 +482,7 @@ term_t SMTBinary::eval_term(SMTClkType clk) {
 		if(is_inverted){
 			yices_term = yices_bvnot(yices_term);
 		}
-		is_term_eval_needed = exprList[0]->is_term_eval_needed | exprList[1]->is_term_eval_needed;
+		is_term_eval_needed = expr_list[0]->is_term_eval_needed | expr_list[1]->is_term_eval_needed;
 	}
 	return yices_term;
 }
@@ -539,10 +539,10 @@ string SMTLogic::get_opcode() {
 
 void SMTLogic::print(std::stringstream& ss) {
 	//info("SMTLogic used. Implement invert inheritance to improve perf");
-	assert(exprList.size() == 2);
+	assert(expr_list.size() == 2);
 	ss << "(" << get_opcode();
 	vector<SMTExpr*>::iterator it;
-	for(auto it:exprList){
+	for(auto it:expr_list){
 		ss << " ";
 		it->print(ss);
 	}
@@ -551,8 +551,8 @@ void SMTLogic::print(std::stringstream& ss) {
 
 term_t SMTLogic::eval_term(SMTClkType clk) {
 	if(is_term_eval_needed){
-		yices_term = func(exprList[0]->eval_term(clk), exprList[1]->eval_term(clk));
-		is_term_eval_needed = exprList[0]->is_term_eval_needed | exprList[1]->is_term_eval_needed;
+		yices_term = func(expr_list[0]->eval_term(clk), expr_list[1]->eval_term(clk));
+		is_term_eval_needed = expr_list[0]->is_term_eval_needed | expr_list[1]->is_term_eval_needed;
 	}
 	return yices_term;
 }
@@ -563,22 +563,22 @@ SMTTernary::SMTTernary() : SMTExpr(SMT_EXPR_TERNARY) {
 }
 
 void SMTTernary::print(std::stringstream& ss) {
-	assert(exprList.size() == 3);
+	assert(expr_list.size() == 3);
     
 	ss << "(ite (= ";
-	exprList[0]-> print(ss);
+	expr_list[0]-> print(ss);
 	ss << " 0b1) ";
-	exprList[1]->print(ss);
+	expr_list[1]->print(ss);
 	ss << " ";
-    exprList[2]->print(ss);
+    expr_list[2]->print(ss);
 	ss << ")";
 }
 
 term_t SMTTernary::eval_term(SMTClkType clk) {
 	if(is_term_eval_needed){
-		term_t cond = yices_eq(exprList[0]->eval_term(clk), yices_bvconst_one(1));
-		yices_term = yices_ite(cond, exprList[1]->eval_term(clk), exprList[2]->eval_term(clk));
-		is_term_eval_needed = exprList[0]->is_term_eval_needed | exprList[1]->is_term_eval_needed | exprList[2]->is_term_eval_needed;
+		term_t cond = yices_eq(expr_list[0]->eval_term(clk), yices_bvconst_one(1));
+		yices_term = yices_ite(cond, expr_list[1]->eval_term(clk), expr_list[2]->eval_term(clk));
+		is_term_eval_needed = expr_list[0]->is_term_eval_needed | expr_list[1]->is_term_eval_needed | expr_list[2]->is_term_eval_needed;
 	}
 	return yices_term;
 }
@@ -620,6 +620,10 @@ term_t SMTAssign::update_term() {
 		sig->parent->commit();
 	}
 	return yices_term;
+}
+
+term_t SMTAssign::get_current_term() {
+	return yices_eq(lval->eval_term(SMT_CLK_CURR), rval->eval_term(SMT_CLK_CURR));
 }
 
 bool SMTAssign::is_covered() {
@@ -779,7 +783,53 @@ void SMTBranch::clear_covered_clk(uint clock) {
 }
 
 void SMTBranch::update_distance() {
+	update_edge();
     block->update_distance();
+}
+
+void SMTBranch::get_state_variables(std::set<SMTSigCore*> &sigs, SMTExpr* expr) {
+	SMTSignal* sig = dynamic_cast<SMTSignal*>(expr);
+	if(sig){
+		if(sig->parent->is_state_variable){
+			sigs.insert(sig->parent);
+		}
+	}
+	else{
+		for(auto it:(expr->expr_list)){
+			get_state_variables(sigs, it);
+		}
+	}
+}
+
+void SMTBranch::update_edge() {
+	block->is_edge_updated = true;
+	set<SMTSigCore*> sigs;
+	get_state_variables(sigs, lval);
+	if(sigs.size()){
+		//delete all predecessor edges
+		block->predecessors.clear();
+		
+		//get condition term
+		term_t cond_term = get_current_term();
+		
+		for(auto a_sig:sigs){
+			for(auto assign:a_sig->assignments){
+				//get assignment term
+				term_t assign_term = assign->get_current_term();
+				
+				//check if (c & p) is satisfiable
+				yices_reset_context(yices_context);
+				yices_assert_formula(yices_context, yices_and2(cond_term, assign_term));
+				if(yices_check_context(yices_context, NULL) == STATUS_SAT){
+					SMTBasicBlock* assign_bb = assign->block;
+					block->predecessors.insert(assign_bb);
+					if(!assign_bb->is_edge_updated){
+						assign_bb->update_edge();
+					}
+				}
+			}
+		}
+	}
 }
 
 void SMTBranch::instrument() {
@@ -860,24 +910,6 @@ void SMTBranch::restore_coverage() {
 	for(auto it:all_branches_list){
 		it->covered_any_clock = it->saved_coverage;
 	}
-}
-
-void SMTBranch::update_is_dep() {
-    uint pruned_br = 0;
-	for(auto it:all_branches_list){
-		SMTExpr* expr = it->lval;
-		if(expr){
-			it->is_dep = check_assign_dependency(expr);
-		}
-		if(!(it->is_dep) && it->rval){
-			it->is_dep = check_assign_dependency(it->rval);
-		}
-		if(!(it->is_dep)){
-			//printf("[CONST] %s", it->print(SMT_CLK_CURR).c_str());
-            pruned_br++;
-		}
-	}
-    info("%u branches are pruned", pruned_br);
 }
 
 term_t SMTBranch::update_term() {
@@ -1197,10 +1229,6 @@ SMTProcess::~SMTProcess() {
 
 void SMTProcess::add_assign(SMTAssign* assign) {
     top_bb->assign_list.push_back(assign);
-    if(assign->assign_type == SMT_ASSIGN_BLOCKING){
-        sig_assign_list.insert(assign->get_lval_sig_core());
-        sig_assign_blocks.insert(top_bb);
-    }
     assign->block = top_bb;
 }
 
@@ -1274,6 +1302,7 @@ SMTBasicBlock::SMTBasicBlock() : id(id_counter) {
     block_list.push_back(this);
 	weight = 0;
 	distance = initial_distance;
+	is_edge_updated = false;
 }
 
 /*SMTBasicBlock::SMTBasicBlock(SMTBasicBlock& obj) : id(id_counter) {
@@ -1325,6 +1354,14 @@ void SMTBasicBlock::update_distance() {
 		}
 	}
 }
+
+void SMTBasicBlock::update_edge() {
+	if(assign_list[0]->assign_type == SMT_ASSIGN_BRANCH){
+		SMTBranch* br = dynamic_cast<SMTBranch*>(assign_list[0]);
+		br->update_edge();
+	}
+}
+
 
 void SMTBasicBlock::print_all(ofstream &out) {
     out << "/*\n";
