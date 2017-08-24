@@ -1277,7 +1277,7 @@ void emit_signal_net_const_as_ca(ivl_scope_t scope, ivl_signal_t sig) {
 		}
 		
         SMTProcess::curr_proc = new SMTProcess();
-		fprintf(g_out, "%*calways @(*) begin\n", g_ind, ' ');
+		fprintf(g_out, "%*cinitial begin\n", g_ind, ' ');
 		g_ind += g_ind_incr;
 		fprintf(g_out, "%*c", g_ind, ' ');
 		emit_id(ivl_signal_basename(sig));
@@ -1285,10 +1285,9 @@ void emit_signal_net_const_as_ca(ivl_scope_t scope, ivl_signal_t sig) {
 		fprintf(g_out, " = ");
 		SMTExpr* rval = emit_const_nexus(scope, net_const);
 		fprintf(g_out, ";");
-		new SMTBlockingAssign(lval, rval);
+		SMTAssign* smt_assign = new SMTBlockingAssign(lval, rval);
 		g_ind -= g_ind_incr;
 		fprintf(g_out, "%*cend\n\n", g_ind, ' ');
-		
         SMTProcess::curr_proc = NULL;
         
 		/* Increment the emitted constant count by one. */

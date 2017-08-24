@@ -27,9 +27,17 @@ module one_round (clk, state_in, key, state_out);
                        p30, p31, p32, p33,
                        k0,  k1,  k2,  k3;
 
-    assign {k0, k1, k2, k3} = key;
+    //assign {k0, k1, k2, k3} = key;
+    assign k0 = key[127:96];
+    assign k1 = key[95:64];
+    assign k2 = key[63:32];
+    assign k3 = key[31:0];
 
-    assign {s0, s1, s2, s3} = state_in;
+    //assign {s0, s1, s2, s3} = state_in;
+    assign s0 = state_in[127:96];
+    assign s1 = state_in[95:64];
+    assign s2 = state_in[63:32];
+    assign s3 = state_in[31:0];
 
     table_lookup
         t0 (clk, s0, p00, p01, p02, p03),
@@ -60,9 +68,18 @@ module final_round (clk, state_in, key_in, state_out);
                 p20, p21, p22, p23,
                 p30, p31, p32, p33;
     
-    assign {k0, k1, k2, k3} = key_in;
+    //assign {k0, k1, k2, k3} = key_in;
+    assign k0 = key_in[127:96];
+    assign k1 = key_in[95:64];
+    assign k2 = key_in[63:32];
+    assign k3 = key_in[31:0];
     
-    assign {s0, s1, s2, s3} = state_in;
+    
+    //assign {s0, s1, s2, s3} = state_in;
+    assign s0 = state_in[127:96];
+    assign s1 = state_in[95:64];
+    assign s2 = state_in[63:32];
+    assign s3 = state_in[31:0];
 
     S4
         S4_1 (clk, s0, {p00, p01, p02, p03}),

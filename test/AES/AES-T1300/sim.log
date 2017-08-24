@@ -1,0 +1,13 @@
+;_C 1
+WARNING: conquest_tb.v:44: $readmemb(data.mem): Too many words in the file for the requested range [0:10].
+;_C          2
+;_C          3
+;_C          4
+;_C          5
+;_C          6
+;_C          7
+;_C          8
+;_C          9
+;_C         10
+;_C         11
+;_C         12

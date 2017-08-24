@@ -15,7 +15,7 @@ using namespace std;
 
 //configuration
 const bool		enable_error_check = true;
-const bool		enable_obs_padding = true;
+const bool		enable_obs_padding = false;
 const bool		enable_sim_copy = false;
 const bool		enable_yices_debug = false;
 const bool		enable_all_target = false;
@@ -405,7 +405,7 @@ static bool concolic_iteration(uint sim_num) {
 }
 
 void start_concolic() {
-    freopen("/dev/null", "w", stderr);
+    //freopen("/dev/null", "w", stderr);
 	init();
 	if(!enable_all_target){
 		SMTAssign* assign = SMTAssign::get_assign(g_branch_id);

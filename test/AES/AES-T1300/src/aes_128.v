@@ -18,10 +18,10 @@ module aes_128(clk, state, key, out, rk1, rk2, rk3, rk4, rk5, rk6, rk7, rk8);
     input          clk;
     input  [127:0] state, key;
     output [127:0] out;
-	 output [127:0] rk1, rk2, rk3, rk4, rk5, rk6, rk7, rk8;
+	output [127:0] rk1, rk2, rk3, rk4, rk5, rk6, rk7, rk8;
     reg    [127:0] s0, k0;
     wire   [127:0] s1, s2, s3, s4, s5, s6, s7, s8, s9,
-                   k1, k2, k3, k4, k5, k6, k7, k8, k9,
+                   k1, k2, k3, k4, k5, k6, k7, k8, k9, k10,
                    k0b, k1b, k2b, k3b, k4b, k5b, k6b, k7b, k8b, k9b;
 
     always @ (posedge clk)
@@ -30,15 +30,15 @@ module aes_128(clk, state, key, out, rk1, rk2, rk3, rk4, rk5, rk6, rk7, rk8);
         k0 <= key;
       end
 
-	 assign rk1 = k1;
-	 assign rk2 = k2;
-	 assign rk3 = k3;
-	 assign rk4 = k4;
-	 assign rk5 = k5;
-	 assign rk6 = k6;
-	 assign rk7 = k7;
-	 assign rk8 = k8;
-
+	assign rk1 = k1;
+	assign rk2 = k2;
+	assign rk3 = k3;
+	assign rk4 = k4;
+	assign rk5 = k5;
+	assign rk6 = k6;
+	assign rk7 = k7;
+	assign rk8 = k8;
+	 
     expand_key_128
         a1 (clk, k0, k1, k0b, 8'h1),
         a2 (clk, k1, k2, k1b, 8'h2),
@@ -49,7 +49,7 @@ module aes_128(clk, state, key, out, rk1, rk2, rk3, rk4, rk5, rk6, rk7, rk8);
         a7 (clk, k6, k7, k6b, 8'h40),
         a8 (clk, k7, k8, k7b, 8'h80),
         a9 (clk, k8, k9, k8b, 8'h1b),
-       a10 (clk, k9,   , k9b, 8'h36);
+       a10 (clk, k9, k10, k9b, 8'h36);
 
     one_round
         r1 (clk, s0, k0b, s1),
@@ -77,15 +77,24 @@ module expand_key_128(clk, in, out_1, out_2, rcon);
     reg        [31:0]  k0a, k1a, k2a, k3a;
     wire       [31:0]  k0b, k1b, k2b, k3b, k4a;
 
-    assign {k0, k1, k2, k3} = in;
+    //assign {k0, k1, k2, k3} = in;
+    assign k0 = in[127:96];
+    assign k1 = in[95:64];
+    assign k2 = in[63:32];
+    assign k3 = in[31:0];
     
     assign v0 = {k0[31:24] ^ rcon, k0[23:0]};
     assign v1 = v0 ^ k1;
     assign v2 = v1 ^ k2;
     assign v3 = v2 ^ k3;
 
-    always @ (posedge clk)
-        {k0a, k1a, k2a, k3a} <= {v0, v1, v2, v3};
+    always @ (posedge clk) begin
+        //{k0a, k1a, k2a, k3a} <= {v0, v1, v2, v3};
+        k0a <= v0;
+        k1a <= v1;
+        k2a <= v2;
+        k3a <= v3;
+    end
 
     S4
         S4_0 (clk, {k3[23:0], k3[31:24]}, k4a);

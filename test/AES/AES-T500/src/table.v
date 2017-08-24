@@ -26,10 +26,10 @@ module table_lookup (clk, state, p0, p1, p2, p3);
     assign p2 = {k2[23:0], k2[31:24]};
     
     //assign {b0, b1, b2, b3} = state;
-    assign b0 = state[127:96];
-    assign b1 = state[95:64];
-    assign b2 = state[63:32];
-    assign b3 = state[31:0];
+    assign b0 = state[31:24];
+    assign b1 = state[23:16];
+    assign b2 = state[15:8];
+    assign b3 = state[7:0];
     
     T
         t0 (clk, b0, k0),
