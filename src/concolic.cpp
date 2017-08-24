@@ -27,7 +27,8 @@ static void post_processing(ivl_design_t design);
 static void extract_parameters(ivl_design_t design);
 
 extern "C" int target_design(ivl_design_t design) {
-	//set globals
+	start_time = clock();
+    //set globals
 	g_design = design;
     
     pre_processing(design);

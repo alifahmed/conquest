@@ -1009,14 +1009,18 @@ void SMTNumber::print(std::stringstream& ss) {
 }
 
 void SMTNumber::emit_verilog_value() {
-    const char* str = value_hex.c_str();
-    if(width & 3){
-        str = value_bin.c_str();
+    if(is_signed){
+        fprintf(g_out, "%u\'s", width);
     }
-    if(!is_signed){
-        fprintf(g_out, "%u\'b%s", width, str);
-    } else{
-        fprintf(g_out, "%u\'sb%s", width, str);
+    else{
+        fprintf(g_out, "%u\'", width);
+    }
+    
+    if(width & 3){
+        fprintf(g_out, "b%s", value_bin.c_str());
+    }
+    else{
+        fprintf(g_out, "h%s", value_hex.c_str());
     }
 }
 

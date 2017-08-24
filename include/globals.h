@@ -4,6 +4,7 @@
 #include "ivl_target.h"
 #include "data_mem.h"
 #include <cstdio>
+#include <ctime>
 
 //global variables
 extern FILE*			g_out;
@@ -16,6 +17,7 @@ extern const char*      g_tb_file;
 extern const char*		g_data_mem;
 extern const char*		g_data_mem_raw;
 extern CTDataMem		g_data;
+extern clock_t          start_time;
 
 //Parameters
 extern uint     		g_unroll;

@@ -23,7 +23,6 @@ const bool		enable_all_target = false;
 
 static SMTBranch* target_branch;
 static inline void free_stack();
-static clock_t start_time;
 context_t *yices_context;
 static vector<constraint_t*> constraints_stack;
 static char sim_file_name[64];
@@ -131,6 +130,7 @@ void init_hash_table(){
 }
 
 static void init() {
+    compile();
     init_hash_table();
     if(enable_yices_debug){
         f_dbg = fopen("debug.log", "w");
@@ -139,7 +139,6 @@ static void init() {
     yices_default_config_for_logic(config, "QF_BV");
     yices_context = yices_new_context(config);
     yices_free_config(config);
-	compile();
 }
 
 static void set_sim_log_name(uint sim_num) {
@@ -370,8 +369,10 @@ static bool concolic_iteration(uint sim_num) {
     //builds stack and also updates coverage
     build_stack();
 	if(target_branch->is_covered()){
+        clock_t end_time = clock();
 		free_stack();
 		printf("Branch %u covered in %u iterations\n", target_branch->id, sim_num);
+        printf("Time: %0.2lf sec\n", (end_time - start_time)/double(CLOCKS_PER_SEC));
 		return false;
 	}
 	if(enable_yices_debug){

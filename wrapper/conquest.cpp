@@ -22,14 +22,14 @@ int main(int argc, char** argv){
 	string cmd;
 	if(g_branch_id == 0xDEADBEEF){
 		//call Concolic tester
-		cmd = "iverilog_dev -t conquest -o conquest_dut.v -f " + g_src_file + 
+		cmd = "iverilog -t conquest -o conquest_dut.v -f " + g_src_file + 
             " -pclk=" + g_clock_name + " -preset=" + g_reset_name + 
             " -preset_edge=" + to_string(g_reset_edge) + " -punroll=" + 
             to_string(g_unroll_cycle);
 	}
 	else{
 		//call Concolic tester
-		cmd = "iverilog_dev -t conquest -o conquest_dut.v -f " + g_src_file + 
+		cmd = "iverilog -t conquest -o conquest_dut.v -f " + g_src_file + 
             " -pclk=" + g_clock_name + " -preset=" + g_reset_name + 
             " -preset_edge=" + to_string(g_reset_edge) + " -punroll=" + 
             to_string(g_unroll_cycle) + " -pbid=" + to_string(g_branch_id);

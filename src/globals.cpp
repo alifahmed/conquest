@@ -20,6 +20,7 @@ const char*     g_tb_file = "conquest_tb.v";
 const char*		g_data_mem = "data.mem";
 const char*     g_data_mem_raw = "data_raw.mem";
 CTDataMem		g_data;
+clock_t         start_time;
 
 //Parameters
 uint			g_unroll;
