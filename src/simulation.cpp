@@ -410,7 +410,7 @@ void start_concolic() {
 	if(!enable_all_target){
 		SMTAssign* assign = SMTAssign::get_assign(g_branch_id);
 		if(assign->assign_type == SMT_ASSIGN_BRANCH){
-			copy_file(g_data_mem_raw, g_data_mem);
+			//copy_file(g_data_mem_raw, g_data_mem);
 			target_branch = dynamic_cast<SMTBranch*>(assign);
 			assert(target_branch);
 			target_branch->update_distance();

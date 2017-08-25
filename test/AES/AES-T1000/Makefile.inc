@@ -5,7 +5,7 @@ CLK_NAME 	= clk
 RESET_NAME 	= rst
 RESET_EDGE 	= 1
 UNROLL_CYC	= 10
-TARGET		= 178687
+TARGET		= 178681
 OBJ_SRC 	= 	./src/aes_128.v		\
 				./src/lfsr.v		\
 				./src/round.v		\

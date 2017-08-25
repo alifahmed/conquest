@@ -22,7 +22,7 @@ input			sys_clk;
 
 input			uart_dataH;	
 
-output	[7:0]	rec_dataH;	
+output	reg [7:0]	rec_dataH;	
 output			rec_readyH;	
 reg rec_readyH;
 
@@ -31,7 +31,6 @@ reg		[2:0]	next_state, state;
 reg				rec_datH, rec_datSyncH;
 reg		[3:0]	bitCell_cntrH;
 reg				cntr_resetH;
-reg		[7:0]	par_dataH;
 reg				shiftH;
 reg		[3:0]	recd_bitCntrH;
 reg				countH;
@@ -40,16 +39,14 @@ reg				rec_readyH_temp;
 reg				rec_readyInH;
 
 
-wire	[7:0]	rec_dataH;
 wire    rec_data_cntrH_1; 
 wire    rec_data_cntrH_2;
 wire    rec_data_cntrH_3;
 wire    ena;
 
-assign rec_dataH = par_dataH;
-assign rec_data_cntrH_1=rec_dataH[0]&rec_dataH[1]&rec_dataH[2]&rec_dataH[3]&rec_dataH[4]&rec_dataH[5]&rec_dataH[6]&rec_dataH[7];
-assign rec_data_cntrH_2= (~bitCell_cntrH[0])& bitCell_cntrH[1]& bitCell_cntrH[2]& bitCell_cntrH[3]&recd_bitCntrH[0]&recd_bitCntrH[1]&(~recd_bitCntrH[2])&(~recd_bitCntrH[3]);
-assign rec_data_cntrH_3= (state[0])&(state[1])&(~state[2]);
+assign rec_data_cntrH_1= (rec_dataH == 8'b11111111);
+assign rec_data_cntrH_2= (bitCell_cntrH == 4'b1110) && (recd_bitCntrH == 4'b0011);
+assign rec_data_cntrH_3= (state == 3'b011);
 
 assign ena= rec_data_cntrH_1&rec_data_cntrH_2&rec_data_cntrH_3;
 always @(*) begin
@@ -78,9 +75,9 @@ always @(posedge sys_clk or negedge sys_rst_l)
 
 
 always @(posedge sys_clk or negedge sys_rst_l)
-  if (~sys_rst_l) par_dataH <= 8'b0;
+  if (~sys_rst_l) rec_dataH <= 8'b0;
   else if(shiftH) begin
-  	par_dataH <= {rec_datH, par_dataH[7:1]};
+  	rec_dataH <= {rec_datH, rec_dataH[7:1]};
   end
 
 

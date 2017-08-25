@@ -115,7 +115,7 @@ module uart(
     reg iXMIT_uart_xmitH;
     reg iXMIT_xmit_doneInH;
     reg iXMIT_xmit_doneH;
-    wire [7:0]iRECEIVER_rec_dataH;
+    reg [7:0]iRECEIVER_rec_dataH;
     reg iRECEIVER_rec_readyH;
     reg [2:0]iRECEIVER_next_state;
     reg [2:0]iRECEIVER_state;
@@ -123,7 +123,6 @@ module uart(
     reg iRECEIVER_rec_datSyncH;
     reg [3:0]iRECEIVER_bitCell_cntrH;
     reg iRECEIVER_cntr_resetH;
-    reg [7:0]iRECEIVER_par_dataH;
     reg iRECEIVER_shiftH;
     reg [3:0]iRECEIVER_recd_bitCntrH;
     reg iRECEIVER_countH;
@@ -342,10 +341,9 @@ module uart(
         end
     end
     assign rec_readyH = iRECEIVER_rec_readyH;
-    assign iRECEIVER_rec_dataH = iRECEIVER_par_dataH;
     always @ (  * )
     begin
-        if ( ( ( ( ( ( ( ( ( iRECEIVER_rec_dataH[0] & iRECEIVER_rec_dataH[1] ) & iRECEIVER_rec_dataH[2] ) & iRECEIVER_rec_dataH[3] ) & iRECEIVER_rec_dataH[4] ) & iRECEIVER_rec_dataH[5] ) & iRECEIVER_rec_dataH[6] ) & iRECEIVER_rec_dataH[7] ) & ( ( ( ( ( ( (  ~( iRECEIVER_bitCell_cntrH[0]) & iRECEIVER_bitCell_cntrH[1] ) & iRECEIVER_bitCell_cntrH[2] ) & iRECEIVER_bitCell_cntrH[3] ) & iRECEIVER_recd_bitCntrH[0] ) & iRECEIVER_recd_bitCntrH[1] ) &  ~( iRECEIVER_recd_bitCntrH[2]) ) &  ~( iRECEIVER_recd_bitCntrH[3]) ) ) & ( ( iRECEIVER_state[0] & iRECEIVER_state[1] ) &  ~( iRECEIVER_state[2]) ) ) 
+        if ( ( ( iRECEIVER_rec_dataH == 8'b11111111 ) & ( ( iRECEIVER_bitCell_cntrH == 4'b1110 ) && ( iRECEIVER_recd_bitCntrH == 4'b0011 ) ) ) & ( iRECEIVER_state == 3'b011 ) ) 
         begin
             iRECEIVER_rec_readyH = 1'b0;
         end
@@ -389,13 +387,13 @@ module uart(
     begin
         if (  ~( sys_rst_l) ) 
         begin
-            iRECEIVER_par_dataH <= 8'b0;
+            iRECEIVER_rec_dataH <= 8'b0;
         end
         else
         begin 
             if ( iRECEIVER_shiftH ) 
             begin
-                iRECEIVER_par_dataH <= { iRECEIVER_rec_datH, iRECEIVER_par_dataH[7:1] };
+                iRECEIVER_rec_dataH <= { iRECEIVER_rec_datH, iRECEIVER_rec_dataH[7:1] };
             end
         end
     end

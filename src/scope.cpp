@@ -8,8 +8,8 @@ using namespace std;
 
 static void emit_sig_id(ivl_signal_t sig) {
 	emit_id(ivl_signal_basename(sig));
-	//fprintf(g_out, " = %u\'b0;\n", ivl_signal_width(sig));
-	fprintf(g_out, ";\n");
+	fprintf(g_out, " = %u\'b0;\n", ivl_signal_width(sig));
+	//fprintf(g_out, ";\n");
 }
 
 static void emit_var_def(ivl_signal_t sig) {
@@ -32,8 +32,8 @@ static void emit_var_def(ivl_signal_t sig) {
 			fprintf(g_out, " [%d:%d]", first, last);
 		}
 	}
-	//fprintf(g_out, " = %u\'b0;\n", ivl_signal_width(sig));
-	fprintf(g_out, ";\n");
+	fprintf(g_out, " = %u\'b0;\n", ivl_signal_width(sig));
+	//fprintf(g_out, ";\n");
 }
 
 /*

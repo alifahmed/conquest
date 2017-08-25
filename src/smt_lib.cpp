@@ -679,7 +679,7 @@ void SMTAssign::instrument() {
 		this->set_covered(0);
         return;
     }
-	//fprintf(g_out, " $display(\";A %u\");\t\t//%s", id, str.c_str());
+	fprintf(g_out, " $display(\";A %u\");\t\t//%s", id, str.c_str());
 	conc_flush(g_out);
 }
 
@@ -840,7 +840,7 @@ void SMTBranch::instrument() {
 		this->set_covered(0);
         return;
     }
-	//fprintf(g_out, "%*c$display(\";A %u\");\t\t//%s", get_indent(), ' ', id, str.c_str());
+	fprintf(g_out, "%*c$display(\";A %u\");\t\t//%s", get_indent(), ' ', id, str.c_str());
 	conc_flush(g_out);
 }
 

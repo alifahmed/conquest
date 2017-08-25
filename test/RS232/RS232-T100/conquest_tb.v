@@ -10,7 +10,6 @@ module conquest_tb();
     reg  uart_REC_dataH = 1'b0;
     wire [7:0] rec_dataH = 8'b0;
     wire rec_readyH = 1'b0;
-    reg  __obs;
 
     // Generated top module instance
     uart _conc_top_inst(
@@ -22,13 +21,12 @@ module conquest_tb();
             .xmit_doneH( xmit_doneH ),
             .uart_REC_dataH( uart_REC_dataH ),
             .rec_dataH ( rec_dataH ),
-            .rec_readyH( rec_readyH ),
-            .__obs     ( __obs ));
+            .rec_readyH( rec_readyH ));
 
     // Generated internal use signals
     reg  [31:0] _conc_pc;
-    reg  [10:0] _conc_opcode;
-    reg  [10:0] _conc_ram[0:200];
+    reg  [9:0] _conc_opcode;
+    reg  [9:0] _conc_ram[0:1];
 
 
     // Generated clock pulse
@@ -40,7 +38,6 @@ module conquest_tb();
     always @(posedge sys_clk) begin
         _conc_pc = _conc_pc + 32'b1;
         _conc_opcode = _conc_ram[_conc_pc];
-        __obs <= #1 _conc_opcode[10];
         uart_REC_dataH <= #1 _conc_opcode[9];
         xmitH <= #1 _conc_opcode[0];
         xmit_dataH <= #1 _conc_opcode[8:1];
@@ -55,14 +52,13 @@ module conquest_tb();
         _conc_pc = 32'b1;
         $readmemb("data.mem", _conc_ram);
         _conc_opcode = _conc_ram[1];
-        __obs <= #1 _conc_opcode[10];
         uart_REC_dataH <= #1 _conc_opcode[9];
         xmitH <= #1 _conc_opcode[0];
         xmit_dataH <= #1 _conc_opcode[8:1];
         #2 sys_clk = 1'b1;
         sys_rst_l = 1'b0;
         #5 sys_rst_l = 1'b1;
-        #2000 $finish;
+        #10 $finish;
     end
 
 endmodule

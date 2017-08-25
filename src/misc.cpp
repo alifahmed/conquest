@@ -615,7 +615,7 @@ bool is_file_exists(const char* file){
 
 void copy_file(const char* src_file, const char* dest_file){
     int source = open(src_file, O_RDONLY, 0);
-    int dest = open(dest_file, O_WRONLY | O_CREAT, 0644);
+    int dest = open(dest_file, O_WRONLY | O_CREAT | O_TRUNC, 0644);
     
     struct stat stat_source;
     fstat(source, &stat_source);
