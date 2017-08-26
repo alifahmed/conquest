@@ -1,0 +1,4 @@
+Running: xsim.dir/conquest_tb_behav/xsimk -simmode gui -wdb conquest_tb_behav.wdb -simrunnum 0 -socket 40171
+Design successfully loaded
+Design Loading Memory Usage: 53128 KB (Peak: 53196 KB)
+Design Loading CPU Usage: 10 ms

@@ -30,7 +30,6 @@ static char cnst_file_name[64];
 static char mem_file_name[64];
 static uint hash_table[1024*16];
 static uint sim_num;
-FILE* f_dbg;
 
 static SMTBranch* selected_branch;
 static uint selected_clock;
@@ -132,9 +131,6 @@ void init_hash_table(){
 static void init() {
     compile();
     init_hash_table();
-    if(enable_yices_debug){
-        f_dbg = fopen("debug.log", "w");
-    }
     ctx_config_t *config = yices_new_config();
     yices_default_config_for_logic(config, "QF_BV");
     yices_context = yices_new_context(config);
@@ -173,7 +169,7 @@ static void dump_yices_constraints(uint top_idx) {
 	for(uint i=0; i<=top_idx; i++){
 		constraint_t* cnst = constraints_stack[i];
 		if(cnst->type != CNST_CLK){
-			smt_yices_assert(yices_context, cnst->yices_term, cnst->obj);
+            yices_assert_formula(yices_context, cnst->yices_term);
 		}
 	}
 }
@@ -332,6 +328,30 @@ static bool find_next_cfg(){
 	return false;
 }
 
+static void smt_yices_dump_error(){
+    //reset context
+    yices_reset_context(yices_context);
+
+    //insert initial assertion to zero for registers
+    SMTSigCore::yices_insert_reg_init(yices_context);
+
+    FILE* f_dbg = fopen("debug.txt", "w");
+    
+    //dump yices constraints
+    for(auto it:constraints_stack){
+		if(it->type != CNST_CLK){
+            fprintf(f_dbg, "[%3u]    ", it->obj->id);
+            yices_pp_term(f_dbg, it->yices_term, 1000, 1, 0);
+            yices_assert_formula(yices_context, it->yices_term);
+            if(yices_check_context(yices_context, NULL) == STATUS_UNSAT){
+                break;
+            }
+		}
+	}
+    
+    fclose(f_dbg);
+}
+
 static void check_satisfiability(){
     //reset context
     yices_reset_context(yices_context);
@@ -342,20 +362,14 @@ static void check_satisfiability(){
     //dump yices constraints
     dump_yices_constraints(constraints_stack.size()-1);
 
-    if(enable_yices_debug){
-        fflush(f_dbg);
-    }
-
     //check status
     if(!check_yices_status()){
+        smt_yices_dump_error();
         error("Simulation not satisfiable");
     }
 }
 
 static bool concolic_iteration(uint sim_num) {
-	if(enable_yices_debug){
-		printf("---------------------------------------------new sim---------------------------------------\n");
-	}
 	set_sim_log_name(sim_num);
     set_cnst_log_name(sim_num);
     set_mem_log_name(sim_num);
@@ -374,9 +388,6 @@ static bool concolic_iteration(uint sim_num) {
 		printf("Branch %u covered in %u iterations\n", target_branch->id, sim_num);
         printf("Time: %0.2lf sec\n", (end_time - start_time)/double(CLOCKS_PER_SEC));
 		return false;
-	}
-	if(enable_yices_debug){
-		printf("\n");
 	}
 	
 	if(SMTBranch::total_branch_count ==  SMTBranch::covered_branch_count){
@@ -475,9 +486,6 @@ void start_concolic() {
 void end_concolic(){
     clock_t end_time = clock();
 	fflush(stdout);
-	if(enable_yices_debug){
-		fclose(f_dbg);
-	}
     
     ofstream report("report_cov.log");
     //report << "[TIME] " << difftime(end_time, start_time) << " sec\n";

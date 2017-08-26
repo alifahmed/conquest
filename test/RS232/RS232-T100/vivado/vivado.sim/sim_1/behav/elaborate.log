@@ -1,0 +1,15 @@
+Vivado Simulator 2016.2
+Copyright 1986-1999, 2001-2016 Xilinx, Inc. All Rights Reserved.
+Running: /home/alif/_tools/Xilinx/Vivado/2016.2/bin/unwrapped/lnx64.o/xelab -wto 12f1eb6fce4f42108d4f2b9c914e3054 --debug typical --relax --mt 8 -L xil_defaultlib -L unisims_ver -L unimacro_ver -L secureip --snapshot conquest_tb_behav xil_defaultlib.conquest_tb xil_defaultlib.glbl -log elaborate.log 
+Using 8 slave threads.
+Starting static elaboration
+Completed static elaboration
+Starting simulation data flow analysis
+WARNING: [XSIM 43-4100] "/home/alif/_tools/_developed/conquest/test/RS232/RS232-T100/vivado/vivado.sim/sim_1/behav/glbl.v" Line 6. Module glbl has a timescale but at least one module in design doesn't have timescale.
+WARNING: [XSIM 43-4100] "/home/alif/_tools/_developed/conquest/test/RS232/RS232-T100/vivado/vivado.sim/sim_1/behav/glbl.v" Line 6. Module glbl has a timescale but at least one module in design doesn't have timescale.
+Completed simulation data flow analysis
+Time Resolution for simulation is 1ps
+Compiling module xil_defaultlib.uart
+Compiling module xil_defaultlib.conquest_tb
+Compiling module xil_defaultlib.glbl
+Built simulation snapshot conquest_tb_behav

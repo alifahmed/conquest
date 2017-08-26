@@ -1,0 +1,6 @@
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/alif/_tools/_developed/conquest/test/RS232/RS232-T100/conquest_dut.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module uart
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/alif/_tools/_developed/conquest/test/RS232/RS232-T100/conquest_tb.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module conquest_tb
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/alif/_tools/_developed/conquest/test/RS232/RS232-T100/vivado/vivado.sim/sim_1/behav/glbl.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module glbl

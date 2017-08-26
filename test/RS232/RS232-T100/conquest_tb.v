@@ -46,6 +46,8 @@ module conquest_tb();
 
     // Generated initial block
     initial begin
+    	$dumpfile("out.vcd");
+    	$dumpvars();
         $display(";_C 1");
         sys_clk = 1'b0;
         sys_rst_l = 1'b1;

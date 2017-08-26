@@ -58,28 +58,28 @@ void add_to_rval(set<SMTSigCore*> &assign_set, SMTExpr* expr){
 
 void smt_yices_assert(context_t *ctx, term_t term, SMTAssign* assign){
 	yices_assert_formula(ctx, term);
-	if(enable_yices_debug){
+	/*if(enable_yices_debug){
 		if(assign){
 			//printf(";%s", assign->print(SMT_CLK_CURR).c_str());
 			yices_pp_term(stdout, term, 0xFFFFFF, 1, 0);
 		}
-	}
+	}*/
 }
 
-static uint level = 0;
+//static uint level = 0;
 
 void smt_yices_push(){
 	assert(yices_push(yices_context) == 0);
-	if(enable_yices_debug){
+	/*if(enable_yices_debug){
 		printf(";---------[PUSH %u]---------\n", level++);
-	}
+	}*/
 }
 
 void smt_yices_pop(){
 	assert(yices_pop(yices_context) == 0);
-	if(enable_yices_debug){
+	/*if(enable_yices_debug){
 		printf(";---------[POP %u]----------\n", --level);
-	}
+	}*/
 }
 
 //----------------------------SMT Expr------------------------------------------
@@ -1150,7 +1150,7 @@ void SMTSigCore::restore_versions(uint clock) {
 
 void SMTSigCore::yices_insert_reg_init(context_t* ctx) {
 	for(auto it:reg_list){
-		smt_yices_assert(ctx, it->init_term, NULL);
+		yices_assert_formula(ctx, it->init_term);
 	}
 }
 
