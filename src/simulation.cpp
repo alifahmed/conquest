@@ -15,7 +15,7 @@ using namespace std;
 
 //configuration
 const bool		enable_error_check = true;
-const bool		enable_obs_padding = false;
+const bool		enable_obs_padding = true;
 const bool		enable_sim_copy = false;
 const bool		enable_yices_debug = false;
 const bool		enable_all_target = false;
@@ -231,7 +231,7 @@ static bool find_next_cfg(){
 	
 	//create branches
 	uint idx = 0;
-	while(constraints_stack[idx]->clock < 2){
+	while(constraints_stack[idx]->clock == 0){
 		idx++;
 	}
 	for(; idx < size; idx++){

@@ -5,8 +5,8 @@ module conquest_tb();
     reg  rst;
     reg  [127:0] state = 128'b0;
     reg  [127:0] key = 128'b0;
-    wire [127:0] out = 128'b0;
-    wire [63:0] Capacitance = 64'b0;
+    wire [127:0] out;
+    wire [63:0] Capacitance;
 
     // Generated top module instance
     top _conc_top_inst(
@@ -44,9 +44,6 @@ module conquest_tb();
         rst = 1'b0;
         _conc_pc = 32'b1;
         $readmemb("data.mem", _conc_ram);
-        _conc_opcode = _conc_ram[1];
-        key <= #1 _conc_opcode[255:128];
-        state <= #1 _conc_opcode[127:0];
         #2 clk = 1'b1;
         rst = 1'b1;
         #5 rst = 1'b0;

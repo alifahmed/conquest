@@ -152,14 +152,13 @@ void generate_tb(ivl_scope_t root){
         name = ivl_scope_mod_module_port_name(root, i);
         uint temp_width = ivl_scope_mod_module_port_width(root, i);
         const char* type;
-        bool is_init_val_req = true;
+        bool is_init_val_req = false;
         if(strcmp(name, g_clock_sig_name) == 0){
             if(temp_width != 1){
                 error("Clock signal width is not 1");
             }
             type = "reg ";
             clk_found = true;
-            is_init_val_req = false;
         }
         else if(strcmp(name, g_reset_sig_name) == 0){
             if(temp_width != 1){
@@ -167,12 +166,12 @@ void generate_tb(ivl_scope_t root){
             }
             type = "reg ";
             reset_found = true;
-            is_init_val_req = false;
         } else{
             type = "reg ";
             ivl_signal_port_t port_type = ivl_scope_mod_module_port_type(root, i);
             if(port_type == IVL_SIP_INPUT){
 				g_data.add_input(name, temp_width);
+				is_init_val_req = true;
             } else if(port_type == IVL_SIP_OUTPUT){
                 type = "wire";
             }
@@ -249,20 +248,11 @@ void generate_tb(ivl_scope_t root){
         //Dump initial block
         fprintf(f_tb, "\n%*c// Generated initial block\n", 4, ' ');
         fprintf(f_tb, "%*cinitial begin\n", 4, ' ');
-        fprintf(f_tb, "%*c$display(\";_C 1\");\n", 8, ' ');
         fprintf(f_tb, "%*c%s = 1'b0;\n", 8, ' ', g_clock_sig_name);
         fprintf(f_tb, "%*c%s = %s;\n", 8, ' ', g_reset_sig_name, reset_edge_inactive);
-        fprintf(f_tb, "%*c_conc_pc = 32'b1;\n", 8, ' ');
+        fprintf(f_tb, "%*c_conc_pc = 32'b0;\n", 8, ' ');
         fprintf(f_tb, "%*c$readmemb(\"%s\", _conc_ram);\n", 8, ' ', g_data_mem);
 
-        fprintf(f_tb, "%*c_conc_opcode = _conc_ram[1];\n", 8, ' ');
-        for(auto it:g_data.in_ports){
-			if(it.second->width > 1){
-                fprintf(f_tb, "%*c%s <= #1 _conc_opcode[%u:%u];\n", 8, ' ', it.first.c_str(), it.second->msb, it.second->lsb);
-            } else {
-                fprintf(f_tb, "%*c%s <= #1 _conc_opcode[%u];\n", 8, ' ', it.first.c_str(), it.second->msb);
-            }
-		}
         fprintf(f_tb, "%*c#2 %s = 1'b1;\n", 8, ' ', g_clock_sig_name);
         fprintf(f_tb, "%*c%s = %s;\n", 8, ' ', g_reset_sig_name, g_reset_edge_active);
         fprintf(f_tb, "%*c#5 %s = %s;\n", 8, ' ', g_reset_sig_name, reset_edge_inactive);

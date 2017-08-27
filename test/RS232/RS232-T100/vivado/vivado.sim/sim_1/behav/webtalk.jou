@@ -2,8 +2,8 @@
 # Webtalk v2016.2 (64-bit)
 # SW Build 1577090 on Thu Jun  2 16:32:35 MDT 2016
 # IP Build 1577682 on Fri Jun  3 12:00:54 MDT 2016
-# Start of session at: Fri Aug 25 16:34:17 2017
-# Process ID: 21680
+# Start of session at: Sat Aug 26 19:40:36 2017
+# Process ID: 29704
 # Current directory: /home/alif/_tools/_developed/conquest/test/RS232/RS232-T100/vivado/vivado.sim/sim_1/behav
 # Command line: wbtcv -mode batch -source /home/alif/_tools/_developed/conquest/test/RS232/RS232-T100/vivado/vivado.sim/sim_1/behav/xsim.dir/conquest_tb_behav/webtalk/xsim_webtalk.tcl -notrace
 # Log file: /home/alif/_tools/_developed/conquest/test/RS232/RS232-T100/vivado/vivado.sim/sim_1/behav/webtalk.log

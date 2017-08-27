@@ -1077,6 +1077,7 @@ SMTSigCore::SMTSigCore(ivl_signal_t sig){
     //create zero term
     init_term = yices_eq(term_stack[0], yices_bvconst_zero(width));
 	version_at_clock.resize(g_unroll + 2);
+	version_at_clock[0] = 0;
 }
 
 SMTSigCore::~SMTSigCore() {
@@ -1150,6 +1151,9 @@ void SMTSigCore::restore_versions(uint clock) {
 
 void SMTSigCore::yices_insert_reg_init(context_t* ctx) {
 	for(auto it:reg_list){
+		yices_assert_formula(ctx, it->init_term);
+	}
+	for(auto it:input_list){
 		yices_assert_formula(ctx, it->init_term);
 	}
 }
