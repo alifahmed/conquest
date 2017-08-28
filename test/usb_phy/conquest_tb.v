@@ -4,21 +4,21 @@ module conquest_tb();
     reg  clk;
     reg  rst;
     reg  phy_tx_mode = 1'b0;
-    wire usb_rst = 1'b0;
-    wire txdp = 1'b0;
-    wire txdn = 1'b0;
-    wire txoe = 1'b0;
+    wire usb_rst;
+    wire txdp;
+    wire txdn;
+    wire txoe;
     reg  rxd = 1'b0;
     reg  rxdp = 1'b0;
     reg  rxdn = 1'b0;
     reg  [7:0] DataOut_i = 8'b0;
     reg  TxValid_i = 1'b0;
-    wire TxReady_o = 1'b0;
-    wire RxValid_o = 1'b0;
-    wire RxActive_o = 1'b0;
-    wire RxError_o = 1'b0;
-    wire [7:0] DataIn_o = 8'b0;
-    wire [1:0] LineState_o = 2'b0;
+    wire TxReady_o;
+    wire RxValid_o;
+    wire RxActive_o;
+    wire RxError_o;
+    wire [7:0] DataIn_o;
+    wire [1:0] LineState_o;
     reg  __obs;
 
     // Generated top module instance
@@ -70,19 +70,10 @@ module conquest_tb();
 
     // Generated initial block
     initial begin
-        $display(";_C 1");
         clk = 1'b0;
         rst = 1'b1;
-        _conc_pc = 32'b1;
+        _conc_pc = 32'b0;
         $readmemb("data.mem", _conc_ram);
-        _conc_opcode = _conc_ram[1];
-        DataOut_i <= #1 _conc_opcode[11:4];
-        TxValid_i <= #1 _conc_opcode[12];
-        __obs <= #1 _conc_opcode[13];
-        phy_tx_mode <= #1 _conc_opcode[0];
-        rxd <= #1 _conc_opcode[1];
-        rxdn <= #1 _conc_opcode[3];
-        rxdp <= #1 _conc_opcode[2];
         #2 clk = 1'b1;
         rst = 1'b0;
         #5 rst = 1'b1;

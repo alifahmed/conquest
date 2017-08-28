@@ -442,7 +442,7 @@ void start_concolic() {
 			}
 		}
 		else{
-			printf("Selected id is not of a branch...");
+			printf("Selected id is not of a branch...\n");
 		}
 	} else{
 		SMTBranch::save_coverage();

@@ -7,6 +7,7 @@ module conquest_tb();
     reg  [127:0] key = 128'b0;
     wire [127:0] out;
     wire [63:0] Capacitance;
+    reg  __obs;
 
     // Generated top module instance
     top _conc_top_inst(
@@ -15,12 +16,13 @@ module conquest_tb();
             .state     ( state ),
             .key       ( key ),
             .out       ( out ),
-            .Capacitance( Capacitance ));
+            .Capacitance( Capacitance ),
+            .__obs     ( __obs ));
 
     // Generated internal use signals
     reg  [31:0] _conc_pc;
-    reg  [255:0] _conc_opcode;
-    reg  [255:0] _conc_ram[0:10];
+    reg  [256:0] _conc_opcode;
+    reg  [256:0] _conc_ram[0:10];
 
 
     // Generated clock pulse
@@ -32,6 +34,7 @@ module conquest_tb();
     always @(posedge clk) begin
         _conc_pc = _conc_pc + 32'b1;
         _conc_opcode = _conc_ram[_conc_pc];
+        __obs <= #1 _conc_opcode[256];
         key <= #1 _conc_opcode[255:128];
         state <= #1 _conc_opcode[127:0];
         $strobe(";_C %d", _conc_pc);
@@ -39,10 +42,9 @@ module conquest_tb();
 
     // Generated initial block
     initial begin
-        $display(";_C 1");
         clk = 1'b0;
         rst = 1'b0;
-        _conc_pc = 32'b1;
+        _conc_pc = 32'b0;
         $readmemb("data.mem", _conc_ram);
         #2 clk = 1'b1;
         rst = 1'b1;

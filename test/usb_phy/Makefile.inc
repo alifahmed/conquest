@@ -5,6 +5,7 @@ CLK_NAME 	= clk
 RESET_NAME 	= rst
 RESET_EDGE 	= 0
 UNROLL_CYC	= 20
+TARGET		= 335
 OBJ_SRC 	= ./src/usb_phy.v		\
 		./src/usb_rx_phy.v			\
 		./src/usb_tx_phy.v
