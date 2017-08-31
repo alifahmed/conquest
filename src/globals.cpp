@@ -27,4 +27,4 @@ uint			g_unroll;
 const char*     g_clock_sig_name;
 const char*     g_reset_sig_name;
 const char*     g_reset_edge_active;
-uint			g_branch_id = 0xDEADBEEF;
+//uint			g_branch_id = 0xDEADBEEF;

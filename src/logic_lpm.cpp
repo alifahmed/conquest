@@ -1285,7 +1285,7 @@ void emit_signal_net_const_as_ca(ivl_scope_t scope, ivl_signal_t sig) {
 		fprintf(g_out, " = ");
 		SMTExpr* rval = emit_const_nexus(scope, net_const);
 		fprintf(g_out, ";");
-		SMTAssign* smt_assign = new SMTBlockingAssign(lval, rval);
+		new SMTBlockingAssign(lval, rval);
 		g_ind -= g_ind_incr;
 		fprintf(g_out, "%*cend\n\n", g_ind, ' ');
         SMTProcess::curr_proc = NULL;

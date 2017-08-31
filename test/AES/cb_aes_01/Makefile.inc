@@ -4,8 +4,8 @@ TOP_MODULE 	= top
 CLK_NAME 	= clk
 RESET_NAME 	= rst
 RESET_EDGE 	= 1
-UNROLL_CYC	= 10
-TARGET		= 178686
+UNROLL_CYC	= 5
+TARGET		= 236
 OBJ_SRC 	= 	./src/aes_128.v		\
 				./src/round.v		\
 				./src/table.v		\

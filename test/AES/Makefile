@@ -39,6 +39,7 @@ clean:
 	@rm -rf *.v
 	@rm -rf *.out
 	@rm -rf data.mem
+	@rm -rf data_raw.mem
 	@rm -rf *.txt
 	@rm -rf *.vvp
 	@rm -rf *.log

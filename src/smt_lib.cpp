@@ -116,6 +116,22 @@ void SMTExpr::free_all() {
 }
 
 
+
+//------------------------------SMT String--------------------------------------
+SMTString::SMTString(const char* str) :  SMTExpr(SMT_EXPR_STRING){
+	_string = str;
+}
+
+void SMTString::print(std::stringstream& ss) {
+	ss << _string;
+}
+
+term_t SMTString::eval_term(SMTClkType clk) {
+	yices_term = NULL_TERM;
+	is_term_eval_needed = false;
+	return NULL_TERM;
+}
+
 //----------------------------SMT Unspecified-----------------------------------
 SMTUnspecified::SMTUnspecified() : SMTExpr(SMT_EXPR_UNSPECIFIED){
 }
@@ -1304,6 +1320,7 @@ void SMTProcess::make_circular() {
 
 //--------------------------SMT Basic Block-------------------------------------
 uint SMTBasicBlock::id_counter = 0;
+SMTBasicBlock* SMTBasicBlock::target = NULL;
 std::vector<SMTBasicBlock*> SMTBasicBlock::block_list;
 SMTBasicBlock::SMTBasicBlock() : id(id_counter) {
     id_counter++;
@@ -1383,6 +1400,22 @@ void SMTBasicBlock::reset_distances() {
     for(auto it:block_list){
         it->distance = initial_distance;
     }
+}
+
+void SMTBasicBlock::set_target(SMTBasicBlock* tgt) {
+	if(target){
+		error("More than one target specified");
+	}
+	target = tgt;
+}
+
+SMTBranch* SMTBasicBlock::get_target() {
+	if(!target){
+		error("Target not specified. Add a $display() at target position.");
+	}
+	SMTBranch* br = dynamic_cast<SMTBranch*>(target->assign_list[0]);
+	assert(br);
+	return br;
 }
 
 //----------------------------SMT Globals---------------------------------------

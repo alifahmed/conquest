@@ -544,6 +544,26 @@ static void emit_stmt_wait(ivl_scope_t scope, ivl_statement_t stmt) {
 	emit_blocked_stmt(scope, ivl_stmt_sub_stmt(stmt));
 }
 
+static void emit_stmt_stask(ivl_scope_t scope, ivl_statement_t stmt) {
+	const char* name = ivl_stmt_name(stmt);
+	if(strcmp(name, "$display")){
+		error("Only $display system call is supported. Used \"%s\" at %s:%u", name, ivl_stmt_file(stmt), ivl_stmt_lineno(stmt));
+	}
+	
+	fprintf(g_out, "%*c%s(", get_indent(), ' ', name);
+	const uint count = ivl_stmt_parm_count(stmt);
+	if(count){
+		emit_expr(scope, ivl_stmt_parm(stmt, 0));
+	}
+	for(uint i = 1; i < count; i++){
+		fprintf(g_out, ", ");
+		emit_expr(scope, ivl_stmt_parm(stmt, i));
+	}
+	fprintf(g_out, ");\n");
+	
+	SMTBasicBlock::set_target(SMTProcess::curr_proc->top_bb);
+}
+
 void emit_stmt(ivl_scope_t scope, ivl_statement_t stmt) {
 	switch (ivl_statement_type(stmt)) {
 		case IVL_ST_ASSIGN:
@@ -572,6 +592,10 @@ void emit_stmt(ivl_scope_t scope, ivl_statement_t stmt) {
 			break;
 		case IVL_ST_CONDIT:
 			emit_stmt_condit(scope, stmt);
+			break;
+		case IVL_ST_STASK:
+			//System task. Emit as is
+			emit_stmt_stask(scope, stmt);
 			break;
 		case IVL_ST_DELAY:
 			//emit_stmt_delay(scope, stmt);

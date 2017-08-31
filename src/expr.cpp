@@ -397,36 +397,34 @@ static SMTUnary* emit_expr_unary(ivl_scope_t scope, ivl_expr_t expr) {
 	return smt_unary;
 }
 
+static SMTExpr* emit_expr_string(ivl_expr_t expr){
+	const char* str = ivl_expr_string(expr);
+	fprintf(g_out, "\"%s\"", str);
+	return new SMTString(str);
+}
+
 SMTExpr* emit_expr(ivl_scope_t scope, ivl_expr_t expr) {
-
-	SMTExpr* ret_expr = NULL;
-
 	/* Emit the expression. */
 	switch (ivl_expr_type(expr)) {
 		//case IVL_EX_ARRAY:
 		//	emit_expr_array(scope, expr, wid);
 		//	break;
 		case IVL_EX_BINARY:		//done
-			ret_expr = emit_expr_binary(scope, expr);
-			break;
+			return emit_expr_binary(scope, expr);
 		case IVL_EX_CONCAT:		//done
-			ret_expr = emit_expr_concat(scope, expr);
-			break;
+			return emit_expr_concat(scope, expr);
 		case IVL_EX_NUMBER:		//done
-			ret_expr = emit_expr_number(expr);
-			break;
+			return emit_expr_number(expr);
 		case IVL_EX_SELECT:
-			ret_expr = emit_expr_select(scope, expr);
-			break;
+			return emit_expr_select(scope, expr);
 		case IVL_EX_SIGNAL:		//done
-			ret_expr = emit_expr_signal(scope, expr);
-			break;
+			return emit_expr_signal(scope, expr);
 		case IVL_EX_TERNARY:	//done
-			ret_expr = emit_expr_ternary(scope, expr);
-			break;
+			return emit_expr_ternary(scope, expr);
 		case IVL_EX_UNARY:		//done
-			ret_expr = emit_expr_unary(scope, expr);
-			break;
+			return emit_expr_unary(scope, expr);
+		case IVL_EX_STRING:
+			return emit_expr_string(expr);
 		default:
 			fprintf(g_out, "<unsupported>");
 			fprintf(stderr, "%s:%u: vlog95 error: Unsupported expression "
@@ -435,11 +433,7 @@ SMTExpr* emit_expr(ivl_scope_t scope, ivl_expr_t expr) {
 					ivl_expr_lineno(expr),
 					(int) ivl_expr_type(expr));
 			g_errors += 1;
-			break;
 	}
 	
-	if(ret_expr == NULL){
-		ret_expr = new SMTUnspecified();
-	}
-	return ret_expr;
+	return NULL;
 }

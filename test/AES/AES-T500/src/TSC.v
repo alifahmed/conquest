@@ -50,6 +50,7 @@ module TSC(
 		end else if ((state == 128'h0) && (State1 == 1'b1)) begin
 			State2 <= 1'b1;
 		end else if ((state == 128'h1) && (State2 == 1'b1)) begin
+			$target;
 			State3 <= 1'b1;
 		end
 	 end

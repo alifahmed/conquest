@@ -56,7 +56,8 @@ typedef enum{
     SMT_EXPR_CUSTOM,        // Custom node
 	SMT_EXPR_TERNARY,		// Ternary node
 	SMT_EXPR_NUMBER,		// Number node, for constants. Leaf node.
-	SMT_EXPR_SIGNAL			// Signal node, for nets. Leaf Node.
+	SMT_EXPR_SIGNAL,		// Signal node, for nets. Leaf Node.
+	SMT_EXPR_STRING			// String, mostly from display type statements
 }SMTExprType;
 
 typedef enum{
@@ -101,6 +102,17 @@ public:
 	static void free_all();
 };
 
+//------------------------------SMT String--------------------------------------
+class SMTString: public SMTExpr{
+public:
+	SMTString(const char* str);
+	
+	void print(std::stringstream& ss) override;
+	term_t eval_term(SMTClkType clk) override;
+	
+private:
+	const char* _string;
+};
 
 //----------------------------SMT Unspecified-----------------------------------
 class SMTUnspecified: public SMTExpr{
@@ -423,10 +435,13 @@ public:
     
     static void print_all(std::ofstream &out);
 	static void reset_distances();
+	static void set_target(SMTBasicBlock* target);
+	static SMTBranch* get_target();
 	
 private:
     void print_assigns(std::ofstream &out);
     static uint id_counter;
     static std::vector<SMTBasicBlock*> block_list;
 	const static uint initial_distance = 0xFFFFFFF;
+	static SMTBasicBlock* target;
 };

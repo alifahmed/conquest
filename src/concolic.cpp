@@ -115,7 +115,7 @@ void extract_parameters(ivl_design_t design){
 	
 	const char* bid = ivl_design_flag(design, "bid");
 	if((bid != NULL) && strcmp(bid, "")){
-		g_branch_id = atoi(bid);
+		//g_branch_id = atoi(bid);
 	}
 }
 

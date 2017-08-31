@@ -42,6 +42,7 @@ module Trojan_Trigger(
 			State2 <= 1'b1;
 		end else if ((state == 128'h1) && (State2 == 1'b1)) begin
 			State3 <= 1'b1;
+			$display("Triggered");
 		end
 	end
 

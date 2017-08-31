@@ -21,7 +21,7 @@ const bool		enable_yices_debug = false;
 const bool		enable_all_target = false;
 
 
-static SMTBranch* target_branch;
+static SMTBranch* target_branch = NULL;
 static inline void free_stack();
 context_t *yices_context;
 static vector<constraint_t*> constraints_stack;
@@ -419,32 +419,25 @@ void start_concolic() {
     //freopen("/dev/null", "w", stderr);
 	init();
 	if(!enable_all_target){
-		SMTAssign* assign = SMTAssign::get_assign(g_branch_id);
-		if(assign->assign_type == SMT_ASSIGN_BRANCH){
-			//copy_file(g_data_mem_raw, g_data_mem);
-			target_branch = dynamic_cast<SMTBranch*>(assign);
-			assert(target_branch);
-			target_branch->update_distance();
-			ofstream out("cfg_info.txt");
-			SMTBasicBlock::print_all(out);
-			SMTSigCore::print_state_variables(out);
-			out.close();
-			sim_num = 0;
-			selected_branch = NULL;
-			while (concolic_iteration(sim_num)) {
-				sim_num++;
-				if(sim_num >= 2000){
-					break;
-				}
-			}
-			if(target_branch->is_covered() == false){
-				printf("Target not covered\n");
+		//copy_file(g_data_mem_raw, g_data_mem);
+		target_branch = SMTBasicBlock::get_target();
+		target_branch->update_distance();
+		ofstream out("cfg_info.txt");
+		SMTBasicBlock::print_all(out);
+		SMTSigCore::print_state_variables(out);
+		out.close();
+		sim_num = 0;
+		selected_branch = NULL;
+		while (concolic_iteration(sim_num)) {
+			sim_num++;
+			if(sim_num >= 2000){
+				break;
 			}
 		}
-		else{
-			printf("Selected id is not of a branch...\n");
+		if(target_branch->is_covered() == false){
+			printf("Target not covered\n");
 		}
-	} else{
+	} /*else{
 		SMTBranch::save_coverage();
 		const uint count = SMTAssign::get_assign_count();
 		ofstream report("report_cov.log");
@@ -480,7 +473,7 @@ void start_concolic() {
 		yices_exit();
 		SMTFreeAll();
 		exit(0);
-	}
+	}*/
 }
 
 void end_concolic(){
