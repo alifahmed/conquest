@@ -149,6 +149,7 @@ module b06(
 			s_intr_w:
 				if(eql == 1'b1)
 					begin
+						target <= 1;
 						uscite <= 2'b11;
 						cc_mux <= cc_intr;
 						state <= s_intr_w;
@@ -162,5 +163,8 @@ module b06(
 
 		endcase
 		end
+		
+		assert property	(not((reset == 0) && (target == 1)));
+		
 endmodule
 

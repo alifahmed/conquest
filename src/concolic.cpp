@@ -49,6 +49,13 @@ extern "C" int target_design(ivl_design_t design) {
 	emit_root(roots[0]);
     
 	post_processing(design);
+	if(g_branch_id){
+		SMTAssign* assign = SMTAssign::get_assign(g_branch_id);
+		if(assign->assign_type != SMT_ASSIGN_BRANCH){
+			error("Selected id is not a branch");
+		}
+		SMTBasicBlock::set_target(assign->block);
+	}
 	
 	start_concolic();
 	
@@ -115,7 +122,7 @@ void extract_parameters(ivl_design_t design){
 	
 	const char* bid = ivl_design_flag(design, "bid");
 	if((bid != NULL) && strcmp(bid, "")){
-		//g_branch_id = atoi(bid);
+		g_branch_id = atoi(bid);
 	}
 }
 

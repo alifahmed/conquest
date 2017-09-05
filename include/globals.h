@@ -24,7 +24,7 @@ extern uint     		g_unroll;
 extern const char*      g_clock_sig_name;
 extern const char*      g_reset_sig_name;
 extern const char*      g_reset_edge_active;
-//extern uint			g_branch_id;
+extern uint				g_branch_id;
 
 //Configuration declarations
 //#define conc_flush(X)   fflush(X)

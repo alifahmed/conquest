@@ -45,7 +45,6 @@ always@(posedge clock)
 		e:
 			begin
 				if(line1 == 1'b1 && line2==1'b1 ) begin
-					target <= 1;
 					stato <= f;
 				end
 				else begin
@@ -71,6 +70,7 @@ always@(posedge clock)
                     stato <= g;
 				end
                 else begin
+                	target = 1;
                     stato <= c;
 				end
 				outp <= ~(line1 ^ line2);
