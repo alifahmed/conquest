@@ -363,10 +363,6 @@ static SMTUnary* emit_expr_unary(ivl_scope_t scope, ivl_expr_t expr) {
 	switch (ivl_expr_opcode(expr)) {
 		case '-':
 		case '~':
-			fprintf(g_out, "(%s", oper);
-			tmp_expr = emit_expr(scope, oper1);
-			fprintf(g_out, ")");
-			break;
 		case '&':
 		case '|':
 		case '^':

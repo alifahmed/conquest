@@ -528,7 +528,7 @@ static SMTExpr* emit_lpm_part_select(ivl_scope_t scope, ivl_lpm_t lpm, uint sign
 	// HERE: variable parameter select needs to be rebuilt.
 	if (!sig) {
 		if(base){
-			error("check: emit_lpm_part_select");
+			error("check: emit_lpm_part_select (%s:%u)", ivl_lpm_file(lpm), ivl_lpm_lineno(lpm));
 		}
 		/* Check if the compiler used a select for a shift. */
 		assert(base >= 0);

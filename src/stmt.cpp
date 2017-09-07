@@ -609,7 +609,7 @@ void emit_stmt(ivl_scope_t scope, ivl_statement_t stmt) {
 		case IVL_ST_NOOP:
 			// If this is a statement termination then just finish the
 			// statement, otherwise print an empty begin/end pair.
-            error("check: IVL_ST_NOOP is entered");
+            //error("check: IVL_ST_NOOP is entered");
 			if (single_indent) {
 				single_indent = 0;
 				fprintf(g_out, ";\n");
@@ -629,7 +629,7 @@ SMTProcess* emit_process(ivl_scope_t scope, ivl_process_t proc) {
     SMTProcess* smt_proc = new SMTProcess();
 	ivl_statement_t stmt = ivl_process_stmt(proc);
 	if (ivl_statement_type(stmt) == IVL_ST_NOOP) {
-		info("Process statement type IVL_ST_NOOP");
+		info("Process statement type IVL_ST_NOOP (%s,%u)", ivl_process_file(proc), ivl_process_lineno(proc));
 		return smt_proc;
 	}
 	//reset indent

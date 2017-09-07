@@ -278,9 +278,6 @@ void SMTUnary::set_opcode(char ivl_code) {
 			break;
 		case '^': 
 			error("TODO: add support for unary \'^\'");
-			opcode = "bv-redcomp";
-			//info("inverted bv-redcomp used");
-			is_inverted = true;
 			break;
 		case 'A': opcode = "bv-redand";
 			//info("inverted bv-redand used");
@@ -295,8 +292,7 @@ void SMTUnary::set_opcode(char ivl_code) {
 			break;
 		case 'X': 
 			error("TODO: add support for unary \'^\'");
-			opcode = "bv-redcomp";
-			//info("bv-redcomp used");
+            is_inverted = true;
 			break;
 		default: 
 			;
