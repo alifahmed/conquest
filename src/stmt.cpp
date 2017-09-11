@@ -319,6 +319,7 @@ static void emit_stmt_case(ivl_scope_t scope, ivl_statement_t stmt) {
     SMTBasicBlock* top_bb = SMTProcess::curr_proc->top_bb;
 	top_bb->weight = 1;
     SMTBasicBlock* exit_bb = new SMTBasicBlock();
+	exit_bb->idom = top_bb;
 	for (idx = 0; idx < count; idx += 1) {
 		ivl_expr_t expr = ivl_stmt_case_expr(stmt, idx);
 		/* This is the default case so emit it last. */
@@ -334,6 +335,7 @@ static void emit_stmt_case(ivl_scope_t scope, ivl_statement_t stmt) {
 		smt_br->block = smt_bb;
         smt_bb->assign_list.push_back(smt_br);
         smt_bb->predecessors.insert(top_bb);
+		smt_bb->idom = top_bb;
         top_bb->successors.insert(smt_bb);
         
 		fprintf(g_out, " :\n");
@@ -356,6 +358,7 @@ static void emit_stmt_case(ivl_scope_t scope, ivl_statement_t stmt) {
 		smt_br->block = smt_bb;
         smt_bb->assign_list.push_back(smt_br);
         smt_bb->predecessors.insert(top_bb);
+		smt_bb->idom = top_bb;
         top_bb->successors.insert(smt_bb);
         
 		branch_stack.push(smt_br);
@@ -400,6 +403,8 @@ static void emit_stmt_condit(ivl_scope_t scope, ivl_statement_t stmt) {
 	SMTProcess::curr_proc->top_bb->weight = 1;
 	true_br->block = true_bb;
 	false_br->block = false_bb;
+	true_bb->idom = SMTProcess::curr_proc->top_bb;
+	false_bb->idom = SMTProcess::curr_proc->top_bb;
     true_bb->predecessors.insert(SMTProcess::curr_proc->top_bb);
     false_bb->predecessors.insert(SMTProcess::curr_proc->top_bb);
     SMTProcess::curr_proc->top_bb->successors.insert(true_bb);
@@ -407,7 +412,8 @@ static void emit_stmt_condit(ivl_scope_t scope, ivl_statement_t stmt) {
     true_bb->assign_list.push_back(true_br);
     false_bb->assign_list.push_back(false_br);
     SMTBasicBlock* exit_bb = new SMTBasicBlock();
-    
+    exit_bb->idom = SMTProcess::curr_proc->top_bb;;
+	
     SMTProcess::curr_proc->top_bb = true_bb;
     single_indent = 1;
 	if (true_stmt) {

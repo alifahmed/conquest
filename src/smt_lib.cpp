@@ -1324,6 +1324,7 @@ SMTBasicBlock::SMTBasicBlock() : id(id_counter) {
 	weight = 0;
 	distance = initial_distance;
 	is_edge_updated = false;
+	idom = NULL;
 }
 
 /*SMTBasicBlock::SMTBasicBlock(SMTBasicBlock& obj) : id(id_counter) {
@@ -1340,7 +1341,11 @@ void SMTBasicBlock::print_assigns(ofstream &out) {
 }
 
 void SMTBasicBlock::print(ofstream &out) {
-    out << "[" << id << "] weight: " << weight << " distance: " << distance << '\n';
+    out << "[" << id << "] weight: " << weight << " distance: " << distance;
+	if(idom){
+		out <<  " idom: " << idom->id;
+	}
+	out << '\n';
     print_assigns(out);
     if(successors.size()){
         out << "[S]";

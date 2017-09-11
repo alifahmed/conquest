@@ -425,6 +425,7 @@ public:
     std::vector<SMTAssign*> assign_list;
     std::set<SMTBasicBlock*> successors;
     std::set<SMTBasicBlock*> predecessors;
+	SMTBasicBlock* idom;
 	uint weight;
 	uint distance;
 	bool is_edge_updated;
