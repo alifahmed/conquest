@@ -265,4 +265,6 @@ module i2c_master_byte_ctrl (
 
 	      endcase
 	  end
+	  
+	  assert property (~(nReset==1 && target==1));
 endmodule

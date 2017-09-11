@@ -17,6 +17,7 @@ module conquest_tb();
     reg  sda_pad_i = 1'b0;
     wire sda_pad_o;
     wire sda_padoen_o;
+    reg  __obs;
 
     // Generated top module instance
     i2c_master_top _conc_top_inst(
@@ -35,12 +36,13 @@ module conquest_tb();
             .scl_padoen_o( scl_padoen_o ),
             .sda_pad_i ( sda_pad_i ),
             .sda_pad_o ( sda_pad_o ),
-            .sda_padoen_o( sda_padoen_o ));
+            .sda_padoen_o( sda_padoen_o ),
+            .__obs     ( __obs ));
 
     // Generated internal use signals
     reg  [31:0] _conc_pc;
-    reg  [15:0] _conc_opcode;
-    reg  [15:0] _conc_ram[0:20];
+    reg  [16:0] _conc_opcode;
+    reg  [16:0] _conc_ram[0:20];
 
 
     // Generated clock pulse
@@ -52,6 +54,7 @@ module conquest_tb();
     always @(posedge wb_clk_i) begin
         _conc_pc = _conc_pc + 32'b1;
         _conc_opcode = _conc_ram[_conc_pc];
+        __obs <= #1 _conc_opcode[16];
         scl_pad_i <= #1 _conc_opcode[14];
         sda_pad_i <= #1 _conc_opcode[15];
         wb_adr_i <= #1 _conc_opcode[2:0];

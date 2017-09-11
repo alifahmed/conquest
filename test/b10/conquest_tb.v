@@ -7,13 +7,13 @@ module conquest_tb();
     reg  start = 1'b0;
     reg  reset;
     reg  test = 1'b0;
-    wire cts = 1'b0;
-    wire ctr = 1'b0;
+    wire cts;
+    wire ctr;
     reg  rts = 1'b0;
     reg  rtr = 1'b0;
     reg  clock;
     reg  [3:0] v_in = 4'b0;
-    wire [3:0] v_out = 4'b0;
+    wire [3:0] v_out;
     reg  __obs;
 
     // Generated top module instance
@@ -62,21 +62,10 @@ module conquest_tb();
 
     // Generated initial block
     initial begin
-        $display(";_C 1");
         clock = 1'b0;
         reset = 1'b0;
-        _conc_pc = 32'b1;
+        _conc_pc = 32'b0;
         $readmemb("data.mem", _conc_ram);
-        _conc_opcode = _conc_ram[1];
-        __obs <= #1 _conc_opcode[11];
-        g_button <= #1 _conc_opcode[1];
-        key <= #1 _conc_opcode[2];
-        r_button <= #1 _conc_opcode[0];
-        rtr <= #1 _conc_opcode[6];
-        rts <= #1 _conc_opcode[5];
-        start <= #1 _conc_opcode[3];
-        test <= #1 _conc_opcode[4];
-        v_in <= #1 _conc_opcode[10:7];
         #2 clock = 1'b1;
         reset = 1'b1;
         #5 reset = 1'b0;

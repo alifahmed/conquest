@@ -5,5 +5,5 @@ CLK_NAME 	= clock
 RESET_NAME 	= reset
 RESET_EDGE 	= 1
 UNROLL_CYC	= 30
-TARGET		= 53
+TARGET		= 54
 OBJ_SRC 	= ./src/b10.v

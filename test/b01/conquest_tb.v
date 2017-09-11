@@ -7,6 +7,7 @@ module conquest_tb();
     reg  reset;
     wire outp;
     wire overflw;
+    reg  __obs;
 
     // Generated top module instance
     b01 _conc_top_inst(
@@ -15,12 +16,13 @@ module conquest_tb();
             .line2     ( line2 ),
             .reset     ( reset ),
             .outp      ( outp ),
-            .overflw   ( overflw ));
+            .overflw   ( overflw ),
+            .__obs     ( __obs ));
 
     // Generated internal use signals
     reg  [31:0] _conc_pc;
-    reg  [1:0] _conc_opcode;
-    reg  [1:0] _conc_ram[0:10];
+    reg  [2:0] _conc_opcode;
+    reg  [2:0] _conc_ram[0:10];
 
 
     // Generated clock pulse
@@ -32,6 +34,7 @@ module conquest_tb();
     always @(posedge clock) begin
         _conc_pc = _conc_pc + 32'b1;
         _conc_opcode = _conc_ram[_conc_pc];
+        __obs <= #1 _conc_opcode[2];
         line1 <= #1 _conc_opcode[0];
         line2 <= #1 _conc_opcode[1];
         $strobe(";_C %d", _conc_pc);
