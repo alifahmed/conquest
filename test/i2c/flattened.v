@@ -87,6 +87,7 @@ module i2c_master_top(
     reg byte_controller_ld;
     reg [2:0]byte_controller_dcnt;
     reg [4:0]byte_controller_c_state;
+    reg byte_controller_target;
     wire byte_controller_bit_controller_scl_o;
     wire byte_controller_bit_controller_sda_o;
     reg byte_controller_bit_controller_cmd_ack;
@@ -623,6 +624,7 @@ module i2c_master_top(
                     begin
                         if ( sta ) 
                         begin
+                            byte_controller_target <= 1;
                             byte_controller_c_state <= byte_controller_ST_START;
                             byte_controller_core_cmd <= 4'b0001;
                         end

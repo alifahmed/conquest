@@ -18,7 +18,8 @@ const bool		enable_error_check = true;
 const bool		enable_obs_padding = true;
 const bool		enable_sim_copy = false;
 const bool		enable_yices_debug = false;
-const bool		enable_all_target = false;
+const bool		enable_all_target = true;
+const bool		enable_cfg_directed = false;
 
 
 static SMTBranch* target_branch = NULL;
@@ -419,7 +420,6 @@ void start_concolic() {
     //freopen("/dev/null", "w", stderr);
 	init();
 	if(!enable_all_target){
-		//copy_file(g_data_mem_raw, g_data_mem);
 		target_branch = SMTBasicBlock::get_target();
 		target_branch->update_distance();
 		ofstream out("cfg_info.txt");
@@ -430,21 +430,25 @@ void start_concolic() {
 		selected_branch = NULL;
 		while (concolic_iteration(sim_num)) {
 			sim_num++;
-			if(sim_num >= 2000){
+			if(sim_num >= 1500){
 				break;
 			}
 		}
 		if(target_branch->is_covered() == false){
 			printf("Target not covered\n");
 		}
-	} /*else{
+	} else{
 		SMTBranch::save_coverage();
 		const uint count = SMTAssign::get_assign_count();
 		ofstream report("report_cov.log");
 		for(uint i=0; i<count; i++){
 			SMTAssign* assign = SMTAssign::get_assign(i);
 			if(assign->assign_type == SMT_ASSIGN_BRANCH){
+				//if(assign->id == 36){
+				//	volatile int a = 6;
+				//}
 				copy_file(g_data_mem_raw, g_data_mem);
+				g_data.load(g_data_mem);
 				target_branch = dynamic_cast<SMTBranch*>(assign);
 				assert(target_branch);
 				target_branch->k_permit_covered = 0;
@@ -457,15 +461,15 @@ void start_concolic() {
 				selected_branch = NULL;
 				while (concolic_iteration(sim_num)) {
 					sim_num++;
-					if(sim_num >= 2000){
+					if(sim_num >= 1500){
 						break;
 					}
 				}
 				if(target_branch->is_covered() == false){
-					sim_num = 2000;
+					sim_num = 1500;
 				}
 				report << setw(12) << assign->id << " ";
-				report << setw(12) << sim_num << " \n";
+				report << setw(12) << sim_num << endl;
 			}
 		}
 		report.close();
@@ -473,7 +477,7 @@ void start_concolic() {
 		yices_exit();
 		SMTFreeAll();
 		exit(0);
-	}*/
+	}
 }
 
 void end_concolic(){

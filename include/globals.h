@@ -33,3 +33,4 @@ extern const bool		enable_error_check;
 extern const bool		enable_obs_padding;
 extern const bool		enable_sim_copy;
 extern const bool		enable_yices_debug;
+extern const bool		enable_cfg_directed;

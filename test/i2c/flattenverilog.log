@@ -1,1 +1,0 @@
-flattenverilog: Note: 51548: Running with option:  -f files.f -top i2c_master_top  -quiet -nobanner  -out flattened.v  -remove_unused_nets 

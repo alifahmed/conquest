@@ -16,6 +16,7 @@ CTDataMem::~CTDataMem(){
 }
 
 void CTDataMem::load(const char* file) {
+	data.clear();
     ifstream mem(file);
     if(!mem.is_open()){
         error("Cannot open file: %s", file);

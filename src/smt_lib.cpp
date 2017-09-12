@@ -795,7 +795,9 @@ void SMTBranch::clear_covered_clk(uint clock) {
 }
 
 void SMTBranch::update_distance() {
-	update_edge();
+	if(!enable_cfg_directed){
+		update_edge();
+	}
     block->update_distance();
 }
 
@@ -841,6 +843,9 @@ void SMTBranch::update_edge() {
 				}
 			}
 		}
+	}
+	else{
+		block->idom->update_edge();
 	}
 }
 
@@ -917,7 +922,7 @@ void SMTBranch::save_coverage() {
 }
 
 void SMTBranch::restore_coverage() {
-	total_branch_count = saved_covered_branch;
+	total_branch_count = saved_total_branch;
 	covered_branch_count = saved_covered_branch;
 	for(auto it:all_branches_list){
 		it->covered_any_clock = it->saved_coverage;
@@ -1382,9 +1387,14 @@ void SMTBasicBlock::update_distance() {
 }
 
 void SMTBasicBlock::update_edge() {
-	if(assign_list[0]->assign_type == SMT_ASSIGN_BRANCH){
-		SMTBranch* br = dynamic_cast<SMTBranch*>(assign_list[0]);
-		br->update_edge();
+	if(assign_list.size()){
+		if(assign_list[0]->assign_type == SMT_ASSIGN_BRANCH){
+			SMTBranch* br = dynamic_cast<SMTBranch*>(assign_list[0]);
+			br->update_edge();
+		}
+	}
+	else if(idom){
+		idom->update_edge();
 	}
 }
 
