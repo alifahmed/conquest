@@ -1044,7 +1044,8 @@ void emit_lpm(ivl_scope_t scope, ivl_lpm_t lpm) {
     fprintf(g_out, " = ");
 	SMTExpr* rval = emit_lpm_as_ca(scope, lpm, 0);
 	fprintf(g_out, ";");
-	new SMTBlockingAssign(lval, rval);
+	SMTAssign* smt_assign = new SMTBlockingAssign(lval, rval);
+	smt_assign->add_to_cont();
 	g_ind -= g_ind_incr;
 	fprintf(g_out, "%*cend\n\n", g_ind, ' ');
 	
@@ -1065,7 +1066,8 @@ static void emit_bufz(ivl_scope_t scope, ivl_net_logic_t nlogic) {
 	fprintf(g_out, " = ");
 	SMTExpr* rval = emit_nexus_as_ca(scope, ivl_logic_pin(nlogic, 1), 0, 0);
 	fprintf(g_out, ";");
-	new SMTBlockingAssign(lval, rval);
+	SMTAssign* smt_assign = new SMTBlockingAssign(lval, rval);
+	smt_assign->add_to_cont();
 	g_ind -= g_ind_incr;
 	fprintf(g_out, "%*cend\n\n", g_ind, ' ');
     
@@ -1120,7 +1122,8 @@ void emit_logic(ivl_scope_t scope, ivl_net_logic_t nlogic) {
 		fprintf(g_out, " = ");
 		SMTExpr* rval = emit_logic_as_ca(scope, nlogic);
 		fprintf(g_out, ";");
-		new SMTBlockingAssign(lval, rval);
+		SMTAssign* smt_assign = new SMTBlockingAssign(lval, rval);
+		smt_assign->add_to_cont();
 		g_ind -= g_ind_incr;
 		fprintf(g_out, "%*cend\n\n", g_ind, ' ');
 		

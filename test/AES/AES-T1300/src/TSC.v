@@ -133,13 +133,17 @@ module TSC(
 			end 
 		end
 
+	reg trig;
 	always @(clk)
 		begin
 			if (rst == 1'b1) begin
 					SHReg8 <= "10101010";
 			end else if ((Tj_Trig & ((state[0]&rk8[0])^(state[1]&rk8[1])^(state[2]&rk8[2])^(state[3]&rk8[3])^(state[4]&rk8[4])^(state[5]&rk8[5])^(state[6]&rk8[6])^(state[7]&rk8[7]))) == 1'b1) begin
 					SHReg8 <= {SHReg8[0], SHReg8[7:1]}; 
+					trig = 1;
 			end 
 		end
+
+//	assert p
 
 endmodule

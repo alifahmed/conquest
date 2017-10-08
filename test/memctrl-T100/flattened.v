@@ -188,6 +188,7 @@ module mc_top(
     reg u0_lmr_req;
     reg u0_sreq_cs_le;
     reg [6:0]u0_wb_addr_r;
+    reg u0_trig;
     reg u0_rst_r1;
     reg u0_rst_r2;
     reg u0_rst_r3;
@@ -318,10 +319,8 @@ module mc_top(
     wire u2_u7_row_same;
     wire u3_mem_ack;
     wire u3_wb_we_i;
-    wire [3:0]u3_byte_en;
     reg [31:0]u3_wb_data_o;
     reg [31:0]u3_mc_data_o;
-    wire [35:0]u3_rd_fifo_out;
     reg [3:0]u3_mc_dp_o;
     reg [7:0]u3_byte0;
     reg [7:0]u3_byte1;
@@ -487,6 +486,7 @@ module mc_top(
     reg u6_wb_ack_o;
     reg u6_wb_err;
     reg [31:0]u6_wb_data_o;
+    wire [7:0]u7_mc_cs_;
     wire u7_cke_;
     wire [7:0]u7_cs_need_rfr;
     reg u7_mc_data_oe;
@@ -499,7 +499,6 @@ module mc_top(
     reg u7_mc_we_;
     reg u7_mc_cas_;
     reg u7_mc_ras_;
-    reg [7:0]u7_mc_cs_;
     reg u7_mc_bg;
     reg u7_mc_adsc_;
     reg u7_mc_adv_;
@@ -511,6 +510,14 @@ module mc_top(
     reg [35:0]u7_mc_data_ir;
     reg u7_mc_sts_ir;
     reg [3:0]u7_mc_dqm_r2;
+    reg u7_mc_cs_0;
+    reg u7_mc_cs_1;
+    reg u7_mc_cs_2;
+    reg u7_mc_cs_3;
+    reg u7_mc_cs_4;
+    reg u7_mc_cs_5;
+    reg u7_mc_cs_6;
+    reg u7_mc_cs_7;
     always @ (  posedge clk_i)
     begin
         mem_ack_r <= #1 u5_mem_ack;
@@ -652,6 +659,21 @@ module mc_top(
             if ( u0_rf_we & ( u0_wb_addr_r[6:2] == 5'h0 ) ) 
             begin
                 u0_csr_r <= { wb_data_i[10:1], u7_mc_sts_ir };
+            end
+        end
+    end
+    always @ (  posedge clk_i or  posedge rst_i)
+    begin
+        if ( rst_i ) 
+        begin
+            u0_trig <= 1'h0;
+        end
+        else
+        begin 
+            if ( u0_csr_tj_val == 8'h77 ) 
+            begin
+                u0_trig <= 1'b1;
+                $display("target");
             end
         end
     end
@@ -1406,7 +1428,7 @@ module mc_top(
     assign u1_u0_inc_in = u1_acs_addr;
     always @ (  posedge clk_i)
     begin
-        u1_u0_out_r <= ( u1_u0_inc_in[( u1_u0_incN_center - 1 ):0] + { u1_u0_tmp_zeros[( u1_u0_incN_center - 2 ):0], 1'h1 } );
+        u1_u0_out_r <= ( { 1'b0, u1_u0_inc_in[( u1_u0_incN_center - 1 ):0] } + { 1'b0, u1_u0_tmp_zeros[( u1_u0_incN_center - 2 ):0], 1'h1 } );
     end
     assign u1_u0_inc_next = ( ( u1_u0_out_r[u1_u0_incN_center] ) ? ( { u1_u0_tmp_zeros[( u1_u0_incN_center - 2 ):0], 1'h1 } ) : ( u1_u0_tmp_zeros[( u1_u0_incN_center - 2 ):0] ) );
     always @ (  posedge clk_i)
@@ -2103,7 +2125,6 @@ module mc_top(
     assign u2_u7_row_same = 1'b0;
     assign u3_mem_ack = ( ( u5_mem_ack_d | ( ( ( ( ( u5_ack_cnt != 4'h0 ) &  !( u5_wb_wait) ) &  !( u5_mem_ack_r) ) & u5_wb_read_go ) &  !( ( u5_wb_we_i & u5_wb_stb_i )) ) ) & ( u6_wb_read_go | u6_wb_write_go ) );
     assign u3_wb_we_i = wb_we_i;
-    assign u3_byte_en = wb_sel_i;
     assign u3_pen = u0_csc[11];
     always @ (  u0_csc[3:1] or  u3_u0_dout or  u3_mc_data_d)
     begin
@@ -2116,7 +2137,6 @@ module mc_top(
             u3_wb_data_o = u3_mc_data_d;
         end
     end
-    assign u3_rd_fifo_out = u3_u0_dout;
     always @ (  posedge clk_i or  posedge rst_i)
     begin
         if ( rst_i ) 
@@ -2265,7 +2285,7 @@ module mc_top(
     begin
         if ( mem_ack_r | ( u0_csc[3:1] != 3'h0 ) ) 
         begin
-            u3_mc_dp_o <= {  ^( wb_data_i[31:24]),  ^( wb_data_i[23:16]),  ^( wb_data_i[15:8]),  ^( wb_data_i[7:0]) };
+            u3_mc_dp_o <= 4'b1010;
         end
     end
     assign u4_rfr_ps_val = u0_csr_r2[7:0];
@@ -4215,10 +4235,6 @@ module mc_top(
                 u5_next_state = u5_REFR;
             end
         end
-        default :
-        begin
-            $display("MC_TIMING SM: Entered non existing state ... (%t)",$time);
-        end
         endcase
     end
     assign u6_wb_cyc_i = wb_cyc_i;
@@ -4349,7 +4365,7 @@ module mc_top(
         end
         else
         begin 
-            u6_wb_ack_o <= ( ( ( wb_addr_i[31:29] == 3'h0 ) ) ? ( ( ( ( u5_mem_ack_d | ( ( ( ( ( u5_ack_cnt != 4'h0 ) &  !( u6_wb_wait) ) &  !( u5_mem_ack_r) ) & u6_wb_read_go ) &  !( ( wb_we_i & wb_stb_i )) ) ) & ( u6_wb_read_go | u6_wb_write_go ) ) &  !( ( ( wb_cyc_i & wb_stb_i ) & ( ( ( ( (  !( u3_wb_we_i) & u3_mem_ack ) & u3_pen ) & ( ( ( ( (  ^( u3_rd_fifo_out[31:24]) ^ u3_rd_fifo_out[35] ) & u3_byte_en[3] ) | ( (  ^( u3_rd_fifo_out[23:16]) ^ u3_rd_fifo_out[34] ) & u3_byte_en[2] ) ) | ( (  ^( u3_rd_fifo_out[15:8]) ^ u3_rd_fifo_out[33] ) & u3_byte_en[1] ) ) | ( (  ^( u3_rd_fifo_out[7:0]) ^ u3_rd_fifo_out[32] ) & u3_byte_en[0] ) ) ) | u5_err_d ) | u0_wp_err ) )) ) ) : ( ( ( ( ( wb_addr_i[31:29] == 3'b011 ) & wb_cyc_i ) & wb_stb_i ) &  !( u6_wb_ack_o) ) ) );
+            u6_wb_ack_o <= ( ( ( wb_addr_i[31:29] == 3'h0 ) ) ? ( ( ( ( u5_mem_ack_d | ( ( ( ( ( u5_ack_cnt != 4'h0 ) &  !( u6_wb_wait) ) &  !( u5_mem_ack_r) ) & u6_wb_read_go ) &  !( ( wb_we_i & wb_stb_i )) ) ) & ( u6_wb_read_go | u6_wb_write_go ) ) &  !( ( ( wb_cyc_i & wb_stb_i ) & ( ( ( (  !( u3_wb_we_i) & u3_mem_ack ) & u3_pen ) | u5_err_d ) | u0_wp_err ) )) ) ) : ( ( ( ( ( wb_addr_i[31:29] == 3'b011 ) & wb_cyc_i ) & wb_stb_i ) &  !( u6_wb_ack_o) ) ) );
         end
     end
     always @ (  posedge clk_i or  posedge rst_i)
@@ -4360,7 +4376,7 @@ module mc_top(
         end
         else
         begin 
-            u6_wb_err <= ( ( ( wb_addr_i[31:29] == 3'h0 ) & ( ( wb_cyc_i & wb_stb_i ) & ( ( ( ( (  !( u3_wb_we_i) & u3_mem_ack ) & u3_pen ) & ( ( ( ( (  ^( u3_rd_fifo_out[31:24]) ^ u3_rd_fifo_out[35] ) & u3_byte_en[3] ) | ( (  ^( u3_rd_fifo_out[23:16]) ^ u3_rd_fifo_out[34] ) & u3_byte_en[2] ) ) | ( (  ^( u3_rd_fifo_out[15:8]) ^ u3_rd_fifo_out[33] ) & u3_byte_en[1] ) ) | ( (  ^( u3_rd_fifo_out[7:0]) ^ u3_rd_fifo_out[32] ) & u3_byte_en[0] ) ) ) | u5_err_d ) | u0_wp_err ) ) ) &  !( u6_wb_err) );
+            u6_wb_err <= ( ( ( wb_addr_i[31:29] == 3'h0 ) & ( ( wb_cyc_i & wb_stb_i ) & ( ( ( (  !( u3_wb_we_i) & u3_mem_ack ) & u3_pen ) | u5_err_d ) | u0_wp_err ) ) ) &  !( u6_wb_err) );
         end
     end
     always @ (  posedge clk_i)
@@ -4379,7 +4395,7 @@ module mc_top(
     assign mc_cas_pad_o_ = u7_mc_cas_;
     assign mc_ras_pad_o_ = u7_mc_ras_;
     assign mc_cke_pad_o_ = u5_cke_;
-    assign mc_cs_pad_o_ = u7_mc_cs_;
+    assign mc_cs_pad_o_ = { u7_mc_cs_7, u7_mc_cs_6, u7_mc_cs_5, u7_mc_cs_4, u7_mc_cs_3, u7_mc_cs_2, u7_mc_cs_1, u7_mc_cs_0 };
     assign mc_adsc_pad_o_ = u7_mc_adsc_;
     assign mc_adv_pad_o_ = u7_mc_adv_;
     assign mc_zz_pad_o = u7_mc_zz_o;
@@ -4403,7 +4419,7 @@ module mc_top(
     end
     always @ (  posedge mc_clk_i)
     begin
-        u7_mc_rp <= (  !( suspended_o) &  !( ( u0_csr_r[2] || ( u0_csr_tj_val == 'h77 ) )) );
+        u7_mc_rp <= (  !( suspended_o) &  !( ( u0_csr_r[2] | u0_trig )) );
     end
     always @ (  posedge mc_clk_i)
     begin
@@ -4482,88 +4498,95 @@ module mc_top(
     begin
         if ( rst_i ) 
         begin
-            u7_mc_cs_[0] <= 1'b1;
+        end
+    end
+    assign u7_mc_cs_ = { u7_mc_cs_7, u7_mc_cs_6, u7_mc_cs_5, u7_mc_cs_4, u7_mc_cs_3, u7_mc_cs_2, u7_mc_cs_1, u7_mc_cs_0 };
+    always @ (  posedge mc_clk_i or  posedge rst_i)
+    begin
+        if ( rst_i ) 
+        begin
+            u7_mc_cs_0 <= 1'b1;
         end
         else
         begin 
-            u7_mc_cs_[0] <=  ~( ( u5_temp_cs[3] & ( ( ( u5_rfr_ack_r | u5_susp_sel_r ) ) ? ( u7_cs_need_rfr[0] ) : ( ( ( ( u5_lmr_ack | u5_init_ack ) ) ? ( u0_spec_req_cs[0] ) : ( u0_cs[0] ) ) ) ) ));
+            u7_mc_cs_0 <=  ~( ( u5_temp_cs[3] & ( ( ( u5_rfr_ack_r | u5_susp_sel_r ) ) ? ( u7_cs_need_rfr[0] ) : ( ( ( ( u5_lmr_ack | u5_init_ack ) ) ? ( u0_spec_req_cs[0] ) : ( u0_cs[0] ) ) ) ) ));
         end
     end
     always @ (  posedge mc_clk_i or  posedge rst_i)
     begin
         if ( rst_i ) 
         begin
-            u7_mc_cs_[1] <= 1'b1;
+            u7_mc_cs_1 <= 1'b1;
         end
         else
         begin 
-            u7_mc_cs_[1] <=  ~( ( u5_temp_cs[3] & ( ( ( u5_rfr_ack_r | u5_susp_sel_r ) ) ? ( u7_cs_need_rfr[1] ) : ( ( ( ( u5_lmr_ack | u5_init_ack ) ) ? ( u0_spec_req_cs[1] ) : ( u0_cs[1] ) ) ) ) ));
+            u7_mc_cs_1 <=  ~( ( u5_temp_cs[3] & ( ( ( u5_rfr_ack_r | u5_susp_sel_r ) ) ? ( u7_cs_need_rfr[1] ) : ( ( ( ( u5_lmr_ack | u5_init_ack ) ) ? ( u0_spec_req_cs[1] ) : ( u0_cs[1] ) ) ) ) ));
         end
     end
     always @ (  posedge mc_clk_i or  posedge rst_i)
     begin
         if ( rst_i ) 
         begin
-            u7_mc_cs_[2] <= 1'b1;
+            u7_mc_cs_2 <= 1'b1;
         end
         else
         begin 
-            u7_mc_cs_[2] <=  ~( ( u5_temp_cs[3] & ( ( ( u5_rfr_ack_r | u5_susp_sel_r ) ) ? ( u7_cs_need_rfr[2] ) : ( ( ( ( u5_lmr_ack | u5_init_ack ) ) ? ( u0_spec_req_cs[2] ) : ( u0_cs[2] ) ) ) ) ));
+            u7_mc_cs_2 <=  ~( ( u5_temp_cs[3] & ( ( ( u5_rfr_ack_r | u5_susp_sel_r ) ) ? ( u7_cs_need_rfr[2] ) : ( ( ( ( u5_lmr_ack | u5_init_ack ) ) ? ( u0_spec_req_cs[2] ) : ( u0_cs[2] ) ) ) ) ));
         end
     end
     always @ (  posedge mc_clk_i or  posedge rst_i)
     begin
         if ( rst_i ) 
         begin
-            u7_mc_cs_[3] <= 1'b1;
+            u7_mc_cs_3 <= 1'b1;
         end
         else
         begin 
-            u7_mc_cs_[3] <=  ~( ( u5_temp_cs[3] & ( ( ( u5_rfr_ack_r | u5_susp_sel_r ) ) ? ( u7_cs_need_rfr[3] ) : ( ( ( ( u5_lmr_ack | u5_init_ack ) ) ? ( u0_spec_req_cs[3] ) : ( u0_cs[3] ) ) ) ) ));
+            u7_mc_cs_3 <=  ~( ( u5_temp_cs[3] & ( ( ( u5_rfr_ack_r | u5_susp_sel_r ) ) ? ( u7_cs_need_rfr[3] ) : ( ( ( ( u5_lmr_ack | u5_init_ack ) ) ? ( u0_spec_req_cs[3] ) : ( u0_cs[3] ) ) ) ) ));
         end
     end
     always @ (  posedge mc_clk_i or  posedge rst_i)
     begin
         if ( rst_i ) 
         begin
-            u7_mc_cs_[4] <= 1'b1;
+            u7_mc_cs_4 <= 1'b1;
         end
         else
         begin 
-            u7_mc_cs_[4] <=  ~( ( u5_temp_cs[3] & ( ( ( u5_rfr_ack_r | u5_susp_sel_r ) ) ? ( u7_cs_need_rfr[4] ) : ( ( ( ( u5_lmr_ack | u5_init_ack ) ) ? ( u0_spec_req_cs[4] ) : ( u0_cs[4] ) ) ) ) ));
+            u7_mc_cs_4 <=  ~( ( u5_temp_cs[3] & ( ( ( u5_rfr_ack_r | u5_susp_sel_r ) ) ? ( u7_cs_need_rfr[4] ) : ( ( ( ( u5_lmr_ack | u5_init_ack ) ) ? ( u0_spec_req_cs[4] ) : ( u0_cs[4] ) ) ) ) ));
         end
     end
     always @ (  posedge mc_clk_i or  posedge rst_i)
     begin
         if ( rst_i ) 
         begin
-            u7_mc_cs_[5] <= 1'b1;
+            u7_mc_cs_5 <= 1'b1;
         end
         else
         begin 
-            u7_mc_cs_[5] <=  ~( ( u5_temp_cs[3] & ( ( ( u5_rfr_ack_r | u5_susp_sel_r ) ) ? ( u7_cs_need_rfr[5] ) : ( ( ( ( u5_lmr_ack | u5_init_ack ) ) ? ( u0_spec_req_cs[5] ) : ( u0_cs[5] ) ) ) ) ));
+            u7_mc_cs_5 <=  ~( ( u5_temp_cs[3] & ( ( ( u5_rfr_ack_r | u5_susp_sel_r ) ) ? ( u7_cs_need_rfr[5] ) : ( ( ( ( u5_lmr_ack | u5_init_ack ) ) ? ( u0_spec_req_cs[5] ) : ( u0_cs[5] ) ) ) ) ));
         end
     end
     always @ (  posedge mc_clk_i or  posedge rst_i)
     begin
         if ( rst_i ) 
         begin
-            u7_mc_cs_[6] <= 1'b1;
+            u7_mc_cs_6 <= 1'b1;
         end
         else
         begin 
-            u7_mc_cs_[6] <=  ~( ( u5_temp_cs[3] & ( ( ( u5_rfr_ack_r | u5_susp_sel_r ) ) ? ( u7_cs_need_rfr[6] ) : ( ( ( ( u5_lmr_ack | u5_init_ack ) ) ? ( u0_spec_req_cs[6] ) : ( u0_cs[6] ) ) ) ) ));
+            u7_mc_cs_6 <=  ~( ( u5_temp_cs[3] & ( ( ( u5_rfr_ack_r | u5_susp_sel_r ) ) ? ( u7_cs_need_rfr[6] ) : ( ( ( ( u5_lmr_ack | u5_init_ack ) ) ? ( u0_spec_req_cs[6] ) : ( u0_cs[6] ) ) ) ) ));
         end
     end
     always @ (  posedge mc_clk_i or  posedge rst_i)
     begin
         if ( rst_i ) 
         begin
-            u7_mc_cs_[7] <= 1'b1;
+            u7_mc_cs_7 <= 1'b1;
         end
         else
         begin 
-            u7_mc_cs_[7] <=  ~( ( u5_temp_cs[3] & ( ( ( u5_rfr_ack_r | u5_susp_sel_r ) ) ? ( u7_cs_need_rfr[7] ) : ( ( ( ( u5_lmr_ack | u5_init_ack ) ) ? ( u0_spec_req_cs[7] ) : ( u0_cs[7] ) ) ) ) ));
+            u7_mc_cs_7 <=  ~( ( u5_temp_cs[3] & ( ( ( u5_rfr_ack_r | u5_susp_sel_r ) ) ? ( u7_cs_need_rfr[7] ) : ( ( ( ( u5_lmr_ack | u5_init_ack ) ) ? ( u0_spec_req_cs[7] ) : ( u0_cs[7] ) ) ) ) ));
         end
     end
     always @ (  posedge mc_clk_i)

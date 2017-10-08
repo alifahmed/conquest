@@ -87,7 +87,7 @@ reg		mc_we_;
 reg		mc_cas_;
 reg		mc_ras_;
 wire		mc_cke_;
-reg	[7:0]	mc_cs_;
+//reg	[7:0]	mc_cs_;
 reg		mc_bg;
 reg		mc_adsc_;
 reg		mc_adv_;
@@ -170,73 +170,86 @@ always @(posedge mc_clk)
 
 assign	mc_cke_ = cke_;
 
+always @(posedge mc_clk or posedge rst) begin
+	if(rst) begin
+		mc_cs_ <= {
+		};
+	end
+	else begin
+	
+	end
+end
+
+reg mc_cs_0, mc_cs_1, mc_cs_2, mc_cs_3, mc_cs_4, mc_cs_5, mc_cs_6, mc_cs_7;
+assign mc_cs_ = {mc_cs_7, mc_cs_6, mc_cs_5, mc_cs_4, mc_cs_3, mc_cs_2, mc_cs_1, mc_cs_0};
+
 always @(posedge mc_clk or posedge rst)
-	if(rst)		mc_cs_[0] <= #1 1'b1;
+	if(rst)		mc_cs_0 <= #1 1'b1;
 	else
-	mc_cs_[0] <= #1 ~(cs_en & (
+	mc_cs_0 <= #1 ~(cs_en & (
 				(rfr_ack | susp_sel) ? cs_need_rfr[0] :
 				lmr_sel ? spec_req_cs[0] :
 				cs[0]
 			));
 
 always @(posedge mc_clk or posedge rst)
-	if(rst)		mc_cs_[1] <= #1 1'b1;
+	if(rst)		mc_cs_1 <= #1 1'b1;
 	else
-	   mc_cs_[1] <= #1 ~(cs_en & (
+	   mc_cs_1 <= #1 ~(cs_en & (
 				(rfr_ack | susp_sel) ? cs_need_rfr[1] :
 				lmr_sel ? spec_req_cs[1] :
 				cs[1]
 			));
 
 always @(posedge mc_clk or posedge rst)
-	if(rst)		mc_cs_[2] <= #1 1'b1;
+	if(rst)		mc_cs_2 <= #1 1'b1;
 	else
-	   mc_cs_[2] <= #1 ~(cs_en & (
+	   mc_cs_2 <= #1 ~(cs_en & (
 				(rfr_ack | susp_sel) ? cs_need_rfr[2] :
 				lmr_sel ? spec_req_cs[2] :
 				cs[2]
 			));
 
 always @(posedge mc_clk or posedge rst)
-	if(rst)		mc_cs_[3] <= #1 1'b1;
+	if(rst)		mc_cs_3 <= #1 1'b1;
 	else
-	   mc_cs_[3] <= #1 ~(cs_en & (
+	   mc_cs_3 <= #1 ~(cs_en & (
 				(rfr_ack | susp_sel) ? cs_need_rfr[3] :
 				lmr_sel ? spec_req_cs[3] :
 				cs[3]
 			));
 
 always @(posedge mc_clk or posedge rst)
-	if(rst)		mc_cs_[4] <= #1 1'b1;
+	if(rst)		mc_cs_4 <= #1 1'b1;
 	else
-	   mc_cs_[4] <= #1 ~(cs_en & (
+	   mc_cs_4 <= #1 ~(cs_en & (
 				(rfr_ack | susp_sel) ? cs_need_rfr[4] :
 				lmr_sel ? spec_req_cs[4] :
 				cs[4]
 			));
 
 always @(posedge mc_clk or posedge rst)
-	if(rst)		mc_cs_[5] <= #1 1'b1;
+	if(rst)		mc_cs_5 <= #1 1'b1;
 	else
-	   mc_cs_[5] <= #1 ~(cs_en & (
+	   mc_cs_5 <= #1 ~(cs_en & (
 				(rfr_ack | susp_sel) ? cs_need_rfr[5] :
 				lmr_sel ? spec_req_cs[5] :
 				cs[5]
 			));
 
 always @(posedge mc_clk or posedge rst)
-	if(rst)		mc_cs_[6] <= #1 1'b1;
+	if(rst)		mc_cs_6 <= #1 1'b1;
 	else
-	   mc_cs_[6] <= #1 ~(cs_en & (
+	   mc_cs_6 <= #1 ~(cs_en & (
 				(rfr_ack | susp_sel) ? cs_need_rfr[6] :
 				lmr_sel ? spec_req_cs[6] :
 				cs[6]
 			));
 
 always @(posedge mc_clk or posedge rst)
-	if(rst)		mc_cs_[7] <= #1 1'b1;
+	if(rst)		mc_cs_7 <= #1 1'b1;
 	else
-	   mc_cs_[7] <= #1 ~(cs_en & (
+	   mc_cs_7 <= #1 ~(cs_en & (
 				(rfr_ack | susp_sel) ? cs_need_rfr[7] :
 				lmr_sel ? spec_req_cs[7] :
 				cs[7]

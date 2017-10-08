@@ -96,6 +96,7 @@ public:
 	virtual ~SMTExpr();
 	virtual void add(SMTExpr *expr);
     virtual SMTExpr* get_child(uint idx);
+	virtual SMTExpr* get_expanded() = 0;
 	virtual term_t eval_term(SMTClkType clk) = 0;
 	virtual void print(std::stringstream &ss) = 0;
 	
@@ -109,6 +110,7 @@ public:
 	
 	void print(std::stringstream& ss) override;
 	term_t eval_term(SMTClkType clk) override;
+	SMTExpr* get_expanded() override;
 	
 private:
 	const char* _string;
@@ -121,6 +123,7 @@ public:
 	
 	void print(std::stringstream& ss) override;
 	term_t eval_term(SMTClkType clk) override;
+	SMTExpr* get_expanded() override;
 };
 
 
@@ -128,13 +131,19 @@ public:
 class SMTAssign{
 private:
 	static std::vector<SMTAssign*> assign_map;
-	bool is_first_time;
+	bool is_first_print;
+	bool is_first_print_exp;
 	
 protected:
     const SMTClkType clk_type;
 	bool covered_any_clock;
     uint covered_in_sim;
 	std::stringstream ss;
+	std::stringstream ss_exp;
+	SMTExpr* expanded_rval;
+	SMTExpr* expanded_lval;
+	term_t expanded_term;
+	term_t unexpanded_term;
 	
 	SMTAssign(SMTClkType clk_type, SMTAssignType assign_type, 
 				SMTExpr* lval, SMTExpr* rval, bool is_commit);
@@ -153,11 +162,16 @@ public:
     virtual void instrument();
 	virtual term_t update_term();
 	virtual term_t get_current_term();
+	virtual term_t get_expanded_term();
 	virtual bool is_covered();
 	virtual void set_covered(uint sim_num);
     virtual void partial_assign_check();
     virtual SMTSigCore* get_lval_sig_core();
 	virtual std::string print();
+	virtual std::string print_expanded();
+	virtual SMTExpr* get_expanded_rval();
+	virtual SMTExpr* get_expanded_lval();
+	virtual void add_to_cont();
 	
 	static SMTAssign* get_assign(uint id);
 	static uint get_assign_count();
@@ -221,7 +235,6 @@ public:
     static void clear_coverage(uint min_clock);
 	static void save_coverage();
 	static void restore_coverage();
-	static void update_fsm();
 	static void get_state_variables(std::set<SMTSigCore*> &sigs, SMTExpr* expr);
 };
 
@@ -243,6 +256,7 @@ public:
 	SMTConcat();
 	void print(std::stringstream& ss) override;
 	term_t eval_term(SMTClkType clk) override;
+	SMTExpr* get_expanded() override;
 };
 
 //-----------------------------SMT Cust-----------------------------------------
@@ -254,6 +268,7 @@ public:
     SMTCust(std::string operand);
 	void print(std::stringstream& ss) override;
 	term_t eval_term(SMTClkType clk) override;
+	SMTExpr* get_expanded() override;
 };
 
 
@@ -272,6 +287,7 @@ public:
 	void set_opcode(char ivl_code);
 	void print(std::stringstream& ss) override;
 	term_t eval_term(SMTClkType clk) override;
+	SMTExpr* get_expanded() override;
 };
 
 
@@ -288,6 +304,8 @@ public:
 	void set_opcode_from_expr(const ivl_expr_t expr);
 	void set_opcode(char ivl_code);
 	term_t eval_term(SMTClkType clk) override;
+	SMTExpr* get_expanded() override;
+
 };
 
 
@@ -303,6 +321,7 @@ public:
 	void print(std::stringstream& ss) override;
 	void set_opcode(char ivl_code, bool is_inverted);
 	term_t eval_term(SMTClkType clk) override;
+	SMTExpr* get_expanded() override;
 };
 
 
@@ -312,6 +331,8 @@ public:
 	SMTTernary();
 	void print(std::stringstream& ss) override;
 	term_t eval_term(SMTClkType clk) override;
+	SMTExpr* get_expanded() override;
+
 };
 
 
@@ -331,6 +352,7 @@ public:
 	void emit_verilog_value();
 	term_t eval_term(SMTClkType clk) override;
 	bool is_equal(SMTNumber* num);
+	SMTExpr* get_expanded() override;
 };
 
 
@@ -354,6 +376,7 @@ public:
     int width;
     bool is_dep;
 	bool is_state_variable;
+	SMTAssign* cont_assign;
 	
 	std::vector<SMTAssign*> assignments;
 	
@@ -385,6 +408,7 @@ public:
 	
     SMTSignal();	
     SMTSignal(ivl_signal_t sig);
+	SMTExpr* get_expanded() override;
     void print(std::stringstream& ss) override;
 	term_t eval_term(SMTClkType clk) override;
 };
@@ -425,6 +449,7 @@ public:
     std::vector<SMTAssign*> assign_list;
     std::set<SMTBasicBlock*> successors;
     std::set<SMTBasicBlock*> predecessors;
+	
 	SMTBasicBlock* idom;
 	uint weight;
 	uint distance;
@@ -435,14 +460,18 @@ public:
 	void update_edge();
     
     static void print_all(std::ofstream &out);
-	static void reset_distances();
+	static void reset_flags();
+	//static void reset_flags();
 	static void set_target(SMTBasicBlock* target);
 	static SMTBranch* get_target();
+	static void save_predecessors();
+	static void restore_predecessors();
 	
 private:
     void print_assigns(std::ofstream &out);
     static uint id_counter;
     static std::vector<SMTBasicBlock*> block_list;
+	std::set<SMTBasicBlock*> saved_predecessors;
 	const static uint initial_distance = 0xFFFFFFF;
 	static SMTBasicBlock* target;
 };

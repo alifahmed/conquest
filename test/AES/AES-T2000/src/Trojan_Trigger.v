@@ -21,11 +21,11 @@
 module Trojan_Trigger(
     input rst,
     input [127:0] state,
-    output Tj_Trig
+    output reg Tj_Trig
     );
 
 	reg State0, State1, State2, State3; 
-	reg Tj_Trig;
+//	reg Tj_Trig;
 	
 	always @(rst, state)
 	begin

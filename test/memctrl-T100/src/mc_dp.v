@@ -118,21 +118,25 @@ always @(bus_width or mc_data_del or byte0 or byte1 or byte2)
 //
 
 always @(posedge clk)
-	if(wb_ack_o | (mem_type != `MC_MEM_TYPE_SDRAM) )
-		mc_dp_o <= #1	{ ^wb_data_i[31:24], ^wb_data_i[23:16],
-				    ^wb_data_i[15:08], ^wb_data_i[07:00] };
+	if(wb_ack_o | (mem_type != `MC_MEM_TYPE_SDRAM) ) begin
+	//	mc_dp_o <= #1	{ ^wb_data_i[31:24], ^wb_data_i[23:16],
+	//			    ^wb_data_i[15:08], ^wb_data_i[07:00] };
+		mc_dp_o <= #1 4'b1010;
+	end
 
 ////////////////////////////////////////////////////////////////////
 //
 // Parity Checking
 //
 
-assign	par_err = !wb_we_i & mem_ack & pen & (
+/*assign	par_err = !wb_we_i & mem_ack & pen & (
 				(( ^rd_fifo_out[31:24] ^ rd_fifo_out[35] ) & byte_en[3] ) |
 				(( ^rd_fifo_out[23:16] ^ rd_fifo_out[34] ) & byte_en[2] ) |
 				(( ^rd_fifo_out[15:08] ^ rd_fifo_out[33] ) & byte_en[1] ) |
 				(( ^rd_fifo_out[07:00] ^ rd_fifo_out[32] ) & byte_en[0] )
-			);
+			);*/
+
+assign	par_err = !wb_we_i & mem_ack & pen;
 
 endmodule
 

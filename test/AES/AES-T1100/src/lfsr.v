@@ -18,6 +18,7 @@ module lfsr_counter (
 			lfsr_stream <= data[19:0];
 		end else begin
 			if (Tj_Trig == 1'b1) begin
+				//$display("lfsr");
 				lfsr_stream <= {d0,lfsr_stream[19:1]}; 
 			end else begin
 				lfsr_stream <= lfsr_stream ;

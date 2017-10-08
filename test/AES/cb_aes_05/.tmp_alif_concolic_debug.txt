@@ -1344,7 +1344,7 @@ module top(
         end
         else
         begin 
-            if ( out == 128'h6939b2e898f969350967325782ecc94e ) 
+            if ( out == 128'h23ccee4ff5cabc4634571553f0b4c207 ) 
             begin
                 trig <= 1'b1;
                 $display("Target");

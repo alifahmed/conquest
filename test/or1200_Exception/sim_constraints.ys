@@ -1,0 +1,96 @@
+(include "defines.ys")
+(assert (= int_pending_1   (bv-and (bv-and (bv-and (bv-and (bv-and (bv-and (bv-and sig_int_0 (bv-or (bv-extract 2 2 sr_0) (bv-and sr_we_0 (bv-extract 2 2 to_sr_0)))) id_pc_val_0) (bv-extract 2 2 delayed_iee_0)) (bv-not ex_freeze_0)) (bv-not ex_branch_taken_0)) (bv-not ex_dslot_0)) (bv-not (bv-and sr_we_0 (bv-not (bv-extract 2 2 to_sr_0))))))) ;9 BL
+(assert (= tick_pending_1   (bv-and (bv-and (bv-and (bv-and (bv-and (bv-and (bv-and sig_tick_0 (bv-or (bv-extract 1 1 sr_0) (bv-and sr_we_0 (bv-extract 1 1 to_sr_0)))) id_pc_val_0) (bv-extract 2 2 delayed_tee_0)) (bv-not ex_freeze_0)) (bv-not ex_branch_taken_0)) (bv-not ex_dslot_0)) (bv-not (bv-and sr_we_0 (bv-not (bv-extract 1 1 to_sr_0))))))) ;10 BL
+(assert (= trace_cond_1   (bv-and (bv-and (bv-not (bv-redor ex_freeze_0)) (bv-not (bv-redor ex_void_0))) (bv-or (bv-or 0b0 dmr1_st_0) (bv-and (bv-and (bv-not (bv-comp branch_op_0 0b000)) (bv-not (bv-comp branch_op_0 0b110))) dmr1_bt_0))))) ;16 BL
+(assert (= dmr1_bt_1   (ite (= ex_freeze_prev_0 0b1) dmr1_bt_prev_0 (bv-extract 23 23 du_dmr1_0)))) ;3 BL
+(assert (= dmr1_st_1   (ite (= ex_freeze_prev_0 0b1) dmr1_st_prev_0 (bv-extract 22 22 du_dmr1_0)))) ;2 BL
+(assert (= abort_ex_1   (bv-or (bv-or (bv-or (bv-or (bv-or sig_dbuserr_0 sig_dmmufault_0) sig_dtlbmiss_0) sig_align_0) sig_illegal_0) (bv-and (bv-and (bv-and (bv-or du_hwbkpt_0 trace_trap_0) ex_pc_val_0) (bv-not (bv-redor sr_ted_0))) (bv-not (bv-redor dsr_te_0)))))) ;13 BL
+(assert (= abort_mvspr_1   (bv-or sig_illegal_0 (bv-and (bv-and (bv-and (bv-or du_hwbkpt_0 trace_trap_0) ex_pc_val_0) (bv-not (bv-redor sr_ted_0))) (bv-not (bv-redor dsr_te_0)))))) ;14 BL
+(assert (= dsr_te_1   (ite (= ex_freeze_prev_0 0b1) dsr_te_prev_0 (bv-extract 13 13 du_dsr_0)))) ;0 BL
+(assert (= fp_pending_1   (bv-and (bv-and (bv-and (bv-and sig_fp_0 fpcsr_fpee_0) (bv-not ex_freeze_0)) (bv-not ex_branch_taken_0)) (bv-not ex_dslot_0)))) ;11 BL
+(assert (= range_pending_1   (bv-and (bv-and (bv-and (bv-and sig_range_0 (bv-extract 12 12 sr_0)) (bv-not ex_freeze_0)) (bv-not ex_branch_taken_0)) (bv-not ex_dslot_0)))) ;12 BL
+(assert (= except_trig_1   (bv-concat (bv-and (bv-extract 1 1 ex_exceptflags_0) (bv-not (bv-extract 9 9 du_dsr_0))) (bv-and (bv-extract 0 0 ex_exceptflags_0) (bv-not (bv-extract 3 3 du_dsr_0))) (bv-and (bv-extract 2 2 ex_exceptflags_0) (bv-not (bv-extract 1 1 du_dsr_0))) (bv-and sig_illegal_0 (bv-not (bv-extract 6 6 du_dsr_0))) (bv-and sig_align_0 (bv-not (bv-extract 5 5 du_dsr_0))) (bv-and sig_dtlbmiss_0 (bv-not (bv-extract 8 8 du_dsr_0))) (bv-and sig_trap_0 (bv-not (bv-extract 13 13 du_dsr_0))) (bv-and (bv-and sig_syscall_0 (bv-not (bv-extract 11 11 du_dsr_0))) (bv-not ex_freeze_0)) (bv-and sig_dmmufault_0 (bv-not (bv-extract 2 2 du_dsr_0))) (bv-and sig_dbuserr_0 (bv-not (bv-extract 1 1 du_dsr_0))) (bv-and range_pending_1 (bv-not (bv-extract 10 10 du_dsr_0))) (bv-and fp_pending_1 (bv-not (bv-extract 12 12 du_dsr_0))) (bv-and int_pending_1 (bv-not (bv-extract 7 7 du_dsr_0))) (bv-and tick_pending_1 (bv-not (bv-extract 4 4 du_dsr_0)))))) ;5 BL
+(assert (= except_stop_1   (bv-concat (bv-and tick_pending_1 (bv-extract 4 4 du_dsr_0)) (bv-and int_pending_1 (bv-extract 7 7 du_dsr_0)) (bv-and (bv-extract 1 1 ex_exceptflags_0) (bv-extract 9 9 du_dsr_0)) (bv-and (bv-extract 0 0 ex_exceptflags_0) (bv-extract 3 3 du_dsr_0)) (bv-and (bv-extract 2 2 ex_exceptflags_0) (bv-extract 1 1 du_dsr_0)) (bv-and sig_illegal_0 (bv-extract 6 6 du_dsr_0)) (bv-and sig_align_0 (bv-extract 5 5 du_dsr_0)) (bv-and sig_dtlbmiss_0 (bv-extract 8 8 du_dsr_0)) (bv-and sig_dmmufault_0 (bv-extract 2 2 du_dsr_0)) (bv-and sig_dbuserr_0 (bv-extract 1 1 du_dsr_0)) (bv-and range_pending_1 (bv-extract 10 10 du_dsr_0)) (bv-and sig_trap_0 (bv-extract 13 13 du_dsr_0)) (bv-and fp_pending_1 (bv-extract 12 12 du_dsr_0)) (bv-and (bv-and sig_syscall_0 (bv-extract 11 11 du_dsr_0)) (bv-not ex_freeze_0))))) ;6 BL
+(assert (= sr_ted_1   (ite (= ex_freeze_prev_0 0b1) sr_ted_prev_0 (bv-extract 16 16 sr_0)))) ;1 BL
+(assert (= spr_dat_npc_1   (ite (= ex_void_0 0b1) id_pc_0 ex_pc_0))) ;4 BL
+(assert (= except_started_1   (bv-and extend_flush_0 except_start_0))) ;7 BL
+(assert (= except_flushpipe_1   (bv-and (bv-redor except_trig_1) (bv-not (bv-redor state_0))))) ;17 BL
+(assert (= except_start_1   (bv-and (bv-not (bv-comp except_type_0 0b0000)) extend_flush_0))) ;8 BL
+(assert (= spr_dat_ppc_1   wb_pc_0)) ;15 BL
+(assert (= trace_cond_2   (bv-and (bv-and (bv-not (bv-redor ex_freeze_0)) (bv-not (bv-redor ex_void_0))) (bv-or (bv-or 0b0 dmr1_st_1) (bv-and (bv-and (bv-not (bv-comp branch_op_0 0b000)) (bv-not (bv-comp branch_op_0 0b110))) dmr1_bt_1))))) ;16 BL
+(assert (= state_1   0b000)) ;107 NB
+(assert (= except_type_1   0b0000)) ;108 NB
+(assert (= extend_flush_1   0b0)) ;109 NB
+(assert (= epcr_1   0b00000000000000000000000000000000)) ;110 NB
+(assert (= eear_1   0b00000000000000000000000000000000)) ;111 NB
+(assert (= esr_1   0b01000000000000001)) ;112 NB
+(assert (= extend_flush_last_1   0b0)) ;113 NB
+(assert (= dsx_1   0b0)) ;114 NB
+(assert (= wb_pc_1   0b00000000000000000000000000000000)) ;99 NB
+(assert (= dl_pc_1   0b00000000000000000000000000000000)) ;100 NB
+(assert (= ex_dslot_1   0b0)) ;68 NB
+(assert (= ex_pc_1   0b00000000000000000000000000000000)) ;69 NB
+(assert (= ex_pc_val_1   0b0)) ;70 NB
+(assert (= ex_exceptflags_1   0b000)) ;71 NB
+(assert (= delayed1_ex_dslot_1   0b0)) ;72 NB
+(assert (= delayed2_ex_dslot_1   0b0)) ;73 NB
+(assert (= delayed_tee_1   0b000)) ;61 NB
+(assert (= delayed_iee_1   0b000)) ;54 NB
+(assert (= id_pc_1   0b00000000000000000000000000000000)) ;40 NB
+(assert (= id_pc_val_1   0b0)) ;41 NB
+(assert (= id_exceptflags_1   0b000)) ;42 NB
+(assert (= ex_freeze_prev_1   0b0)) ;26 NB
+(assert (= sr_ted_prev_1   0b0)) ;27 NB
+(assert (= dsr_te_prev_1   0b0)) ;28 NB
+(assert (= dmr1_st_prev_1   0b0)) ;29 NB
+(assert (= dmr1_bt_prev_1   0b0)) ;30 NB
+(assert (= trace_trap_1   0b0)) ;20 NB
+
+;------------------------------------------------CLK 1-----------------------------------------------
+(assert (= trace_cond_3   (bv-and (bv-and (bv-not (bv-redor ex_freeze_1)) (bv-not (bv-redor ex_void_1))) (bv-or (bv-or 0b0 dmr1_st_1) (bv-and (bv-and (bv-not (bv-comp branch_op_1 0b000)) (bv-not (bv-comp branch_op_1 0b110))) dmr1_bt_1))))) ;16 BL
+(assert (= dmr1_st_2   (ite (= ex_freeze_prev_1 0b1) dmr1_st_prev_1 (bv-extract 22 22 du_dmr1_1)))) ;2 BL
+(assert (= dmr1_bt_2   (ite (= ex_freeze_prev_1 0b1) dmr1_bt_prev_1 (bv-extract 23 23 du_dmr1_1)))) ;3 BL
+(assert (= dsr_te_2   (ite (= ex_freeze_prev_1 0b1) dsr_te_prev_1 (bv-extract 13 13 du_dsr_1)))) ;0 BL
+(assert (= except_trig_2   (bv-concat (bv-and (bv-extract 1 1 ex_exceptflags_1) (bv-not (bv-extract 9 9 du_dsr_1))) (bv-and (bv-extract 0 0 ex_exceptflags_1) (bv-not (bv-extract 3 3 du_dsr_1))) (bv-and (bv-extract 2 2 ex_exceptflags_1) (bv-not (bv-extract 1 1 du_dsr_1))) (bv-and sig_illegal_1 (bv-not (bv-extract 6 6 du_dsr_1))) (bv-and sig_align_1 (bv-not (bv-extract 5 5 du_dsr_1))) (bv-and sig_dtlbmiss_1 (bv-not (bv-extract 8 8 du_dsr_1))) (bv-and sig_trap_1 (bv-not (bv-extract 13 13 du_dsr_1))) (bv-and (bv-and sig_syscall_1 (bv-not (bv-extract 11 11 du_dsr_1))) (bv-not ex_freeze_1)) (bv-and sig_dmmufault_1 (bv-not (bv-extract 2 2 du_dsr_1))) (bv-and sig_dbuserr_1 (bv-not (bv-extract 1 1 du_dsr_1))) (bv-and range_pending_1 (bv-not (bv-extract 10 10 du_dsr_1))) (bv-and fp_pending_1 (bv-not (bv-extract 12 12 du_dsr_1))) (bv-and int_pending_1 (bv-not (bv-extract 7 7 du_dsr_1))) (bv-and tick_pending_1 (bv-not (bv-extract 4 4 du_dsr_1)))))) ;5 BL
+(assert (= except_stop_2   (bv-concat (bv-and tick_pending_1 (bv-extract 4 4 du_dsr_1)) (bv-and int_pending_1 (bv-extract 7 7 du_dsr_1)) (bv-and (bv-extract 1 1 ex_exceptflags_1) (bv-extract 9 9 du_dsr_1)) (bv-and (bv-extract 0 0 ex_exceptflags_1) (bv-extract 3 3 du_dsr_1)) (bv-and (bv-extract 2 2 ex_exceptflags_1) (bv-extract 1 1 du_dsr_1)) (bv-and sig_illegal_1 (bv-extract 6 6 du_dsr_1)) (bv-and sig_align_1 (bv-extract 5 5 du_dsr_1)) (bv-and sig_dtlbmiss_1 (bv-extract 8 8 du_dsr_1)) (bv-and sig_dmmufault_1 (bv-extract 2 2 du_dsr_1)) (bv-and sig_dbuserr_1 (bv-extract 1 1 du_dsr_1)) (bv-and range_pending_1 (bv-extract 10 10 du_dsr_1)) (bv-and sig_trap_1 (bv-extract 13 13 du_dsr_1)) (bv-and fp_pending_1 (bv-extract 12 12 du_dsr_1)) (bv-and (bv-and sig_syscall_1 (bv-extract 11 11 du_dsr_1)) (bv-not ex_freeze_1))))) ;6 BL
+(assert (= int_pending_2   (bv-and (bv-and (bv-and (bv-and (bv-and (bv-and (bv-and sig_int_1 (bv-or (bv-extract 2 2 sr_1) (bv-and sr_we_1 (bv-extract 2 2 to_sr_1)))) id_pc_val_1) (bv-extract 2 2 delayed_iee_1)) (bv-not ex_freeze_1)) (bv-not ex_branch_taken_1)) (bv-not ex_dslot_1)) (bv-not (bv-and sr_we_1 (bv-not (bv-extract 2 2 to_sr_1))))))) ;9 BL
+(assert (= tick_pending_2   (bv-and (bv-and (bv-and (bv-and (bv-and (bv-and (bv-and sig_tick_1 (bv-or (bv-extract 1 1 sr_1) (bv-and sr_we_1 (bv-extract 1 1 to_sr_1)))) id_pc_val_1) (bv-extract 2 2 delayed_tee_1)) (bv-not ex_freeze_1)) (bv-not ex_branch_taken_1)) (bv-not ex_dslot_1)) (bv-not (bv-and sr_we_1 (bv-not (bv-extract 1 1 to_sr_1))))))) ;10 BL
+(assert (= fp_pending_2   (bv-and (bv-and (bv-and (bv-and sig_fp_1 fpcsr_fpee_1) (bv-not ex_freeze_1)) (bv-not ex_branch_taken_1)) (bv-not ex_dslot_1)))) ;11 BL
+(assert (= range_pending_2   (bv-and (bv-and (bv-and (bv-and sig_range_1 (bv-extract 12 12 sr_1)) (bv-not ex_freeze_1)) (bv-not ex_branch_taken_1)) (bv-not ex_dslot_1)))) ;12 BL
+(assert (= spr_dat_npc_2   (ite (= ex_void_1 0b1) id_pc_1 ex_pc_1))) ;4 BL
+(assert (= abort_ex_2   (bv-or (bv-or (bv-or (bv-or (bv-or sig_dbuserr_1 sig_dmmufault_1) sig_dtlbmiss_1) sig_align_1) sig_illegal_1) (bv-and (bv-and (bv-and (bv-or du_hwbkpt_1 trace_trap_1) ex_pc_val_1) (bv-not (bv-redor sr_ted_1))) (bv-not (bv-redor dsr_te_2)))))) ;13 BL
+(assert (= abort_mvspr_2   (bv-or sig_illegal_1 (bv-and (bv-and (bv-and (bv-or du_hwbkpt_1 trace_trap_1) ex_pc_val_1) (bv-not (bv-redor sr_ted_1))) (bv-not (bv-redor dsr_te_2)))))) ;14 BL
+(assert (= sr_ted_2   (ite (= ex_freeze_prev_1 0b1) sr_ted_prev_1 (bv-extract 16 16 sr_1)))) ;1 BL
+(assert (= trace_cond_4   (bv-and (bv-and (bv-not (bv-redor ex_freeze_1)) (bv-not (bv-redor ex_void_1))) (bv-or (bv-or 0b0 dmr1_st_2) (bv-and (bv-and (bv-not (bv-comp branch_op_1 0b000)) (bv-not (bv-comp branch_op_1 0b110))) dmr1_bt_2))))) ;16 BL
+(assert (= except_flushpipe_2   (bv-and (bv-redor except_trig_2) (bv-not (bv-redor state_1))))) ;17 BL
+(assert (= (bv-not (bv-redor (bv-and trace_trap_1 (bv-not (bv-redor ex_pc_val_1)))))   0b1)) ;21 BR
+(assert (= trace_trap_2   (bv-and (bv-and trace_cond_4 (bv-not (bv-redor dsr_te_2))) (bv-not (bv-redor sr_ted_2))))) ;23 NB
+(assert (= ex_freeze_prev_2   ex_freeze_1)) ;31 NB
+(assert (= (bv-or (bv-not (bv-redor ex_freeze_prev_1)) ex_void_1)   0b1)) ;32 BR
+(assert (= sr_ted_prev_2   (bv-extract 16 16 sr_1))) ;34 NB
+(assert (= dsr_te_prev_2   (bv-extract 13 13 du_dsr_1))) ;35 NB
+(assert (= dmr1_st_prev_2   (bv-extract 22 22 du_dmr1_1))) ;36 NB
+(assert (= dmr1_bt_prev_2   (bv-extract 23 23 du_dmr1_1))) ;37 NB
+(assert (= id_flushpipe_1   0b0)) ;44 BR
+(assert (= (bv-not (bv-redor id_freeze_1))   0b0)) ;48 BR
+(assert (= (bv-not (bv-redor (bv-extract 2 2 sr_1)))   0b1)) ;55 BR
+(assert (= delayed_iee_2   0b000)) ;57 NB
+(assert (= (bv-not (bv-redor (bv-extract 1 1 sr_1)))   0b0)) ;63 BR
+(assert (= delayed_tee_2   (bv-concat (bv-extract 1 0 delayed_tee_1) 0b1))) ;65 NB
+(assert (= ex_flushpipe_1   0b0)) ;75 BR
+(assert (= (bv-and (bv-not (bv-redor ex_freeze_1)) id_freeze_1)   0b1)) ;81 BR
+(assert (= ex_dslot_2   0b0)) ;83 NB
+(assert (= ex_pc_2   id_pc_1)) ;84 NB
+(assert (= ex_pc_val_2   id_pc_val_1)) ;85 NB
+(assert (= ex_exceptflags_2   0b000)) ;86 NB
+(assert (= delayed1_ex_dslot_2   ex_dslot_1)) ;87 NB
+(assert (= delayed2_ex_dslot_2   delayed1_ex_dslot_1)) ;88 NB
+(assert (= (bv-not (bv-redor wb_freeze_1))   0b1)) ;101 BR
+(assert (= wb_pc_2   ex_pc_1)) ;103 NB
+(assert (= dl_pc_2   wb_pc_1)) ;104 NB
+(assert (= state_1   0b000)) ;115 CS
+(assert (= except_flushpipe_2   0b0)) ;117 BR
+(assert (= pc_we_1   0b1)) ;200 BR
+(assert (= state_2   0b001)) ;202 NB
+(assert (= extend_flush_2   0b1)) ;203 NB
+(check)

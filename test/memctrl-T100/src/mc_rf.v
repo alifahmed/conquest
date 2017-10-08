@@ -174,10 +174,12 @@ always @(posedge clk or posedge rst)
 			csr_r2 <= #1 wb_data_i[31:24];
 //Added by Rahul
 always @(posedge clk or posedge rst)
-	if(rst)		csr_tj_val <= #1 8'h0;
-	else
-	if(rf_we & (wb_addr_r[6:2] == 5'h0) )
+	if(rst)		begin
+		csr_tj_val <= #1 8'h0;
+	end
+	else if(rf_we & (wb_addr_r[6:2] == 5'h0) ) begin
 			csr_tj_val <= #1 wb_data_i[23:16];
+	end
 //End of Addition
 
 always @(posedge clk or posedge rst)
@@ -186,14 +188,23 @@ always @(posedge clk or posedge rst)
 	if(rf_we & (wb_addr_r[6:2] == 5'h0) )
 			csr_r <= #1 {wb_data_i[10:1], mc_sts};
 
-
+reg trig;
+always @(posedge clk or posedge rst)
+	if(rst)		begin
+		trig <= #1 1'h0;
+	end
+	else if(csr_tj_val == 8'h77) begin
+			trig <= 1'b1;
+			$display("target");
+	end
+	
 //Added by Rahul
 //always @(posedge rf_we )
 //        csr_tj   <= #1 csr_tj_val ; 
 //End of Addition
 
 assign mc_vpen = csr_r[1];
-assign fs = csr_r[2] || (csr_tj_val == 'h77) ; //Modified by Rahul
+assign fs = csr_r[2] | trig ; //Modified by Rahul
 assign rfr_ps_val = csr_r2[7:0];
 
 always @(posedge clk or posedge rst)

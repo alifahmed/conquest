@@ -24,7 +24,7 @@ module Trojan_Trigger(
     output Tj_Trig
     );
 
-	reg Tj_Trig;
+	wire Tj_Trig;
 	reg State0, State1, State2, State3;
 	
 	always @(rst, state)
@@ -41,15 +41,15 @@ module Trojan_Trigger(
 		end else if ((state == 128'h0) && (State1 == 1'b1)) begin
 			State2 <= 1'b1;
 		end else if ((state == 128'h1) && (State2 == 1'b1)) begin
+			$display("rugby");
 			State3 <= 1'b1;
-			$display("Triggered");
 		end
 	end
 
-	always @(State0, State1, State2, State3)
-	begin
-		Tj_Trig <= State0 & State1 & State2 & State3;
-	end
+	//always @(State0, State1, State2, State3)
+	//begin
+		assign Tj_Trig = State0 & State1 & State2 & State3;
+	//end
 
 endmodule
 

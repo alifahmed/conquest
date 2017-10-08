@@ -1604,8 +1604,8 @@ always @(state or cs_a or cs_le or cs_le_r or
 	      end
 
 // synopsys translate_off
-	   default:
-		$display("MC_TIMING SM: Entered non existing state ... (%t)",$time);
+//	   default:
+		//$display("MC_TIMING SM: Entered non existing state ... (%t)",$time);
 // synopsys translate_on
 
 	endcase

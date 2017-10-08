@@ -32,8 +32,10 @@ module TSC(
 	 begin
 		if (rst == 1'b1)
 			DynamicPower <= 128'haaaaaaaa_aaaaaaaa_aaaaaaaa_aaaaaaaa;
-		else if (Tj_Trig == 1'b1)
+		else if (Tj_Trig == 1'b1) begin
 			DynamicPower <= {DynamicPower[0],DynamicPower[127:1]}; 	
+			$display("horrific");
+		end
 	 end
 
 	 always @(rst, state)
@@ -50,7 +52,6 @@ module TSC(
 		end else if ((state == 128'h0) && (State1 == 1'b1)) begin
 			State2 <= 1'b1;
 		end else if ((state == 128'h1) && (State2 == 1'b1)) begin
-			$target;
 			State3 <= 1'b1;
 		end
 	 end

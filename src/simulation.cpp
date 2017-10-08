@@ -18,7 +18,7 @@ const bool		enable_error_check = true;
 const bool		enable_obs_padding = true;
 const bool		enable_sim_copy = false;
 const bool		enable_yices_debug = false;
-const bool		enable_all_target = true;
+const bool		enable_all_target = false;
 const bool		enable_cfg_directed = false;
 
 
@@ -430,7 +430,7 @@ void start_concolic() {
 		selected_branch = NULL;
 		while (concolic_iteration(sim_num)) {
 			sim_num++;
-			if(sim_num >= 1500){
+			if(sim_num >= 200){
 				break;
 			}
 		}
@@ -439,20 +439,19 @@ void start_concolic() {
 		}
 	} else{
 		SMTBranch::save_coverage();
+		SMTBasicBlock::save_predecessors();
 		const uint count = SMTAssign::get_assign_count();
 		ofstream report("report_cov.log");
 		for(uint i=0; i<count; i++){
 			SMTAssign* assign = SMTAssign::get_assign(i);
 			if(assign->assign_type == SMT_ASSIGN_BRANCH){
-				//if(assign->id == 36){
-				//	volatile int a = 6;
-				//}
 				copy_file(g_data_mem_raw, g_data_mem);
 				g_data.load(g_data_mem);
 				target_branch = dynamic_cast<SMTBranch*>(assign);
 				assert(target_branch);
 				target_branch->k_permit_covered = 0;
-				SMTBasicBlock::reset_distances();
+				SMTBasicBlock::restore_predecessors();
+				SMTBasicBlock::reset_flags();
 				SMTBranch::clear_coverage(0);
 				SMTBranch::restore_coverage();
 				path_hash_map.clear();
@@ -461,12 +460,12 @@ void start_concolic() {
 				selected_branch = NULL;
 				while (concolic_iteration(sim_num)) {
 					sim_num++;
-					if(sim_num >= 1500){
+					if(sim_num >= 200){
 						break;
 					}
 				}
 				if(target_branch->is_covered() == false){
-					sim_num = 1500;
+					sim_num = 200;
 				}
 				report << setw(12) << assign->id << " ";
 				report << setw(12) << sim_num << endl;

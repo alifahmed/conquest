@@ -132,6 +132,10 @@ term_t SMTString::eval_term(SMTClkType clk) {
 	return NULL_TERM;
 }
 
+SMTExpr* SMTString::get_expanded() {
+	return this;
+}
+
 //----------------------------SMT Unspecified-----------------------------------
 SMTUnspecified::SMTUnspecified() : SMTExpr(SMT_EXPR_UNSPECIFIED){
 }
@@ -145,6 +149,10 @@ term_t SMTUnspecified::eval_term(SMTClkType clk) {
 	yices_term = NULL_TERM;
 	is_term_eval_needed = false;
 	return NULL_TERM;
+}
+
+SMTExpr* SMTUnspecified::get_expanded() {
+	return this;
 }
 
 
@@ -197,6 +205,15 @@ term_t SMTConcat::eval_term(SMTClkType clk) {
 	return yices_term;
 }
 
+SMTExpr* SMTConcat::get_expanded() {
+	SMTConcat* expr = new SMTConcat();
+	expr->repeat = repeat;
+	for(auto it:expr_list){
+		expr->expr_list.push_back(it->get_expanded());
+	}
+	return expr;
+}
+
 
 //-----------------------------SMT Cust-----------------------------------------
 SMTCust::SMTCust(std::string _operand) : SMTExpr(SMT_EXPR_CUSTOM){
@@ -245,6 +262,14 @@ term_t SMTCust::eval_term(SMTClkType clk) {
 		}
 	}
 	return yices_term;
+}
+
+SMTExpr* SMTCust::get_expanded() {
+	SMTCust* expr = new SMTCust(operand);
+	for(auto it:expr_list){
+		expr->expr_list.push_back(it->get_expanded());
+	}
+	return expr;
 }
 
 //-----------------------------SMT Unary----------------------------------------
@@ -331,6 +356,14 @@ term_t SMTUnary::eval_term(SMTClkType clk) {
 		}
 	}
 	return yices_term;
+}
+
+SMTExpr* SMTUnary::get_expanded() {
+	SMTUnary* expr = new SMTUnary();
+	expr->opcode = opcode;
+	expr->func = func;
+	expr->expr_list.push_back(expr_list[0]->get_expanded());
+	return expr;
 }
 
 
@@ -499,6 +532,16 @@ term_t SMTBinary::eval_term(SMTClkType clk) {
 	return yices_term;
 }
 
+SMTExpr* SMTBinary::get_expanded() {
+	SMTBinary* expr = new SMTBinary();
+	expr->opcode = opcode;
+	expr->func = func;
+	expr->is_signed = is_signed;
+	expr->expr_list.push_back(expr_list[0]->get_expanded());
+	expr->expr_list.push_back(expr_list[1]->get_expanded());
+	return expr;
+}
+
 
 //----------------------------SMT Logic-----------------------------------------
 SMTLogic::SMTLogic() : SMTExpr(SMT_EXPR_LOGIC) {
@@ -553,7 +596,6 @@ void SMTLogic::print(std::stringstream& ss) {
 	//info("SMTLogic used. Implement invert inheritance to improve perf");
 	assert(expr_list.size() == 2);
 	ss << "(" << get_opcode();
-	vector<SMTExpr*>::iterator it;
 	for(auto it:expr_list){
 		ss << " ";
 		it->print(ss);
@@ -567,6 +609,15 @@ term_t SMTLogic::eval_term(SMTClkType clk) {
 		is_term_eval_needed = expr_list[0]->is_term_eval_needed | expr_list[1]->is_term_eval_needed;
 	}
 	return yices_term;
+}
+
+SMTExpr* SMTLogic::get_expanded() {
+	SMTLogic* expr = new SMTLogic();
+	expr->opcode = opcode;
+	expr->func = func;
+	expr->expr_list.push_back(expr_list[0]->get_expanded());
+	expr->expr_list.push_back(expr_list[1]->get_expanded());
+	return expr;
 }
 
 
@@ -595,6 +646,13 @@ term_t SMTTernary::eval_term(SMTClkType clk) {
 	return yices_term;
 }
 
+SMTExpr* SMTTernary::get_expanded() {
+	SMTTernary* smt_ter = new SMTTernary();
+	smt_ter->expr_list.push_back(expr_list[0]->get_expanded());
+	smt_ter->expr_list.push_back(expr_list[1]->get_expanded());
+	smt_ter->expr_list.push_back(expr_list[2]->get_expanded());
+	return smt_ter;
+}
 
 
 //----------------------------SMT Assign----------------------------------------
@@ -609,7 +667,12 @@ SMTAssign::SMTAssign(SMTClkType _clk_type, SMTAssignType _assign_type,
 	assign_map.push_back(this);
 	process = SMTProcess::curr_proc;
 	assert(process);
-	is_first_time = true;
+	is_first_print = true;
+	is_first_print_exp = true;
+	expanded_rval = NULL;
+	expanded_lval = NULL;
+	expanded_term = NULL_TERM;
+	unexpanded_term = NULL_TERM;
 }
 
 void SMTAssign::init_assign() {
@@ -635,7 +698,17 @@ term_t SMTAssign::update_term() {
 }
 
 term_t SMTAssign::get_current_term() {
-	return yices_eq(lval->eval_term(SMT_CLK_CURR), rval->eval_term(SMT_CLK_CURR));
+	if(unexpanded_term == NULL_TERM){
+		unexpanded_term = yices_eq(lval->eval_term(SMT_CLK_CURR), rval->eval_term(SMT_CLK_CURR));
+	}
+	return unexpanded_term;
+}
+
+term_t SMTAssign::get_expanded_term() {
+	if(expanded_term == NULL_TERM){
+		expanded_term = yices_eq(get_expanded_lval()->eval_term(SMT_CLK_CURR), get_expanded_rval()->eval_term(SMT_CLK_CURR));
+	}
+	return expanded_term; 
 }
 
 bool SMTAssign::is_covered() {
@@ -643,8 +716,8 @@ bool SMTAssign::is_covered() {
 }
 
 std::string SMTAssign::print() {
-	if(is_first_time){
-		is_first_time = false;
+	if(is_first_print){
+		is_first_print = false;
 		ss << "(assert (= ";
 		lval->print(ss);
 		ss << "   ";
@@ -652,6 +725,38 @@ std::string SMTAssign::print() {
 		ss << ")) ;" << id << "\n";
 	}
 	return ss.str();
+}
+
+std::string SMTAssign::print_expanded() {
+	if(is_first_print_exp){
+		is_first_print_exp = false;
+		ss_exp << "(assert (= ";
+		get_expanded_lval()->print(ss_exp);
+		ss_exp << "   ";
+		get_expanded_rval()->print(ss_exp);
+		ss_exp << "));\n";
+	}
+	return ss_exp.str();
+}
+
+SMTExpr* SMTAssign::get_expanded_rval() {
+	//expand rval if not already expanded
+	if(!expanded_rval){
+		expanded_rval = rval->get_expanded();
+	}
+	return expanded_rval;
+}
+
+SMTExpr* SMTAssign::get_expanded_lval() {
+	//expand rval if not already expanded
+	if(!expanded_lval){
+		expanded_lval = lval->get_expanded();
+	}
+	return expanded_lval;
+}
+
+void SMTAssign::add_to_cont() {
+	get_lval_sig_core()->cont_assign = this;
 }
 
 void SMTAssign::set_covered(uint sim_num) {
@@ -735,7 +840,6 @@ void SMTAssign::print_coverage(std::ofstream& report) {
 	printf("[COVERED BRANCH] %u\n", covered_branch);
 }
 
-
 //------------------------SMT Blocking Assign-----------------------------------
 SMTBlockingAssign::SMTBlockingAssign(SMTExpr* lval, SMTExpr* rval) : 
 	SMTAssign(SMT_CLK_CURR, SMT_ASSIGN_BLOCKING, lval, rval, true){
@@ -818,6 +922,36 @@ void SMTBranch::get_state_variables(std::set<SMTSigCore*> &sigs, SMTExpr* expr) 
 void SMTBranch::update_edge() {
 	block->is_edge_updated = true;
 	set<SMTSigCore*> sigs;
+	get_state_variables(sigs, get_expanded_lval());
+	if(sigs.size()){
+		//delete all predecessor edges
+		block->predecessors.clear();
+		
+		//get expanded condition term
+		term_t cond_term = get_expanded_term();
+		
+		for(auto a_sig:sigs){
+			for(auto assign:a_sig->assignments){
+				//get assignment term
+				term_t assign_term = assign->get_current_term();
+				
+				//check if (c & p) is satisfiable
+				yices_reset_context(yices_context);
+				yices_assert_formula(yices_context, yices_and2(cond_term, assign_term));
+				if(yices_check_context(yices_context, NULL) == STATUS_SAT){
+					SMTBasicBlock* assign_bb = assign->block;
+					block->predecessors.insert(assign_bb);
+					assign_bb->update_edge();
+				}
+			}
+		}
+	}
+	else {
+		block->idom->update_edge();
+	}
+	
+	/*block->is_edge_updated = true;
+	set<SMTSigCore*> sigs;
 	get_state_variables(sigs, lval);
 	if(sigs.size()){
 		//delete all predecessor edges
@@ -846,7 +980,7 @@ void SMTBranch::update_edge() {
 	}
 	else{
 		block->idom->update_edge();
-	}
+	}*/
 }
 
 void SMTBranch::instrument() {
@@ -858,6 +992,7 @@ void SMTBranch::instrument() {
         return;
     }
 	fprintf(g_out, "%*c$display(\";A %u\");\t\t//%s", get_indent(), ' ', id, str.c_str());
+	//fprintf(g_out, "%*c//exp: %s", get_indent(), ' ', print_expanded().c_str());
 	conc_flush(g_out);
 }
 
@@ -933,33 +1068,6 @@ term_t SMTBranch::update_term() {
 	//printf("%s", print(clk_type).c_str());
 	yices_term = yices_eq(lval->eval_term(SMT_CLK_CURR), rval->eval_term(SMT_CLK_CURR));
 	return yices_term;
-}
-
-void SMTBranch::update_fsm() {
-	for(auto br:all_branches_list){
-		if(br->is_dep == false){
-			//check if lval is a signal
-			if(br->lval->type == SMT_EXPR_SIGNAL){
-				SMTSigCore* sig_core = dynamic_cast<SMTSignal*>(br->lval)->parent;
-				if(sig_core->is_state_variable){
-					//is a state variable. First clear the predecessors of this block
-					br->block->predecessors.clear();
-					
-					SMTNumber* value = dynamic_cast<SMTNumber*>(br->rval);
-					assert(value);
-					//check which assignments have same number
-					for(auto assign:sig_core->assignments){
-						SMTNumber* comp_value = dynamic_cast<SMTNumber*>(assign->rval);
-						assert(comp_value);
-						if(value->is_equal(comp_value)){
-							//found an assignment which matches the branch condition
-							br->block->predecessors.insert(assign->block);
-						}
-					}
-				}
-			}
-		}
-	}
 }
 
 //-------------------------SMT Branch Node--------------------------------------
@@ -1053,6 +1161,10 @@ bool SMTNumber::is_equal(SMTNumber* num) {
 	return (value_bin == num->value_bin);
 }
 
+SMTExpr* SMTNumber::get_expanded() {
+	return this;
+}
+
 //---------------------------SMT Signal Core------------------------------------
 std::unordered_map<ivl_signal_t, SMTSigCore*> SMTSigCore::sig_to_core_map;
 vector<SMTSigCore*> SMTSigCore::reg_list;
@@ -1078,6 +1190,7 @@ SMTSigCore::SMTSigCore(ivl_signal_t sig){
 		is_dep = true;
 		is_state_variable = false;
     }
+	cont_assign = NULL;
 	curr_version = 0;
     next_version = 0;
 	was_in_queue = false;
@@ -1199,6 +1312,15 @@ SMTSignal::SMTSignal() : SMTExpr(SMT_EXPR_SIGNAL) {
 SMTSignal::SMTSignal(ivl_signal_t sig) : SMTExpr(SMT_EXPR_SIGNAL) {
     parent = SMTSigCore::get_parent(sig);
     get_sig_msb_lsb(sig, &msb, &lsb);
+}
+
+SMTExpr* SMTSignal::get_expanded() {
+	if(parent->assignments.size() == 1){
+		return parent->assignments[0]->get_expanded_rval();
+	}
+	else{
+		return this;
+	}
 }
 
 void SMTSignal::print(std::stringstream& ss) {
@@ -1387,14 +1509,17 @@ void SMTBasicBlock::update_distance() {
 }
 
 void SMTBasicBlock::update_edge() {
-	if(assign_list.size()){
-		if(assign_list[0]->assign_type == SMT_ASSIGN_BRANCH){
-			SMTBranch* br = dynamic_cast<SMTBranch*>(assign_list[0]);
-			br->update_edge();
+	if(!is_edge_updated){
+		is_edge_updated = true;
+		if(assign_list.size()){
+			if(assign_list[0]->assign_type == SMT_ASSIGN_BRANCH){
+				SMTBranch* br = dynamic_cast<SMTBranch*>(assign_list[0]);
+				br->update_edge();
+			}
 		}
-	}
-	else if(idom){
-		idom->update_edge();
+		else if(idom){
+			idom->update_edge();
+		}
 	}
 }
 
@@ -1407,9 +1532,10 @@ void SMTBasicBlock::print_all(ofstream &out) {
     out << "*/\n\n";
 }
 
-void SMTBasicBlock::reset_distances() {
+void SMTBasicBlock::reset_flags() {
     for(auto it:block_list){
         it->distance = initial_distance;
+		it->is_edge_updated = false;
     }
 }
 
@@ -1427,6 +1553,18 @@ SMTBranch* SMTBasicBlock::get_target() {
 	SMTBranch* br = dynamic_cast<SMTBranch*>(target->assign_list[0]);
 	assert(br);
 	return br;
+}
+
+void SMTBasicBlock::save_predecessors() {
+	for(auto it:block_list){
+		it->saved_predecessors = it->predecessors;
+	}
+}
+
+void SMTBasicBlock::restore_predecessors() {
+	for(auto it:block_list){
+		it->predecessors = it->saved_predecessors;
+	}
 }
 
 //----------------------------SMT Globals---------------------------------------

@@ -18,7 +18,7 @@ wire	[31:0]			tmp_zeros = 32'h0;
 wire	[incN_center-1:0]	inc_next;
 
 always @(posedge clk)
-	out_r <= #1 inc_in[incN_center - 1:0] + {tmp_zeros[incN_center-2:0], 1'h1};
+	out_r <= #1 {1'b0, inc_in[incN_center - 1:0]} + {1'b0, tmp_zeros[incN_center-2:0], 1'h1};
 
 assign inc_out = {inc_in[incN_width-1:incN_center] + inc_next, out_r};
 
