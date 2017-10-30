@@ -1445,6 +1445,7 @@ void SMTProcess::make_circular() {
 uint SMTBasicBlock::id_counter = 0;
 SMTBasicBlock* SMTBasicBlock::target = NULL;
 std::vector<SMTBasicBlock*> SMTBasicBlock::block_list;
+std::set<SMTBasicBlock*> SMTBasicBlock::target_list;
 SMTBasicBlock::SMTBasicBlock() : id(id_counter) {
     id_counter++;
     block_list.push_back(this);
@@ -1540,10 +1541,11 @@ void SMTBasicBlock::reset_flags() {
 }
 
 void SMTBasicBlock::set_target(SMTBasicBlock* tgt) {
-	if(target){
+	if(target && !enable_multi_target){
 		error("More than one target specified");
 	}
 	target = tgt;
+	target_list.insert(tgt);
 }
 
 SMTBranch* SMTBasicBlock::get_target() {

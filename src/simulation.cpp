@@ -20,6 +20,7 @@ const bool		enable_sim_copy = false;
 const bool		enable_yices_debug = false;
 const bool		enable_all_target = false;
 const bool		enable_cfg_directed = false;
+const bool		enable_multi_target = true;
 
 
 static SMTBranch* target_branch = NULL;
@@ -419,25 +420,48 @@ static bool concolic_iteration(uint sim_num) {
 void start_concolic() {
     //freopen("/dev/null", "w", stderr);
 	init();
-	if(!enable_all_target){
-		target_branch = SMTBasicBlock::get_target();
-		target_branch->update_distance();
-		ofstream out("cfg_info.txt");
-		SMTBasicBlock::print_all(out);
-		SMTSigCore::print_state_variables(out);
-		out.close();
-		sim_num = 0;
-		selected_branch = NULL;
-		while (concolic_iteration(sim_num)) {
-			sim_num++;
-			if(sim_num >= 200){
-				break;
+	
+	if(enable_multi_target){
+		SMTBranch::save_coverage();
+		SMTBasicBlock::save_predecessors();
+		ofstream report("report_cov.log");
+		info("Total targets: %d", SMTBasicBlock::target_list.size());
+		uint iterations = 1;
+		for(auto it:SMTBasicBlock::target_list){
+			copy_file(g_data_mem_raw, g_data_mem);
+			g_data.load(g_data_mem);
+			target_branch = dynamic_cast<SMTBranch*>(it->assign_list[0]);
+			assert(target_branch);
+			target_branch->k_permit_covered = 0;
+			SMTBasicBlock::restore_predecessors();
+			SMTBasicBlock::reset_flags();
+			SMTBranch::clear_coverage(0);
+			SMTBranch::restore_coverage();
+			path_hash_map.clear();
+			target_branch->update_distance();
+			sim_num = 0;
+			selected_branch = NULL;
+			while (concolic_iteration(sim_num)) {
+				iterations++;
+				sim_num++;
+				if(sim_num >= 200){
+					break;
+				}
 			}
+			if(target_branch->is_covered() == false){
+				sim_num = 200;
+			}
+			report << setw(12) << it->assign_list[0]->id << " ";
+			report << setw(12) << sim_num << endl;
 		}
-		if(target_branch->is_covered() == false){
-			printf("Target not covered\n");
-		}
-	} else{
+		info("Total Iterations: %d", iterations);
+		report.close();
+		yices_free_context(yices_context);
+		yices_exit();
+		SMTFreeAll();
+		exit(0);
+	}
+	else if(enable_all_target){
 		SMTBranch::save_coverage();
 		SMTBasicBlock::save_predecessors();
 		const uint count = SMTAssign::get_assign_count();
@@ -476,6 +500,25 @@ void start_concolic() {
 		yices_exit();
 		SMTFreeAll();
 		exit(0);
+	}
+	else{
+		target_branch = SMTBasicBlock::get_target();
+		target_branch->update_distance();
+		ofstream out("cfg_info.txt");
+		SMTBasicBlock::print_all(out);
+		SMTSigCore::print_state_variables(out);
+		out.close();
+		sim_num = 0;
+		selected_branch = NULL;
+		while (concolic_iteration(sim_num)) {
+			sim_num++;
+			if(sim_num >= 200){
+				break;
+			}
+		}
+		if(target_branch->is_covered() == false){
+			printf("Target not covered\n");
+		}
 	}
 }
 

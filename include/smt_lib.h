@@ -467,11 +467,14 @@ public:
 	static void save_predecessors();
 	static void restore_predecessors();
 	
+	static std::set<SMTBasicBlock*> target_list;
+	
 private:
     void print_assigns(std::ofstream &out);
     static uint id_counter;
     static std::vector<SMTBasicBlock*> block_list;
 	std::set<SMTBasicBlock*> saved_predecessors;
 	const static uint initial_distance = 0xFFFFFFF;
+	
 	static SMTBasicBlock* target;
 };

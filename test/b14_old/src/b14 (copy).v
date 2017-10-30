@@ -1,3 +1,18 @@
+/*
+entity b14 is
+port (
+	clock,reset : in bit;
+	addr : out integer range 2**20 - 1 downto 0;
+	datai : in integer;
+	datao : out integer;
+	rd,wr : out bit
+	);
+end b14;
+
+architecture BEHAV of b14 is
+*/
+
+
 module b14 (
 	input clock,
 	input reset,
@@ -90,10 +105,8 @@ always@(posedge clock)
 					rx <= reg0;
 				2'b01:
 					rx <= reg1;
-				2'b10: begin
-					$display("target");
+				2'b10:
 					rx <= reg2;
-					end
 				2'b11:
 					rx <= reg3;
 			endcase
@@ -216,10 +229,8 @@ always@(posedge clock)
 				if(rx > 31'b111111111111111111111111111111)
 //					   rx = rx - 2**30;
 						rx = rx;
-				if ((rx < m) || ( B == 1'b1) ) begin
-						$display("target");
+				if ((rx < m) || ( B == 1'b1) )
 						B <= 1'b1;              
-					end
 				else
 						B <= 1'b0;
 				end
@@ -261,7 +272,6 @@ always@(posedge clock)
 				
 				//d = ((df == 3'b101 && B == 1'b0) || (df == 3'b100 && B == 1'b1)) ? 2'b11 : df[1:0];
 				if((df == 3'b101 && B == 1'b0) || (df == 3'b100 && B == 1'b1)) begin
-					$display("target");
 					d = 2'b11;
 				end
 				else begin
@@ -436,7 +446,6 @@ always@(posedge clock)
 					end
 					2'b10:
 					begin
-						$display("target");
 						addr <= tail + reg1[19:0];
 						rd <= 1'b1;
 						m = datai;
@@ -660,10 +669,8 @@ always@(posedge clock)
 					2'b11:
 					begin
 						t = {rx[29:0],1'b0};
-						if(t > 31'b111111111111111111111111111111) begin
-							$display("target");
+						if(t > 31'b111111111111111111111111111111) 
 							B <= 1'b1;
-						end
 						else
 							B <= 1'b0;
 					end
